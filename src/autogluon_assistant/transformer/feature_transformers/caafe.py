@@ -82,7 +82,7 @@ class CAAFETransformer(BaseFeatureTransformer):
             target_column_name,
         )
         logger.info("CAAFE generated features:")
-        logger.info("{self.caafe_clf.code}")
+        logger.info(self.caafe_clf.code)
 
     def _transform_dataframes(self, train_X: pd.DataFrame, test_X: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         transformed_train_X = run_llm_code(self.caafe_clf.code, train_X)
