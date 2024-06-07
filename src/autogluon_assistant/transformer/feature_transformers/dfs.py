@@ -121,12 +121,6 @@ class DFSTransformer(BaseFeatureTransformer):
             task = copy.deepcopy(task)
             task.train_data = transformed_train_data
             task.test_data = transformed_test_data
-            # left for debugging
-            save_dfs_data = True
-            if save_dfs_data:
-                comp_dir = "/Users/anidagar/Desktop/Work/autogluon-assistant/post_dfs"
-                transformed_train_data.to_csv(f"{comp_dir}/train_post_dfs.csv", index=False)
-                transformed_test_data.to_csv(f"{comp_dir}/test_post_dfs.csv", index=False)
         except:
             logger.warning(f"FeatureTransformer {self.__class__.__name__} failed to transform.")
         finally:
