@@ -95,11 +95,13 @@ class DFSTransformer(BaseFeatureTransformer):
             train_data = task.train_data
             test_data = task.test_data
 
-            # add dummy target column to test_data
-            test_data[self.target_column] = np.nan
+            # create a shallow copy of test_data
+            # and add dummy target column to it
+            test_data_w_dummy_target = test_data.copy()
+            test_data_w_dummy_target[self.target_column] = np.nan
 
             # concatenate both to create a single dataframe
-            all_data = pd.concat([train_data, test_data])
+            all_data = pd.concat([train_data, test_data_w_dummy_target])
 
             # run dfs transformer
             all_data_transformed = self._run_dfs(
@@ -112,7 +114,7 @@ class DFSTransformer(BaseFeatureTransformer):
             )
 
             # postprocess the data back to train and test
-            transformed_train_data, transformed_test_data = self._reorder_and_split_data(
+            transformed_train_data, transformed_test_data = DFSTransformer._reorder_and_split_data(
                 all_data_transformed, train_data
             )
             # drop fake target column from test data
@@ -174,13 +176,15 @@ class DFSTransformer(BaseFeatureTransformer):
     def _get_dtype_with_llm(self):
         raise NotImplementedError
 
-    def _get_time_column(self, column_name_types_map):
+    @staticmethod
+    def _get_time_column(column_name_types_map):
         for key, value in column_name_types_map.items():
             if value == "DateTime":
                 return key
         return None
 
-    def _reorder_columns(self, df_reference, df_to_reorder):
+    @staticmethod
+    def _reorder_columns(df_reference, df_to_reorder):
         """
         Reorder columns in df_to_reorder to match the order of columns in df_reference,
         with any additional columns in df_to_reorder placed after the ordered columns.
@@ -205,7 +209,8 @@ class DFSTransformer(BaseFeatureTransformer):
         df_reordered = df_to_reorder[new_order]
         return df_reordered
 
-    def _reorder_and_split_data(self, all_data, train_data):
+    @staticmethod
+    def _reorder_and_split_data(all_data, train_data):
         """
         Split the combined DataFrame back into train and test sets based on the original indices.
 
@@ -221,7 +226,7 @@ class DFSTransformer(BaseFeatureTransformer):
         pd.DataFrame, pd.DataFrame: Transformed training and testing DataFrames.
         """
         # reorder columns post dfs
-        all_data = self._reorder_columns(train_data, all_data)
+        all_data = DFSTransformer._reorder_columns(train_data, all_data)
 
         # split
         train_indices = len(train_data)
@@ -280,8 +285,7 @@ class DFSTransformer(BaseFeatureTransformer):
                 )
 
         path.mkdir(exist_ok=True, parents=True)
-        data_path = path / "data_train.pqt"
-        dataframe.to_parquet(data_path)
+        dataframe.to_parquet(path / "data_train.pqt")
         # The current DFS pipeline requires the DBB dataset to have a training,
         # validation, and test table, so we fake the latter two.
         dummy = dataframe.iloc[:0]
