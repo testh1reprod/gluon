@@ -9,10 +9,10 @@ import numpy as np
 import pandas as pd
 from autogluon.common.features.feature_metadata import FeatureMetadata
 from dbinfer_bench.dataset_meta import DBBColumnSchema, DBBRDBDatasetMeta, DBBTableSchema, DBBTaskMeta
-from dbinfer.device import get_device_info
-from dbinfer.preprocess.dfs.dfs_preprocess import DFSPreprocess, DFSPreprocessConfig
-from dbinfer.preprocess.transform_preprocess import RDBTransformPreprocess, RDBTransformPreprocessConfig
-from dbinfer.yaml_utils import load_pyd, save_pyd
+from tab2graph.device import get_device_info
+from tab2graph.preprocess.dfs.dfs_preprocess import DFSPreprocess, DFSPreprocessConfig
+from tab2graph.preprocess.transform_preprocess import RDBTransformPreprocess, RDBTransformPreprocessConfig
+from tab2graph.yaml_utils import load_pyd, save_pyd
 
 from autogluon_assistant.task import TabularPredictionTask
 
@@ -67,8 +67,9 @@ class DFSTransformer(BaseFeatureTransformer):
 
     identifier = "dfs"
 
-    def __init__(self, depth: int = 2, **kwargs) -> None:
+    def __init__(self, depth: int = 2, use_cat_vars_as_fks: bool = False, **kwargs) -> None:
         self.depth = depth
+        self.use_cat_vars_as_fks = use_cat_vars_as_fks
         self.metadata: Dict[str, Any] = {"transformer": "DFS"}
 
     def fit(self, task: TabularPredictionTask) -> "BaseFeatureTransformer":
@@ -91,47 +92,55 @@ class DFSTransformer(BaseFeatureTransformer):
             return self
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        try:
-            train_data = task.train_data
-            test_data = task.test_data
+        # try:
+        train_data = task.train_data
+        test_data = task.test_data
 
-            # create a shallow copy of test_data
-            # and add dummy target column to it
-            test_data_w_dummy_target = test_data.copy()
-            test_data_w_dummy_target[self.target_column] = np.nan
+        # create a shallow copy of test_data
+        # and add dummy target column to it
+        test_data_w_dummy_target = test_data.copy()
+        test_data_w_dummy_target[self.target_column] = np.nan
 
-            # concatenate both to create a single dataframe
-            all_data = pd.concat([train_data, test_data_w_dummy_target])
+        # concatenate both to create a single dataframe
+        all_data = pd.concat([train_data, test_data_w_dummy_target])
 
-            # run dfs transformer
-            all_data_transformed = self._run_dfs(
-                input_df=all_data,
-                df_name=task.name,
-                target_column=self.target_column,
-                time_column=self.time_column,
-                column_type_dict=self.column_type_dict,
-                depth=self.depth,
-            )
+        # run dfs transformer
+        all_data_transformed = self._run_dfs(
+            input_df=all_data,
+            df_name=task.name,
+            target_column=self.target_column,
+            time_column=self.time_column,
+            column_type_dict=self.column_type_dict,
+            depth=self.depth,
+            use_cat_vars_as_fks=self.use_cat_vars_as_fks,
+        )
 
-            # postprocess the data back to train and test
-            transformed_train_data, transformed_test_data = DFSTransformer._reorder_and_split_data(
-                all_data_transformed, train_data
-            )
-            # drop fake target column from test data
-            transformed_test_data = transformed_test_data.drop([self.target_column], axis="columns")
+        import pdb; pdb.set_trace()
+        # postprocess the data back to train and test
+        transformed_train_data, transformed_test_data = DFSTransformer._reorder_and_split_data(
+            all_data_transformed, train_data
+        )
+        # drop fake target column from test data
+        transformed_test_data = transformed_test_data.drop([self.target_column], axis="columns")
 
-            task = copy.deepcopy(task)
-            task.train_data = transformed_train_data
-            task.test_data = transformed_test_data
-        except:
-            logger.warning(f"FeatureTransformer {self.__class__.__name__} failed to transform.")
-        finally:
-            return task
+        task = copy.deepcopy(task)
+        task.train_data = transformed_train_data
+        task.test_data = transformed_test_data
+        # left for debugging
+        save_dfs_data = True
+        if save_dfs_data:
+            comp_dir = f"/Users/anidagar/Desktop/Work/autogluon-assistant/post_dfs/{task.name}"
+            transformed_train_data.to_csv(f"{comp_dir}/train_post_dfs.csv", index=False)
+            transformed_test_data.to_csv(f"{comp_dir}/test_post_dfs.csv", index=False)
+        # except:
+        #     logger.warning(f"FeatureTransformer {self.__class__.__name__} failed to transform.")
+        # finally:
+        #     return task
 
     def get_metadata(self) -> Mapping:
         return self.metadata
 
-    def _remap_column_dtypes(self, column_name_dtypes_map):
+    def _remap_column_dtypes(self, dataframe, column_name_dtypes_map):
         """
         Remaps AG inferred column dtypes to dbinfer specific type group string categories.
         """
@@ -139,7 +148,16 @@ class DFSTransformer(BaseFeatureTransformer):
         for column_name, dtype in column_name_dtypes_map.items():
             datatype_str = str(dtype)
             if "int" in datatype_str:
-                transformed_dict[column_name] = "Numerical_INT"
+                # Check the number of unique values in the integer column.
+                unique_count = dataframe[column_name].nunique()
+                # If the number of unique values is less than 20 (heuristic number assumption),
+                # consider it as categorical. This is because a low number of unique values
+                # suggests that the column likely represents a category or label rather
+                # than a continuous numerical value.
+                if unique_count < 5:
+                    transformed_dict[column_name] = "Categorical"
+                else:
+                    transformed_dict[column_name] = "Numerical_INT"
             elif "float" in datatype_str:
                 transformed_dict[column_name] = "Numerical_FLOAT"
             elif "text" in datatype_str:
@@ -170,7 +188,7 @@ class DFSTransformer(BaseFeatureTransformer):
         dict : A dictionary mapping column names to their inferred data types.
         """
         feature_metadata = FeatureMetadata.from_df(dataframe)
-        column_name_types_map = self._remap_column_dtypes(feature_metadata.to_dict())
+        column_name_types_map = self._remap_column_dtypes(dataframe, feature_metadata.to_dict())
         return column_name_types_map
 
     def _get_dtype_with_llm(self):
@@ -243,6 +261,7 @@ class DFSTransformer(BaseFeatureTransformer):
         time_column: str,
         column_type_dict: dict,
         path: Path,
+        use_cat_vars_as_fks: bool,
     ):
         """
         Converts a DataFrame to a DBInfer-Bench (DBB) dataset and saves it to the specified path.
@@ -264,11 +283,17 @@ class DFSTransformer(BaseFeatureTransformer):
             A dictionary mapping column names to their data types.
         path : Path
             The directory where the dataset will be saved.
+        use_cat_vars_as_fks: bool
+            If categorical variables should be treated as IDs for FKs.
         """
         column_type_dict = {k: v for k, v in column_type_dict.items() if v != "null"}
         column_config = []
+        if use_cat_vars_as_fks:
+            fk_list = ["ID", "Categorical"]
+        else:
+            fk_list = ["ID"]
         for k, v in column_type_dict.items():
-            if v == "ID":
+            if v in fk_list:
                 column_config.append(
                     {
                         "name": k,
@@ -351,7 +376,7 @@ class DFSTransformer(BaseFeatureTransformer):
                 "dfs": {
                     "max_depth": depth,
                     "use_cutoff_time": True,
-                    # "engine": "dfs2sql",  # dbinfer doesn't offer dfs2sql engine yet; use tab2graph instead
+                    "engine": "dfs2sql",  # dbinfer doesn't offer dfs2sql engine yet; use tab2graph instead
                 }
             }
         )
@@ -385,7 +410,7 @@ class DFSTransformer(BaseFeatureTransformer):
 
         preprocess.run(dataset, output_path, device)
 
-    def _run_dfs(self, input_df, df_name, target_column, time_column, column_type_dict, depth):
+    def _run_dfs(self, input_df, df_name, target_column, time_column, column_type_dict, depth, use_cat_vars_as_fks):
         """
         Runs the Deep Feature Synthesis transformation on the input DataFrame.
 
@@ -403,6 +428,8 @@ class DFSTransformer(BaseFeatureTransformer):
             A dictionary mapping column names to their data types.
         depth : int
             The depth of the DFS transformation.
+        use_cat_vars_as_fks: bool
+            If categorical variables should be treated as IDs for FKs.
 
         Returns:
         --------
@@ -416,6 +443,7 @@ class DFSTransformer(BaseFeatureTransformer):
             time_column,
             column_type_dict,
             Path("__workspace__/rdb"),
+            use_cat_vars_as_fks,
         )
         self._launch_pre_dfs(Path("__workspace__/rdb"), Path("__workspace__/pre_dfs"))
         self._launch_dfs(Path("__workspace__/pre_dfs"), Path("__workspace__/dfs"), depth)

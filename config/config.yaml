@@ -1,15 +1,16 @@
 infer_eval_metric: True
 feature_transformers:
-  - _target_: autogluon_assistant.transformer.CAAFETransformer
-    eval_model: lightgbm
-    llm_model: gpt-3.5-turbo
-    num_iterations: 2
-    optimization_metric: roc
-  - _target_: autogluon_assistant.transformer.OpenFETransformer
-    n_jobs: 1
-    num_features_to_keep: 10
+  # - _target_: autogluon_assistant.transformer.CAAFETransformer
+  #   eval_model: lightgbm
+  #   llm_model: gpt-3.5-turbo
+  #   num_iterations: 2
+  #   optimization_metric: roc
+  # - _target_: autogluon_assistant.transformer.OpenFETransformer
+  #   n_jobs: 1
+  #   num_features_to_keep: 10
   - _target_: autogluon_assistant.transformer.DFSTransformer
     depth: 2
+    use_cat_vars_as_fks: True
 autogluon:
   predictor_init_kwargs: {}
   predictor_fit_kwargs:
