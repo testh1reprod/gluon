@@ -9,10 +9,10 @@ import numpy as np
 import pandas as pd
 from autogluon.common.features.feature_metadata import FeatureMetadata
 from dbinfer_bench.dataset_meta import DBBColumnSchema, DBBRDBDatasetMeta, DBBTableSchema, DBBTaskMeta
-from tab2graph.device import get_device_info
-from tab2graph.preprocess.dfs.dfs_preprocess import DFSPreprocess, DFSPreprocessConfig
-from tab2graph.preprocess.transform_preprocess import RDBTransformPreprocess, RDBTransformPreprocessConfig
-from tab2graph.yaml_utils import load_pyd, save_pyd
+from dbinfer.device import get_device_info
+from dbinfer.preprocess.dfs.dfs_preprocess import DFSPreprocess, DFSPreprocessConfig
+from dbinfer.preprocess.transform_preprocess import RDBTransformPreprocess, RDBTransformPreprocessConfig
+from dbinfer.yaml_utils import load_pyd, save_pyd
 
 from autogluon_assistant.task import TabularPredictionTask
 
@@ -92,50 +92,43 @@ class DFSTransformer(BaseFeatureTransformer):
             return self
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        # try:
-        train_data = task.train_data
-        test_data = task.test_data
+        try:
+            train_data = task.train_data
+            test_data = task.test_data
 
-        # create a shallow copy of test_data
-        # and add dummy target column to it
-        test_data_w_dummy_target = test_data.copy()
-        test_data_w_dummy_target[self.target_column] = np.nan
+            # create a shallow copy of test_data
+            # and add dummy target column to it
+            test_data_w_dummy_target = test_data.copy()
+            test_data_w_dummy_target[self.target_column] = np.nan
 
-        # concatenate both to create a single dataframe
-        all_data = pd.concat([train_data, test_data_w_dummy_target])
+            # concatenate both to create a single dataframe
+            all_data = pd.concat([train_data, test_data_w_dummy_target])
 
-        # run dfs transformer
-        all_data_transformed = self._run_dfs(
-            input_df=all_data,
-            df_name=task.name,
-            target_column=self.target_column,
-            time_column=self.time_column,
-            column_type_dict=self.column_type_dict,
-            depth=self.depth,
-            use_cat_vars_as_fks=self.use_cat_vars_as_fks,
-        )
+            # run dfs transformer
+            all_data_transformed = self._run_dfs(
+                input_df=all_data,
+                df_name=task.name,
+                target_column=self.target_column,
+                time_column=self.time_column,
+                column_type_dict=self.column_type_dict,
+                depth=self.depth,
+                use_cat_vars_as_fks=self.use_cat_vars_as_fks,
+            )
 
-        import pdb; pdb.set_trace()
-        # postprocess the data back to train and test
-        transformed_train_data, transformed_test_data = DFSTransformer._reorder_and_split_data(
-            all_data_transformed, train_data
-        )
-        # drop fake target column from test data
-        transformed_test_data = transformed_test_data.drop([self.target_column], axis="columns")
+            # postprocess the data back to train and test
+            transformed_train_data, transformed_test_data = DFSTransformer._reorder_and_split_data(
+                all_data_transformed, train_data
+            )
+            # drop fake target column from test data
+            transformed_test_data = transformed_test_data.drop([self.target_column], axis="columns")
 
-        task = copy.deepcopy(task)
-        task.train_data = transformed_train_data
-        task.test_data = transformed_test_data
-        # left for debugging
-        save_dfs_data = True
-        if save_dfs_data:
-            comp_dir = f"/Users/anidagar/Desktop/Work/autogluon-assistant/post_dfs/{task.name}"
-            transformed_train_data.to_csv(f"{comp_dir}/train_post_dfs.csv", index=False)
-            transformed_test_data.to_csv(f"{comp_dir}/test_post_dfs.csv", index=False)
-        # except:
-        #     logger.warning(f"FeatureTransformer {self.__class__.__name__} failed to transform.")
-        # finally:
-        #     return task
+            task = copy.deepcopy(task)
+            task.train_data = transformed_train_data
+            task.test_data = transformed_test_data
+        except:
+            logger.warning(f"FeatureTransformer {self.__class__.__name__} failed to transform.")
+        finally:
+            return task
 
     def get_metadata(self) -> Mapping:
         return self.metadata
@@ -376,7 +369,7 @@ class DFSTransformer(BaseFeatureTransformer):
                 "dfs": {
                     "max_depth": depth,
                     "use_cutoff_time": True,
-                    "engine": "dfs2sql",  # dbinfer doesn't offer dfs2sql engine yet; use tab2graph instead
+                    # "engine": "dfs2sql",  # dbinfer doesn't offer dfs2sql engine yet; use tab2graph instead
                 }
             }
         )
