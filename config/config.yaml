@@ -15,6 +15,7 @@ autogluon:
     presets: best_quality 
     time_limit: 14400
     dynamic_stacking: False
+    num_stack_levels: 0
 llm:
   provider: openai
   api_key_location: OPENAI_API_KEY

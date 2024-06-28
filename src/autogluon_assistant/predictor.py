@@ -92,7 +92,13 @@ class AutogluonTabularPredictor(Predictor):
         logger.info(f"predictor_fit_kwargs: {predictor_fit_kwargs}")
 
         if predictor_fit_kwargs.get("dynamic_stacking", False):
-            predictor_fit_kwargs["num_stack_levels"] = 1
+            # Use config value for num_stack_levels
+            # Default 1 if dynamic_stacking is True
+            if predictor_fit_kwargs["num_stack_levels"] == 0:
+                predictor_fit_kwargs["num_stack_levels"] = 1
+            logger.info(
+                f"Dynamic stacking is enabled; setting num_stack_levels={predictor_fit_kwargs['num_stack_levels']}"
+            )
 
         self.metadata |= {
             "predictor_init_kwargs": predictor_init_kwargs,
