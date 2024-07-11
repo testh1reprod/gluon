@@ -10,7 +10,10 @@ feature_transformers:
     num_features_to_keep: 10
   - _target_: autogluon_assistant.transformer.DFSTransformer
     depth: 2
-    use_cat_vars_as_fks: True
+    max_fks: 10
+    categorical_var_cardinality_upper: 20
+    min_fk_cardinality: 2
+
 autogluon:
   predictor_init_kwargs: {}
   predictor_fit_kwargs:

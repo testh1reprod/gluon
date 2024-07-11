@@ -67,16 +67,18 @@ class DFSTransformer(BaseFeatureTransformer):
 
     identifier = "dfs"
 
-    def __init__(self, depth: int = 2, use_cat_vars_as_fks: bool = False, **kwargs) -> None:
+    def __init__(self, depth: int = 2, max_fks: int = 10, categorical_var_cardinality_upper: int = 20, min_fk_cardinality: int = 2, **kwargs) -> None:
         self.depth = depth
-        self.use_cat_vars_as_fks = use_cat_vars_as_fks
+        self.max_fks = max_fks
+        self.categorical_var_cardinality_upper = categorical_var_cardinality_upper
+        self.min_fk_cardinality = min_fk_cardinality
         self.metadata: Dict[str, Any] = {"transformer": "DFS"}
 
     def fit(self, task: TabularPredictionTask) -> "BaseFeatureTransformer":
         # No fitting process required for DFS transformer, only perform setup here
         try:
             self.id_column = task.test_id_column
-            self.column_type_dict = self._infer_column_types(task.train_data)
+            self.column_type_dict = self._infer_column_types(task.train_data, self.categorical_var_cardinality_upper)
             # Add ID Column to column_type_dict map
             self.column_type_dict[self.id_column] = "ID"
             self.time_column = self._get_time_column(self.column_type_dict)
@@ -112,7 +114,8 @@ class DFSTransformer(BaseFeatureTransformer):
                 time_column=self.time_column,
                 column_type_dict=self.column_type_dict,
                 depth=self.depth,
-                use_cat_vars_as_fks=self.use_cat_vars_as_fks,
+                max_fks=self.max_fks,
+                min_fk_cardinality=self.min_fk_cardinality,
             )
 
             # postprocess the data back to train and test
@@ -142,7 +145,7 @@ class DFSTransformer(BaseFeatureTransformer):
     def get_metadata(self) -> Mapping:
         return self.metadata
 
-    def _remap_column_dtypes(self, dataframe, column_name_dtypes_map):
+    def _remap_column_dtypes(self, dataframe, column_name_dtypes_map, categorical_var_upper):
         """
         Remaps AG inferred column dtypes to dbinfer specific type group string categories.
         """
@@ -156,7 +159,7 @@ class DFSTransformer(BaseFeatureTransformer):
                 # consider it as categorical. This is because a low number of unique values
                 # suggests that the column likely represents a category or label rather
                 # than a continuous numerical value.
-                if unique_count < 5:
+                if unique_count < categorical_var_upper:
                     transformed_dict[column_name] = "Categorical"
                 else:
                     transformed_dict[column_name] = "Numerical_INT"
@@ -172,7 +175,7 @@ class DFSTransformer(BaseFeatureTransformer):
                 transformed_dict[column_name] = "Other"
         return transformed_dict
 
-    def _infer_column_types(self, dataframe):
+    def _infer_column_types(self, dataframe, categorical_var_upper):
         """
         Infers the data types of the columns in the given DataFrame.
 
@@ -184,13 +187,15 @@ class DFSTransformer(BaseFeatureTransformer):
         -----------
         dataframe : pd.DataFrame
             The input DataFrame for which the column types are inferred.
+        categorical_var_upper: int
+            The upper limit for the number of unique values in a column to be considered as categorical.
 
         Returns:
         --------
         dict : A dictionary mapping column names to their inferred data types.
         """
         feature_metadata = FeatureMetadata.from_df(dataframe)
-        column_name_types_map = self._remap_column_dtypes(dataframe, feature_metadata.to_dict())
+        column_name_types_map = self._remap_column_dtypes(dataframe, feature_metadata.to_dict(), categorical_var_upper)
         return column_name_types_map
 
     def _get_dtype_with_llm(self):
@@ -263,7 +268,8 @@ class DFSTransformer(BaseFeatureTransformer):
         time_column: str,
         column_type_dict: dict,
         path: Path,
-        use_cat_vars_as_fks: bool,
+        max_fks: int,
+        min_fk_cardinality: int
     ):
         """
         Converts a DataFrame to a DBInfer-Bench (DBB) dataset and saves it to the specified path.
@@ -285,17 +291,18 @@ class DFSTransformer(BaseFeatureTransformer):
             A dictionary mapping column names to their data types.
         path : Path
             The directory where the dataset will be saved.
-        use_cat_vars_as_fks: bool
-            If categorical variables should be treated as IDs for FKs.
+        max_fks: int
+            Maximum number of FKs to be assinged. Limiting this number to avoid feature explosion.
+        min_fk_cardinality: int
+            Minimum cardinality for a column to be considered as a FK.
         """
         column_type_dict = {k: v for k, v in column_type_dict.items() if v != "null"}
         column_config = []
-        if use_cat_vars_as_fks:
-            fk_list = ["ID", "Categorical"]
-        else:
-            fk_list = ["ID"]
+        fk_list = ["ID", "Categorical"]
+        num_fks = 0
         for k, v in column_type_dict.items():
-            if v in fk_list:
+            if v in fk_list and k != target_column and num_fks <= max_fks and dataframe[k].nunique() > min_fk_cardinality:
+                num_fks += 1
                 column_config.append(
                     {
                         "name": k,
@@ -311,6 +318,7 @@ class DFSTransformer(BaseFeatureTransformer):
                     }
                 )
 
+        logging.info(f"DFS Schema Populated: {column_config}")
         path.mkdir(exist_ok=True, parents=True)
         dataframe.to_parquet(path / "data_train.pqt")
         # The current DFS pipeline requires the DBB dataset to have a training,
@@ -321,7 +329,7 @@ class DFSTransformer(BaseFeatureTransformer):
 
         column_schemas = [DBBColumnSchema.parse_obj(c) for c in column_config]
         table_schema = DBBTableSchema(
-            name=name,
+            name="data",
             source="data_train.pqt",
             format="parquet",
             columns=column_schemas,
@@ -334,7 +342,7 @@ class DFSTransformer(BaseFeatureTransformer):
             columns=column_schemas,
             time_column=time_column,
             target_column=target_column,
-            target_table=name,
+            target_table="data",
             # These two arguments are not relevant for the DFS.
             # However they are required by the existing dbinfer pipeline.
             # Therefore, we provide arbitrary placeholder values for these args.
@@ -412,7 +420,7 @@ class DFSTransformer(BaseFeatureTransformer):
 
         preprocess.run(dataset, output_path, device)
 
-    def _run_dfs(self, input_df, df_name, target_column, time_column, column_type_dict, depth, use_cat_vars_as_fks):
+    def _run_dfs(self, input_df, df_name, target_column, time_column, column_type_dict, depth, max_fks, min_fk_cardinality):
         """
         Runs the Deep Feature Synthesis transformation on the input DataFrame.
 
@@ -430,8 +438,10 @@ class DFSTransformer(BaseFeatureTransformer):
             A dictionary mapping column names to their data types.
         depth : int
             The depth of the DFS transformation.
-        use_cat_vars_as_fks: bool
-            If categorical variables should be treated as IDs for FKs.
+        max_fks: int
+            Maximum number of FKs to be assinged. Limiting this number to avoid feature explosion.
+        min_fk_cardinality: int
+            Minimum cardinality for a column to be considered as a FK.
 
         Returns:
         --------
@@ -445,7 +455,8 @@ class DFSTransformer(BaseFeatureTransformer):
             time_column,
             column_type_dict,
             Path("__workspace__/rdb"),
-            use_cat_vars_as_fks,
+            max_fks,
+            min_fk_cardinality
         )
         self._launch_pre_dfs(Path("__workspace__/rdb"), Path("__workspace__/pre_dfs"))
         self._launch_dfs(Path("__workspace__/pre_dfs"), Path("__workspace__/dfs"), depth)
