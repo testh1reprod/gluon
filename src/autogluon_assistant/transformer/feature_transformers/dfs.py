@@ -122,6 +122,15 @@ class DFSTransformer(BaseFeatureTransformer):
             # drop fake target column from test data
             transformed_test_data = transformed_test_data.drop([self.target_column], axis="columns")
 
+            # handle dbinfer mutation of the original column dtypes in the
+            # transformed dataframes, specifically int cols are turned into floats
+            # Overwrite the original columns in transformed df with the
+            # columns from df to retain their original dtypes
+            for col in train_data.columns:
+                transformed_train_data[col] = train_data[col].values
+            for col in test_data.columns:
+                transformed_test_data[col] = test_data[col].values
+
             task = copy.deepcopy(task)
             task.train_data = transformed_train_data
             task.test_data = transformed_test_data
