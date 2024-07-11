@@ -9,10 +9,10 @@ import numpy as np
 import pandas as pd
 from autogluon.common.features.feature_metadata import FeatureMetadata
 from dbinfer_bench.dataset_meta import DBBColumnSchema, DBBRDBDatasetMeta, DBBTableSchema, DBBTaskMeta
-from tab2graph.device import get_device_info
-from tab2graph.preprocess.dfs.dfs_preprocess import DFSPreprocess, DFSPreprocessConfig
-from tab2graph.preprocess.transform_preprocess import RDBTransformPreprocess, RDBTransformPreprocessConfig
-from tab2graph.yaml_utils import load_pyd, save_pyd
+from dbinfer.device import get_device_info
+from dbinfer.preprocess.dfs.dfs_preprocess import DFSPreprocess, DFSPreprocessConfig
+from dbinfer.preprocess.transform_preprocess import RDBTransformPreprocess, RDBTransformPreprocessConfig
+from dbinfer.yaml_utils import load_pyd, save_pyd
 
 from autogluon_assistant.task import TabularPredictionTask
 
@@ -386,7 +386,7 @@ class DFSTransformer(BaseFeatureTransformer):
                 "dfs": {
                     "max_depth": depth,
                     "use_cutoff_time": True,
-                    "engine": "dfs2sql",  # dbinfer doesn't offer dfs2sql engine yet; use tab2graph instead
+                    # "engine": "dfs2sql",  # dbinfer doesn't offer dfs2sql engine yet; use tab2graph instead
                 }
             }
         )
