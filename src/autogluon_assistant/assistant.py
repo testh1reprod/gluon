@@ -77,7 +77,9 @@ class TabularPredictionAssistant:
         )
         for transformer in task_preprocessors:
             try:
-                with timeout(seconds=60 * 60, error_message=f"Task preprocessing timed out: {transformer.name}"):
+                default_timeout_seconds = 60 * 60  # Default to 3600 if not provided
+                timeout_seconds = self.config.get('task_preprocessors_timeout', default_timeout_seconds)
+                with timeout(seconds=timeout_seconds, error_message=f"Task preprocessing timed out: {transformer.name}"):
                     task = transformer.fit_transform(task)
             except Exception as e:
                 self.handle_exception(f"Task preprocessing: {transformer.name}", e)

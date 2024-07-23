@@ -1,4 +1,5 @@
 infer_eval_metric: True
+task_preprocessors_timeout: 3600
 feature_transformers:
   - _target_: autogluon_assistant.transformer.CAAFETransformer
     eval_model: lightgbm
