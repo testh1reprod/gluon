@@ -164,7 +164,12 @@ class TabularPredictionTask:
     @property
     def label_column(self) -> Optional[str]:
         """Return the label column for the task."""
-        return self.metadata.get("label_column", self.output_columns[-1])
+        if "label_column" in self.metadata:
+            return self.metadata["label_column"]
+        else:
+            # should ideally never be called after LabelColumnInferenceTransformer has run
+            # `_infer_label_column_from_output_data` is the fallback when label_column is not found
+            return self._infer_label_column_from_output_data()
 
     @property
     def columns_in_train_but_not_test(self) -> List[str]:
@@ -187,6 +192,28 @@ class TabularPredictionTask:
         return self.metadata.get(
             "output_id_column", self.output_data.columns[0] if self.output_data is not None else None
         )
+
+    def _infer_label_column_from_output_data(self) -> Optional[str]:
+        # Assume the first output column is the ID column and ignore it
+        relevant_output_cols = self.output_columns[1:]
+
+        # Check if any of the output columns exist in the train data
+        existing_output_cols = [col for col in relevant_output_cols if col in self.train_data.columns]
+
+        # Case 1: If there's only one output column in the train data, use it
+        if len(existing_output_cols) == 1:
+            return existing_output_cols[0]
+
+        # Case 2: For example in multiclass problems, look for a column
+        #         whose unique values match or contain the output columns
+        output_set = set(col.lower() for col in relevant_output_cols)
+        for col in self.train_data.columns:
+            unique_values = set(str(val).lower() for val in self.train_data[col].unique() if pd.notna(val))
+            if output_set == unique_values or output_set.issubset(unique_values):
+                return col
+
+        # If no suitable column is found, raise an exception
+        raise ValueError("Unable to infer the label column. Please specify it manually.")
 
     def _find_problem_type_in_description(self) -> Optional[str]:
         """Find the problem type in the task description."""

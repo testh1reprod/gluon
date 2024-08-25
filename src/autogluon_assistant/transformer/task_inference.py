@@ -149,10 +149,10 @@ class LabelColumnInferenceTransformer(LLMParserTransformer):
             parser_output = self._chat_and_parse_prompt_output(composite_prompt, basic_system_prompt)
             task.metadata["label_column"] = parser_output["label_column"]
         except OutputParserException as e:
-            output_last_column = task.output_columns[-1]
-            if output_last_column in task.train_data.columns:
-                task.metadata["label_column"] = output_last_column
-            else:
+            # Use the fallback method to infer the label column
+            task.metadata["label_column"] = task._infer_label_column_from_output_data()
+            if not task.metadata["label_column"]:
+                # raise the error if the fallback logic returns an Empty/None value
                 raise e
 
         return task
