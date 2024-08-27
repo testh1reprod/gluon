@@ -1,13 +1,12 @@
-import os
-import pytest
-import pandas as pd
 from pathlib import Path
-from autogluon_assistant.transformer.task_inference import LabelColumnInferenceTransformer
-from autogluon_assistant.task import TabularPredictionTask, DatasetType
-from autogluon_assistant.llm import LLMFactory
-from hydra import compose, initialize
-from omegaconf import DictConfig, OmegaConf
 
+import pandas as pd
+import pytest
+from hydra import compose, initialize
+
+from autogluon_assistant.llm import LLMFactory
+from autogluon_assistant.task import DatasetType, TabularPredictionTask
+from autogluon_assistant.transformer.task_inference import LabelColumnInferenceTransformer
 
 _config_path = "../../../config"
 with initialize(version_base=None, config_path=_config_path):
@@ -18,30 +17,48 @@ _llm = LLMFactory.get_chat_model(config.llm)
 @pytest.fixture
 def toy_multiclass_data():
     # toy data below is formed from shelter_animal_data
-    train_data = pd.DataFrame({
-        "AnimalID": ["A671945", "A656520", "A686464", "A683430", "A667013"],
-        "Name": ["Hambone", "Emily", "Pearce", None, None],
-        "DateTime": ["2014-02-12 18:22:00", "2013-10-13 12:44:00", "2015-01-31 12:28:00", "2014-07-11 19:09:00", "2013-11-15 12:52:00"],
-        "OutcomeType": ["Return_to_owner", "Euthanasia", "Adoption", "Transfer", "Died"],
-        "OutcomeSubtype": [None, "Suffering", "Foster", "Partner", "Partner"],
-        "AnimalType": ["Dog", "Cat", "Dog", "Cat", "Dog"],
-    })
+    train_data = pd.DataFrame(
+        {
+            "AnimalID": ["A671945", "A656520", "A686464", "A683430", "A667013"],
+            "Name": ["Hambone", "Emily", "Pearce", None, None],
+            "DateTime": [
+                "2014-02-12 18:22:00",
+                "2013-10-13 12:44:00",
+                "2015-01-31 12:28:00",
+                "2014-07-11 19:09:00",
+                "2013-11-15 12:52:00",
+            ],
+            "OutcomeType": ["Return_to_owner", "Euthanasia", "Adoption", "Transfer", "Died"],
+            "OutcomeSubtype": [None, "Suffering", "Foster", "Partner", "Partner"],
+            "AnimalType": ["Dog", "Cat", "Dog", "Cat", "Dog"],
+        }
+    )
 
-    test_data = pd.DataFrame({
-        "ID": [1, 2, 3, 4, 5],
-        "Name": ["Summer", "Cheyenne", "Gus", "Pongo", "Skooter"],
-        "DateTime": ["2015-10-12 12:15:00", "2014-07-26 17:59:00", "2016-01-13 12:20:00", "2013-12-28 18:12:00", "2015-09-24 17:59:00"],
-        "AnimalType": ["Dog", "Dog", "Cat", "Dog", "Dog"],
-    })
+    test_data = pd.DataFrame(
+        {
+            "ID": [1, 2, 3, 4, 5],
+            "Name": ["Summer", "Cheyenne", "Gus", "Pongo", "Skooter"],
+            "DateTime": [
+                "2015-10-12 12:15:00",
+                "2014-07-26 17:59:00",
+                "2016-01-13 12:20:00",
+                "2013-12-28 18:12:00",
+                "2015-09-24 17:59:00",
+            ],
+            "AnimalType": ["Dog", "Dog", "Cat", "Dog", "Dog"],
+        }
+    )
 
-    sample_submission_data = pd.DataFrame({
-        "ID": [1, 2, 3, 4, 5],
-        "Adoption": [1, 1, 1, 1, 1],
-        "Died": [0, 0, 0, 0, 0],
-        "Euthanasia": [0, 0, 0, 0, 0],
-        "Return_to_owner": [0, 0, 0, 0, 0],
-        "Transfer": [0, 0, 0, 0, 0]
-    })
+    sample_submission_data = pd.DataFrame(
+        {
+            "ID": [1, 2, 3, 4, 5],
+            "Adoption": [1, 1, 1, 1, 1],
+            "Died": [0, 0, 0, 0, 0],
+            "Euthanasia": [0, 0, 0, 0, 0],
+            "Return_to_owner": [0, 0, 0, 0, 0],
+            "Transfer": [0, 0, 0, 0, 0],
+        }
+    )
 
     return train_data, test_data, sample_submission_data
 
@@ -78,5 +95,3 @@ def test_label_column_inference(toy_multiclass_data):
 
 if __name__ == "__main__":
     pytest.main()
-
-
