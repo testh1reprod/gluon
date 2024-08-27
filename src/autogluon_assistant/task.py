@@ -204,7 +204,7 @@ class TabularPredictionTask:
         if len(existing_output_cols) == 1:
             return existing_output_cols[0]
 
-        # Case 2: For example in multiclass problems, look for a column
+        # Case 2: For example in some multiclass problems, look for a column
         #         whose unique values match or contain the output columns
         output_set = set(col.lower() for col in relevant_output_cols)
         for col in self.train_data.columns:
