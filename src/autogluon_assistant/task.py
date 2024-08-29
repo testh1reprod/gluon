@@ -1,10 +1,13 @@
 """A task encapsulates the data for a data science task or project. It contains descriptions, data, metadata."""
 
+import os
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+import joblib
 import pandas as pd
+import s3fs
 from autogluon.tabular import TabularDataset
 
 
@@ -69,6 +72,27 @@ class TabularPredictionTask:
             return Path.read_text(first_path[0])
         except (FileNotFoundError, IndexError):
             return ""
+
+    @staticmethod
+    def save_artifacts(full_save_path, predictor, train_data, test_data, output_data):
+        # Prepare the dictionary with all artifacts
+        artifacts = {
+            "trained_model": predictor,  # AutoGluon TabularPredictor
+            "train_data": train_data,  # Pandas DataFrame
+            "test_data": test_data,  # Pandas DataFrame
+            "out_data": output_data,  # Pandas DataFrame
+        }
+
+        if full_save_path.startswith("s3://"):
+            # Using s3fs to save directly to S3
+            fs = s3fs.S3FileSystem()
+            with fs.open(full_save_path, "wb") as f:
+                joblib.dump(artifacts, f)
+        else:
+            # local path handling
+            os.makedirs(os.path.dirname(full_save_path), exist_ok=True)
+            with open(full_save_path, "wb") as f:
+                joblib.dump(artifacts, f)
 
     @classmethod
     def from_path(cls, task_path: Path, name: Optional[str] = None) -> "TabularPredictionTask":
