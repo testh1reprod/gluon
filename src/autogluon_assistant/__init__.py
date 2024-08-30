@@ -93,6 +93,14 @@ def run_assistant(
 
     rprint("[green]Predictor fit complete![/green]")
 
+    predictions = assistant.predict(task)
+
+    output_filename = f"aga-output-{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    with open(output_filename, "w") as fp:
+        make_prediction_outputs(task, predictions).to_csv(fp, index=False)
+
+    rprint(f"[green]Prediction complete! Outputs written to {output_filename}[/green]")
+
     if config.save_artifacts.enabled:
         # Determine the filename with or without timestamp
         pickle_file_name = f"{task.name}_artifacts.pkl"
@@ -106,13 +114,6 @@ def run_assistant(
 
         rprint(f"[green]Artifacts including transformed datasets and trained model saved at {full_save_path}[/green]")
 
-    predictions = assistant.predict(task)
-
-    output_filename = f"aga-output-{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv"
-    with open(output_filename, "w") as fp:
-        make_prediction_outputs(task, predictions).to_csv(fp, index=False)
-
-    rprint(f"[green]Prediction complete! Outputs written to {output_filename}[/green]")
     return output_filename
 
 
