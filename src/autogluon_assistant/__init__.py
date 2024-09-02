@@ -102,13 +102,13 @@ def run_assistant(
     rprint(f"[green]Prediction complete! Outputs written to {output_filename}[/green]")
 
     if config.save_artifacts.enabled:
-        # Determine the filename with or without timestamp
-        pickle_file_name = f"{task.name}_artifacts.pkl"
+        # Determine the artifacts_dir with or without timestamp
+        artifacts_dir_name = f"{task.name}_artifacts"
         if config.save_artifacts.append_timestamp:
             current_timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            pickle_file_name = f"{task.name}_artifacts_{current_timestamp}.pkl"
+            artifacts_dir_name = f"{task.name}_artifacts_{current_timestamp}"
 
-        full_save_path = f"{config.save_artifacts.path.rstrip('/')}/{pickle_file_name}"
+        full_save_path = f"{config.save_artifacts.path.rstrip('/')}/{artifacts_dir_name}"
 
         task.save_artifacts(full_save_path, assistant.predictor, task.train_data, task.test_data, task.output_data)
 

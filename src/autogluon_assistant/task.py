@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import joblib
+import shutil
 import pandas as pd
 import s3fs
 from autogluon.tabular import TabularDataset
@@ -83,16 +84,29 @@ class TabularPredictionTask:
             "out_data": output_data,  # Pandas DataFrame
         }
 
+        # Get the directory where the AG models are saved
+        ag_model_dir = predictor.predictor.path
+        full_save_path_pkl_file = f"{full_save_path}/artifacts.pkl"
         if full_save_path.startswith("s3://"):
             # Using s3fs to save directly to S3
             fs = s3fs.S3FileSystem()
-            with fs.open(full_save_path, "wb") as f:
+            with fs.open(full_save_path_pkl_file, "wb") as f:
                 joblib.dump(artifacts, f)
+
+            # Upload the ag model directory to the same S3 bucket
+            s3_model_dir = f"{full_save_path}/{os.path.dirname(ag_model_dir)}/{os.path.basename(ag_model_dir)}"
+            fs.put(ag_model_dir, s3_model_dir, recursive=True)
         else:
-            # local path handling
-            os.makedirs(os.path.dirname(full_save_path), exist_ok=True)
-            with open(full_save_path, "wb") as f:
+            # Local path handling
+            os.makedirs(full_save_path, exist_ok=True)
+
+            # Save the artifacts .pkl file locally
+            with open(full_save_path_pkl_file, "wb") as f:
                 joblib.dump(artifacts, f)
+
+            # Copy the model directory to the same location as the .pkl file
+            local_model_dir = os.path.join(full_save_path, ag_model_dir)
+            shutil.copytree(ag_model_dir, local_model_dir, dirs_exist_ok=True)
 
     @classmethod
     def from_path(cls, task_path: Path, name: Optional[str] = None) -> "TabularPredictionTask":
