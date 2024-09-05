@@ -7,6 +7,7 @@ import os
 import uuid
 import subprocess
 import glob
+from io import StringIO
 
 
 st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide")
@@ -198,27 +199,36 @@ def file_uploader():
     if 'uploaded_files' not in st.session_state:
         st.session_state.uploaded_files = {}
     if uploaded_files:
-        st.write("Uploaded Files:")
+        st.markdown('''
+            <style>
+                .stFileUploaderFile {display: none}
+            <style>''',
+                    unsafe_allow_html=True)
         for file in uploaded_files:
-            st.write(f"- {file.name}")
-            if file.type == 'text/csv':
-                # Check if the file is already in the session state
-                if file.name in st.session_state.uploaded_files:
-                    df = st.session_state.uploaded_files[file.name]
-                else:
+            if file.name not in st.session_state.uploaded_files.keys():
+                if file.type == 'text/csv':
                     df = pd.read_csv(file)
                     save_uploaded_file(file, user_data_dir)
                     st.session_state.uploaded_files[file.name] = df
+                elif file.type == 'text/plain':
+                    save_uploaded_file(file, user_data_dir)
+                    stringio = StringIO(file.getvalue().decode("utf-8"))
+                    st.session_state.uploaded_files[file.name] = stringio
+    if st.session_state.uploaded_files:
+        st.write("Uploaded Files:")
+        for file_name, file_contents in st.session_state.uploaded_files.items():
+            st.write(f"- {file_name}")
+            if file_name.endswith('.csv'):
+                df = file_contents
                 with st.expander("Show/Hide File Data"):
                     st.write(df.head())
-                # else:
-                    # st.warning(f"File '{file.name}' is already uploaded")
-            elif file.type == 'text/plain':
-                save_uploaded_file(file, user_data_dir)
+            elif file_name.endswith('.txt'):
+                with st.expander("Show/Hide File Data"):
+                    st.text_area(label=file_name,value=file_contents.getvalue(),label_visibility="collapsed")
 
     # Button to run AutoGluon Assistant
     if st.button("Run AutoGluon Assistant"):
-        if uploaded_files:
+        if st.session_state.uploaded_files:
             run_autogluon_assistant(CONFIG_DIR, user_data_dir)
         else:
             st.warning("Please upload files before running the task.")

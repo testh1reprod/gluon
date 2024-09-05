@@ -17,12 +17,16 @@ def preview_dataset():
         st.write("Preview of Uploaded Files:")
         file_names = list(uploaded_files.keys())
         selected_file = st.selectbox("Select a file to preview:", file_names)
-        gb = GridOptionsBuilder.from_dataframe(st.session_state.uploaded_files[selected_file])
-        gb.configure_pagination()
-        gridOptions = gb.build()
-        st.write(f"### Preview of '{selected_file}'")
-        AgGrid(st.session_state.uploaded_files[selected_file],gridOptions=gridOptions,enable_enterprise_modules=False)
-
+        if selected_file.endswith('.csv'):
+            gb = GridOptionsBuilder.from_dataframe(st.session_state.uploaded_files[selected_file])
+            gb.configure_pagination()
+            gridOptions = gb.build()
+            st.write(f"### Preview of '{selected_file}'")
+            AgGrid(st.session_state.uploaded_files[selected_file],gridOptions=gridOptions,enable_enterprise_modules=False)
+        elif selected_file.endswith('.txt'):
+            st.write(f"### Preview of '{selected_file}'")
+            file_content = st.session_state.uploaded_files[selected_file].getvalue()
+            st.text_area(label=selected_file, value=file_content, label_visibility="collapsed")
 
     else:
         st.write("No files uploaded. Please upload files on the Run Task page.")
