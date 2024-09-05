@@ -18,6 +18,8 @@ dependencies = [
     "caafe@git+https://github.com/gidler/CAAFE.git@main",
     "typer",
     "rich",
+    "s3fs",
+    "joblib",
 ]
 
 [project.optional-dependencies]

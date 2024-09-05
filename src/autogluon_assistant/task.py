@@ -1,10 +1,14 @@
 """A task encapsulates the data for a data science task or project. It contains descriptions, data, metadata."""
 
+import os
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+import joblib
+import shutil
 import pandas as pd
+import s3fs
 from autogluon.tabular import TabularDataset
 
 
@@ -69,6 +73,40 @@ class TabularPredictionTask:
             return Path.read_text(first_path[0])
         except (FileNotFoundError, IndexError):
             return ""
+
+    @staticmethod
+    def save_artifacts(full_save_path, predictor, train_data, test_data, output_data):
+        # Prepare the dictionary with all artifacts
+        artifacts = {
+            "trained_model": predictor,  # AutoGluon TabularPredictor
+            "train_data": train_data,  # Pandas DataFrame
+            "test_data": test_data,  # Pandas DataFrame
+            "out_data": output_data,  # Pandas DataFrame
+        }
+
+        # Get the directory where the AG models are saved
+        ag_model_dir = predictor.predictor.path
+        full_save_path_pkl_file = f"{full_save_path}/artifacts.pkl"
+        if full_save_path.startswith("s3://"):
+            # Using s3fs to save directly to S3
+            fs = s3fs.S3FileSystem()
+            with fs.open(full_save_path_pkl_file, "wb") as f:
+                joblib.dump(artifacts, f)
+
+            # Upload the ag model directory to the same S3 bucket
+            s3_model_dir = f"{full_save_path}/{os.path.dirname(ag_model_dir)}/{os.path.basename(ag_model_dir)}"
+            fs.put(ag_model_dir, s3_model_dir, recursive=True)
+        else:
+            # Local path handling
+            os.makedirs(full_save_path, exist_ok=True)
+
+            # Save the artifacts .pkl file locally
+            with open(full_save_path_pkl_file, "wb") as f:
+                joblib.dump(artifacts, f)
+
+            # Copy the model directory to the same location as the .pkl file
+            local_model_dir = os.path.join(full_save_path, ag_model_dir)
+            shutil.copytree(ag_model_dir, local_model_dir, dirs_exist_ok=True)
 
     @classmethod
     def from_path(cls, task_path: Path, name: Optional[str] = None) -> "TabularPredictionTask":
@@ -164,7 +202,12 @@ class TabularPredictionTask:
     @property
     def label_column(self) -> Optional[str]:
         """Return the label column for the task."""
-        return self.metadata.get("label_column", self.output_columns[-1])
+        if "label_column" in self.metadata:
+            return self.metadata["label_column"]
+        else:
+            # should ideally never be called after LabelColumnInferenceTransformer has run
+            # `_infer_label_column_from_output_data` is the fallback when label_column is not found
+            return self._infer_label_column_from_output_data()
 
     @property
     def columns_in_train_but_not_test(self) -> List[str]:
@@ -187,6 +230,28 @@ class TabularPredictionTask:
         return self.metadata.get(
             "output_id_column", self.output_data.columns[0] if self.output_data is not None else None
         )
+
+    def _infer_label_column_from_output_data(self) -> Optional[str]:
+        # Assume the first output column is the ID column and ignore it
+        relevant_output_cols = self.output_columns[1:]
+
+        # Check if any of the output columns exist in the train data
+        existing_output_cols = [col for col in relevant_output_cols if col in self.train_data.columns]
+
+        # Case 1: If there's only one output column in the train data, use it
+        if len(existing_output_cols) == 1:
+            return existing_output_cols[0]
+
+        # Case 2: For example in some multiclass problems, look for a column
+        #         whose unique values match or contain the output columns
+        output_set = set(col.lower() for col in relevant_output_cols)
+        for col in self.train_data.columns:
+            unique_values = set(str(val).lower() for val in self.train_data[col].unique() if pd.notna(val))
+            if output_set == unique_values or output_set.issubset(unique_values):
+                return col
+
+        # If no suitable column is found, raise an exception
+        raise ValueError("Unable to infer the label column. Please specify it manually.")
 
     def _find_problem_type_in_description(self) -> Optional[str]:
         """Find the problem type in the task description."""
