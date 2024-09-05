@@ -146,10 +146,14 @@ def get_user_data_dir():
 
     return st.session_state.user_data_dir
 
-def save_uploaded_file(uploaded_file, directory):
-    file_path = os.path.join(directory, uploaded_file.name)
-    with open(file_path, 'wb') as f:
-        f.write(uploaded_file.getbuffer())
+def save_uploaded_file(file, directory):
+    file_path = os.path.join(directory, file.name)
+    if file.type == 'text/csv':
+        with open(file_path, 'wb') as f:
+            f.write(file.getbuffer())
+    elif file.type == 'text/plain':
+        with open(file_path, "w") as f:
+            f.write(file.read().decode("utf-8"))
     return file_path
 
 # This function is to make sure click on the download button does not reload the entire app (a temporary workaround)
@@ -209,6 +213,9 @@ def file_uploader():
                     st.write(df.head())
                 # else:
                     # st.warning(f"File '{file.name}' is already uploaded")
+            elif file.type == 'text/plain':
+                save_uploaded_file(file, user_data_dir)
+
     # Button to run AutoGluon Assistant
     if st.button("Run AutoGluon Assistant"):
         if uploaded_files:

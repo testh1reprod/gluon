@@ -31,4 +31,4 @@ pip install -r requirements.txt
 ````
 streamlit run app.py
 ````
-5. The Autogluon Assistant Web UI should now be accessible in your web browser at `http://localhost:8501` in your web browser.
+5. The Autogluon Assistant Web UI should now be accessible in your web browser at `http://localhost:8501`
