@@ -12,7 +12,7 @@ if page == "Run Autogluon":
     st.switch_page("pages/task.py")
 
 def preview_dataset():
-    if 'uploaded_files' in st.session_state and  st.session_state.uploaded_files:
+    if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
         uploaded_files = st.session_state.uploaded_files
         st.write("Preview of Uploaded Files:")
         file_names = list(uploaded_files.keys())
@@ -27,7 +27,14 @@ def preview_dataset():
             st.write(f"### Preview of '{selected_file}'")
             file_content = st.session_state.uploaded_files[selected_file].getvalue()
             st.text_area(label=selected_file, value=file_content, label_visibility="collapsed")
-
+    if 'output_file' in st.session_state and st.session_state.output_file is not None:
+        output_file = st.session_state.output_file
+        output_filename = st.session_state.output_filename
+        gb = GridOptionsBuilder.from_dataframe(output_file)
+        gb.configure_pagination()
+        gridOptions = gb.build()
+        st.write(f"### Preview of '{output_filename}'")
+        AgGrid(output_file,gridOptions=gridOptions,enable_enterprise_modules=False)
     else:
         st.write("No files uploaded. Please upload files on the Run Task page.")
 

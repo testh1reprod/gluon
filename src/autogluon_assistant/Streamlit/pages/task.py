@@ -182,16 +182,30 @@ def run_autogluon_assistant(config_dir, data_dir):
         csv_files = glob.glob("*.csv")
         if csv_files:
             latest_csv = max(csv_files, key=os.path.getmtime)
+            latest_csv_name = os.path.basename(latest_csv)
             df = pd.read_csv(latest_csv)
-            st.write("Generated CSV file:")
-            st.dataframe(df)
-            show_download_button(df.to_csv(index=False),os.path.basename(latest_csv))
+            st.session_state.output_file = df
+            st.session_state.output_filename = latest_csv_name
         else:
             st.warning("No CSV file generated.")
     else:
         st.error("Task failed. Check the logs for more details.")
 
+def download_button():
+    if "output_file" not in st.session_state:
+        st.session_state.output_file = None
+    if "output_filename" not in st.session_state:
+        st.session_state.output_filename = None
+    if st.session_state.output_file is not None:
+        output_file = st.session_state.output_file
+        output_filename = st.session_state.output_filename
+        show_download_button(output_file.to_csv(index=False),output_filename)
 
+def generate_task_file(user_data_dir):
+    competition_files_path = os.path.join(user_data_dir, "task_files.txt")
+    csv_file_names = [file_name for file_name in st.session_state.uploaded_files.keys() if file_name.endswith(".csv")]
+    with open(competition_files_path, "w") as f:
+        f.write("\n".join(csv_file_names))
 
 def file_uploader():
     uploaded_files = st.file_uploader("Select the training dataset", accept_multiple_files=True)
@@ -229,6 +243,7 @@ def file_uploader():
     # Button to run AutoGluon Assistant
     if st.button("Run AutoGluon Assistant"):
         if st.session_state.uploaded_files:
+            generate_task_file(user_data_dir)
             run_autogluon_assistant(CONFIG_DIR, user_data_dir)
         else:
             st.warning("Please upload files before running the task.")
@@ -245,3 +260,5 @@ st.write("")
 
 display_description()
 file_uploader()
+download_button()
+st.write(st.session_state)
