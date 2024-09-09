@@ -5,11 +5,9 @@ from pathlib import Path
 from streamlit_navigation_bar import st_navbar
 import os
 import uuid
-import subprocess
 import glob
 from io import StringIO
 import asyncio
-
 
 st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide")
 
@@ -174,21 +172,32 @@ async def run_autogluon_assistant(config_dir, data_dir):
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,
     )
-    # stdout, stderr = await process.communicate()
-    # st.write(stdout.decode())
-    # if stderr:
-    #     st.error(stderr.decode())
-
-    # Stream the output line by line in real-time
-    log_placeholder = st.empty()
     logs = ""
-    while True:
-        line = await process.stdout.readline()
-        if not line:
-            break
-        logs += line.decode()
-        print(line.decode(), end="")
-        log_placeholder.text_area("Real-Time Logs", logs, height=400)
+    logs_css = """
+    <style>
+        /* Set height for the stExpanderDetails */
+        div[data-testid="stExpanderDetails"] {
+            height: 300px !important;
+            background-color: lightgrey;
+            overflow-y: auto; /* Ensures content scrolls if it overflows */
+        }
+    </style>
+    """
+
+    # Inject the CSS into Streamlit
+    st.markdown(logs_css, unsafe_allow_html=True)
+    with st.status("Running Tasks, Expand to see full logs ") as status:
+        while True:
+            line = await process.stdout.readline()
+            if not line:
+                status.update(
+                    label="Tasks complete! Expand to see full logs ", state="complete", expanded=False
+                )
+                break
+            logs += line.decode()
+            print(line.decode(), end="")
+            st.write(line.decode())
+
     await process.wait()
     if process.returncode == 0:
         st.success("Task completed successfully!")
