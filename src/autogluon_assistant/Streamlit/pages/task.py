@@ -7,7 +7,9 @@ import os
 import uuid
 import glob
 from io import StringIO
-import asyncio
+import subprocess
+import psutil
+
 
 st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide")
 
@@ -161,18 +163,28 @@ def save_uploaded_file(file, directory):
 def show_download_button(data,file_name):
     st.download_button(label="Download the output file", data=data,file_name=file_name,mime="text/csv")
 
+def show_cancel_task_button():
+    try:
+        if st.button("Stop Task"):
+            p = psutil.Process(st.session_state.pid)
+            p.terminate()
+            p.wait()
+            st.session_state.pid = None
+    except psutil.NoSuchProcess:
+        st.error(f"No process found with PID: {st.session_state.pid}")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
 # Run the autogluon-assistant command
-async def run_autogluon_assistant(config_dir, data_dir):
+def run_autogluon_assistant(config_dir, data_dir):
+    if "pid" not in st.session_state:
+        st.session_state.pid = None
     command = ['autogluon-assistant', config_dir, data_dir]
     if st.session_state.config_overrides:
         command.extend(['--config-overrides', ' '.join(st.session_state.config_overrides)])
-    process = await asyncio.create_subprocess_exec(
-        *command,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.STDOUT,
-    )
-    logs = ""
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    st.session_state.pid = process.pid
+    st.session_state.logs = ""
     logs_css = """
     <style>
         /* Set height for the stExpanderDetails */
@@ -183,22 +195,21 @@ async def run_autogluon_assistant(config_dir, data_dir):
         }
     </style>
     """
-
     # Inject the CSS into Streamlit
     st.markdown(logs_css, unsafe_allow_html=True)
     with st.status("Running Tasks, Expand to see full logs ") as status:
-        while True:
-            line = await process.stdout.readline()
-            if not line:
-                status.update(
-                    label="Tasks complete! Expand to see full logs ", state="complete", expanded=False
-                )
-                break
-            logs += line.decode()
-            print(line.decode(), end="")
-            st.write(line.decode())
+        for line in process.stdout:
+            st.session_state.logs += line
+            print(line, end="")
+            st.write(line)
+            if "Prediction complete" in line:
+                status.update(label="Tasks complete! Expand to see full logs ", state="complete", expanded=False)
+            elif "exception" in line.lower():
+                status.update(label="Error detected in the process...Check the logs for more details.",state="error", expanded=False)
+            else:
+                status.update(label="AutoGluon Assistant is running...",state="running", expanded=False)
 
-    await process.wait()
+    process.wait()
     if process.returncode == 0:
         st.success("Task completed successfully!")
         csv_files = glob.glob("*.csv")
@@ -212,7 +223,8 @@ async def run_autogluon_assistant(config_dir, data_dir):
             st.warning("No CSV file generated.")
     else:
         st.error("Task failed. Check the logs for more details.")
-
+    toggle_running_state()
+    st.rerun()
 def download_button():
     if "output_file" not in st.session_state:
         st.session_state.output_file = None
@@ -262,26 +274,32 @@ def file_uploader():
                 with st.expander("Show/Hide File Data"):
                     st.text_area(label=file_name,value=file_contents.getvalue(),label_visibility="collapsed")
 
-def run_async_task(config_dir, data_dir):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(run_autogluon_assistant(config_dir, data_dir))
+def toggle_running_state():
+    st.session_state.task_running = not st.session_state.task_running
 
 def main():
     set_params()
     display_header()
     st.write("")
     st.write("")
-
     display_description()
     file_uploader()
     user_data_dir = get_user_data_dir()
-    if st.button("Run AutoGluon Assistant"):
+    show_cancel_task_button()
+    if "task_running" not in st.session_state:
+        st.session_state.task_running = False
+    if st.session_state.task_running:
+        st.stop()
+    if st.button(label="Run AutoGluon Assistant"):
         if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
             generate_task_file(user_data_dir)
-            run_async_task(CONFIG_DIR, user_data_dir)
+            st.session_state.task_running = True
+            run_autogluon_assistant(CONFIG_DIR, user_data_dir)
+            st.session_state.task_running = False
         else:
+            st.session_state.task_running = True
             st.warning("Please upload files before running the task.")
+            st.session_state.task_running = False
     download_button()
 
 
