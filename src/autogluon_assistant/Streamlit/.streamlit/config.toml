@@ -1,4 +1,2 @@
 [server]
 maxUploadSize = 2048
-[runner]
-enforceSerializableSessionState = true

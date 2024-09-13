@@ -9,7 +9,7 @@ import glob
 from io import StringIO
 import subprocess
 import psutil
-
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide")
 
@@ -41,7 +41,6 @@ def img_to_html(img_path):
 
 def update_config_overrides():
     config_overrides = []
-
     if st.session_state.preset:
         preset_mapping = {"Best Quality": "best_quality", "High Quality": "high_quality",
                           "Good Quality": "good_quality", "Medium Quality": "medium_quality"}
@@ -88,25 +87,39 @@ def set_params():
 
     with st.sidebar:
         st.image("./images/logo.png")
-        # autogluon preset
-        preset_options = ["Best Quality", "High Quality", "Good Quality", "Medium Quality"]
-        load_value("preset")
-        st.selectbox("Autogluon Preset",index=None, placeholder="Autogluon Preset", options=preset_options, key="_preset", on_change=store_value, args=["preset"])
-
-        # Time limit
-        time_limit_options = ["30s", "1 min", "15 mins", "30 mins" , "1 hr", "2 hrs", "4 hrs"]
-        load_value("time_limit")
-        st.selectbox("Time Limit",index=None, placeholder="Time Limit", options=time_limit_options, key="_time_limit",on_change=store_value, args=["time_limit"])
-
-        # Feature Transformer
-        transformer_options = ["OpenFE", "CAAFE"]
-        load_value("transformers")
-        st.multiselect("Feature Transformers", placeholder="Feature Transformers",options=transformer_options,key="_transformers",on_change=store_value, args=["transformers"])
-        #  LLM
-        llm_options = ["GPT 3.5-Turbo", "GPT 4", "Claude 3 - Sonnet"]
-        load_value("llm")
-        st.selectbox("Choose a LLM model",index=None, placeholder="Choose a LLM model",options=llm_options,key="_llm",on_change=store_value, args=["llm"])
+        config_autogluon_preset()
+        config_time_limit()
+        config_transformer()
+        config_llm()
     update_config_overrides()
+
+@st.fragment
+def config_autogluon_preset():
+    preset_options = ["Best Quality", "High Quality", "Good Quality", "Medium Quality"]
+    load_value("preset")
+    st.selectbox("Autogluon Preset", index=None, placeholder="Autogluon Preset", options=preset_options, key="_preset",
+                 on_change=store_value, args=["preset"])
+
+@st.fragment
+def config_time_limit():
+    time_limit_options = ["30s", "1 min", "15 mins", "30 mins", "1 hr", "2 hrs", "4 hrs"]
+    load_value("time_limit")
+    st.selectbox("Time Limit", index=None, placeholder="Time Limit", options=time_limit_options, key="_time_limit",
+                 on_change=store_value, args=["time_limit"])
+
+@st.fragment
+def config_transformer():
+    transformer_options = ["OpenFE", "CAAFE"]
+    load_value("transformers")
+    st.multiselect("Feature Transformers", placeholder="Feature Transformers", options=transformer_options,
+                   key="_transformers", on_change=store_value, args=["transformers"])
+
+@st.fragment
+def config_llm():
+    llm_options = ["GPT 3.5-Turbo", "GPT 4", "Claude 3 - Sonnet"]
+    load_value("llm")
+    st.selectbox("Choose a LLM model", index=None, placeholder="Choose a LLM model", options=llm_options, key="_llm",
+                 on_change=store_value, args=["llm"])
 
 def save_description_file(description):
     user_data_dir = get_user_data_dir()
@@ -119,9 +132,8 @@ def store_value_and_save_file(key):
     store_value(key)
     save_description_file(st.session_state.task_description)
 
+@st.fragment
 def display_description():
-    if "task_description" not in st.session_state:
-        st.session_state.task_description = ""
     load_value("task_description")
     st.text_area(label='Task Description',placeholder="Enter your task description : ",key="_task_description",on_change=store_value_and_save_file, args=["task_description"])
 
@@ -165,71 +177,138 @@ def show_download_button(data,file_name):
 
 def show_cancel_task_button():
     try:
-        if st.button("Stop Task"):
-            p = psutil.Process(st.session_state.pid)
+        if st.button("Stop Task", on_click=toggle_cancel_state):
+            p = st.session_state.process
+            print("Stopping the task ...")
             p.terminate()
             p.wait()
+            st.session_state.process = None
             st.session_state.pid = None
+            print("The Task has stopped")
+            st.session_state.task_running = False
+            st.rerun()
     except psutil.NoSuchProcess:
-        st.error(f"No process found with PID: {st.session_state.pid}")
+        st.session_state.task_running = False
+        st.session_state.process = None
+        st.session_state.pid = None
+        st.error(f"No running task is found")
     except Exception as e:
+        st.session_state.task_running = False
+        st.session_state.process = None
+        st.session_state.pid = None
         st.error(f"An error occurred: {e}")
+
+def generate_output_file():
+    if st.session_state.process is not None:
+        process = st.session_state.process
+        process.wait()
+        st.session_state.task_running = False
+        st.write("current running state",st.session_state.task_running)
+        st.session_state.return_code = process.returncode
+        st.session_state.process = None
+        if st.session_state.return_code == 0:
+            csv_files = glob.glob("*.csv")
+            if csv_files:
+                latest_csv = max(csv_files, key=os.path.getmtime)
+                latest_csv_name = os.path.basename(latest_csv)
+                df = pd.read_csv(latest_csv)
+                st.session_state.output_file = df
+                st.session_state.output_filename = latest_csv_name
+                st.rerun()
+            else:
+                st.warning("No CSV file generated.")
 
 # Run the autogluon-assistant command
 def run_autogluon_assistant(config_dir, data_dir):
-    if "pid" not in st.session_state:
-        st.session_state.pid = None
     command = ['autogluon-assistant', config_dir, data_dir]
     if st.session_state.config_overrides:
         command.extend(['--config-overrides', ' '.join(st.session_state.config_overrides)])
+    st.session_state.output_file = None
+    st.session_state.output_filename = None
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    st.session_state.process = process
     st.session_state.pid = process.pid
-    st.session_state.logs = ""
-    logs_css = """
-    <style>
-        /* Set height for the stExpanderDetails */
-        div[data-testid="stExpanderDetails"] {
-            height: 300px !important;
-            background-color: lightgrey;
-            overflow-y: auto; /* Ensures content scrolls if it overflows */
-        }
-    </style>
-    """
-    # Inject the CSS into Streamlit
-    st.markdown(logs_css, unsafe_allow_html=True)
-    with st.status("Running Tasks, Expand to see full logs ") as status:
-        for line in process.stdout:
-            st.session_state.logs += line
-            print(line, end="")
-            st.write(line)
-            if "Prediction complete" in line:
-                status.update(label="Tasks complete! Expand to see full logs ", state="complete", expanded=False)
-            elif "exception" in line.lower():
-                status.update(label="Error detected in the process...Check the logs for more details.",state="error", expanded=False)
-            else:
-                status.update(label="AutoGluon Assistant is running...",state="running", expanded=False)
 
-    process.wait()
-    if process.returncode == 0:
-        st.success("Task completed successfully!")
-        csv_files = glob.glob("*.csv")
-        if csv_files:
-            latest_csv = max(csv_files, key=os.path.getmtime)
-            latest_csv_name = os.path.basename(latest_csv)
-            df = pd.read_csv(latest_csv)
-            st.session_state.output_file = df
-            st.session_state.output_filename = latest_csv_name
+def show_logs():
+    if st.session_state.logs:
+        status_container = st.empty()
+        log_container = st.empty()
+        log_container.text_area("Real-Time Logs", st.session_state.logs, height=400)
+        if st.session_state.return_code == 0:
+            status_container.success("Task completed successfully!")
         else:
-            st.warning("No CSV file generated.")
+            status_container.error("Error detected in the process...Check the logs for more details")
+
+def show_real_time_logs():
+    if st.session_state.process is not None:
+        process = st.session_state.process
+        st.session_state.logs = ""
+        progress = st.progress(0)
+        task_stages = {
+            "Task loaded!": 10,
+            "Beginning AutoGluon training": 20,
+            "Preprocessing data": 30,
+            "User-specified model hyperparameters to be fit": 50,
+            "Fitting model": 65,
+            "AutoGluon training complete": 90,
+        }
+        logs_css = """
+            <style>
+                /* Set height for the stExpanderDetails */
+                div[data-testid="stExpanderDetails"] {
+                    height: 300px !important;
+                    background-color: lightgrey;
+                    overflow-y: auto; /* Ensures content scrolls if it overflows */
+                }
+            </style>
+            """
+        st.markdown(logs_css, unsafe_allow_html=True)
+        # # hide the iframe container
+        st.markdown(
+            f"""
+                <style>
+                .element-container:has(iframe[height="0"]) {{
+                  display: None;
+                }}
+                </style>
+            """, unsafe_allow_html=True
+        )
+        status_container = st.empty()
+        status_container.info("Running Tasks...")
+        log_container = st.empty()
+        for line in process.stdout:
+            print(line, end="")
+            auto_scroll = """
+            <script>
+                const textAreas = parent.document.querySelectorAll('textarea[aria-label="Real-Time Logs"]');
+                  if (textAreas.length > 0) 
+                  {
+                      const lastTextArea = textAreas[textAreas.length - 1];
+                      lastTextArea.scrollTop = lastTextArea.scrollHeight;
+                  }
+            </script>
+              """
+            components.html(auto_scroll, height=0)
+            st.session_state.logs += line
+            if "exception" in line.lower():
+                progress.empty()
+                status_container.error("Error detected in the process...Check the logs for more details")
+                break
+            elif "Prediction complete" in line:
+                progress.empty()
+                status_container.success("Task completed successfully!")
+                break
+            else:
+                for stage, progress_value in task_stages.items():
+                    if stage.lower() in line.lower():
+                        progress.progress(progress_value / 100)
+                        status_container.info(stage)
+                        break
+            log_container.text_area("Real-Time Logs", st.session_state.logs, height=400)
     else:
-        st.error("Task failed. Check the logs for more details.")
-    toggle_running_state()
-    st.rerun()
+        print("process is None")
+
 def download_button():
-    if "output_file" not in st.session_state:
-        st.session_state.output_file = None
-    if "output_filename" not in st.session_state:
-        st.session_state.output_filename = None
     if st.session_state.output_file is not None:
         output_file = st.session_state.output_file
         output_filename = st.session_state.output_filename
@@ -275,32 +354,70 @@ def file_uploader():
                     st.text_area(label=file_name,value=file_contents.getvalue(),label_visibility="collapsed")
 
 def toggle_running_state():
-    st.session_state.task_running = not st.session_state.task_running
+    st.session_state.task_running = True
+    st.session_state.task_canceled = False
+
+def toggle_cancel_state():
+    st.session_state.task_canceled = True
+
+def run_button():
+    user_data_dir = get_user_data_dir()
+    if st.button(label="Run AutoGluon Assistant", on_click=toggle_running_state,
+                 disabled=st.session_state.task_running):
+        if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
+            generate_task_file(user_data_dir)
+            run_autogluon_assistant(CONFIG_DIR, user_data_dir)
+        else:
+            st.warning("Please upload files before running the task.")
+            st.session_state.task_running = False
+
+def show_cancel_container():
+    status_container = st.empty()
+    status_container.info("Task has been cancelled")
+
+def initial_session_state():
+    if "pid" not in st.session_state:
+        st.session_state.pid = None
+    if "logs" not in st.session_state:
+        st.session_state.logs = ""
+    if "process" not in st.session_state:
+        st.session_state.process = None
+    if 'clicked' not in st.session_state:
+        st.session_state.clicked = False
+    if "task_running" not in st.session_state:
+        st.session_state.task_running = False
+    if "output_file" not in st.session_state:
+        st.session_state.output_file = None
+    if "output_filename" not in st.session_state:
+        st.session_state.output_filename = None
+    if "task_description" not in st.session_state:
+        st.session_state.task_description = ""
+    if "return_code" not in st.session_state:
+        st.session_state.return_code = None
+    if "task_canceled" not in st.session_state:
+        st.session_state.task_canceled = False
 
 def main():
+    initial_session_state()
     set_params()
     display_header()
     st.write("")
     st.write("")
     display_description()
     file_uploader()
-    user_data_dir = get_user_data_dir()
-    show_cancel_task_button()
-    if "task_running" not in st.session_state:
-        st.session_state.task_running = False
+    run_button()
     if st.session_state.task_running:
-        st.stop()
-    if st.button(label="Run AutoGluon Assistant"):
-        if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
-            generate_task_file(user_data_dir)
-            st.session_state.task_running = True
-            run_autogluon_assistant(CONFIG_DIR, user_data_dir)
-            st.session_state.task_running = False
-        else:
-            st.session_state.task_running = True
-            st.warning("Please upload files before running the task.")
-            st.session_state.task_running = False
+        show_cancel_task_button()
+    if st.session_state.task_running:
+        show_real_time_logs()
+    elif not st.session_state.task_running and not st.session_state.task_canceled:
+        show_logs()
+    elif st.session_state.task_canceled:
+        show_cancel_container()
+
+    generate_output_file()
     download_button()
+    st.write(st.session_state)
 
 
 if __name__ == "__main__":
