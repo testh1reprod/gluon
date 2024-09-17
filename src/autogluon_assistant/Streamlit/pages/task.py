@@ -2,11 +2,11 @@ import streamlit as st
 import pandas as pd
 import base64
 from pathlib import Path
+
 from streamlit_navigation_bar import st_navbar
 import os
 import uuid
 import glob
-from io import StringIO
 import subprocess
 import psutil
 import streamlit.components.v1 as components
@@ -126,16 +126,27 @@ def save_description_file(description):
     description_file = os.path.join(user_data_dir, "description.txt")
     with open(description_file, "w") as f:
         f.write(description)
-    st.success(f"Description saved to {description_file}")
 
 def store_value_and_save_file(key):
     store_value(key)
     save_description_file(st.session_state.task_description)
 
+def description_file_uploader():
+    if "description_uploader_key" not in st.session_state:
+        st.session_state.description_uploader_key = 0
+    uploaded_file = st.file_uploader("Upload task description file", type="txt", key=st.session_state.description_uploader_key)
+    if uploaded_file:
+        task_description = uploaded_file.read().decode("utf-8")
+        st.session_state.task_description = task_description
+        save_description_file(st.session_state.task_description)
+        st.session_state.description_uploader_key += 1
+        st.rerun()
+
 @st.fragment
 def display_description():
     load_value("task_description")
-    st.text_area(label='Task Description',placeholder="Enter your task description : ",key="_task_description",on_change=store_value_and_save_file, args=["task_description"])
+    st.text_area(label='Task Description',placeholder="Enter your task description : ",value=st.session_state.task_description,key="_task_description",on_change=store_value_and_save_file, args=["task_description"])
+
 
 
 def display_header():
@@ -160,15 +171,13 @@ def get_user_data_dir():
 
     return st.session_state.user_data_dir
 
-def save_uploaded_file(file, directory):
-    file_path = os.path.join(directory, file.name)
+def save_uploaded_file(file, file_path):
     if file.type == 'text/csv':
         with open(file_path, 'wb') as f:
             f.write(file.getbuffer())
     elif file.type == 'text/plain':
         with open(file_path, "w") as f:
             f.write(file.read().decode("utf-8"))
-    return file_path
 
 # This function is to make sure click on the download button does not reload the entire app (a temporary workaround)
 @st.fragment
@@ -220,14 +229,14 @@ def generate_output_file():
 
 # Run the autogluon-assistant command
 def run_autogluon_assistant(config_dir, data_dir):
-    command = ['autogluon-assistant', config_dir, data_dir]
-    if st.session_state.config_overrides:
-        command.extend(['--config-overrides', ' '.join(st.session_state.config_overrides)])
-    st.session_state.output_file = None
-    st.session_state.output_filename = None
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    st.session_state.process = process
-    st.session_state.pid = process.pid
+        command = ['autogluon-assistant', config_dir, data_dir]
+        if st.session_state.config_overrides:
+            command.extend(['--config-overrides', ' '.join(st.session_state.config_overrides)])
+        st.session_state.output_file = None
+        st.session_state.output_filename = None
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        st.session_state.process = process
+        st.session_state.pid = process.pid
 
 def show_logs():
     if st.session_state.logs:
@@ -293,7 +302,12 @@ def show_real_time_logs():
             if "exception" in line.lower():
                 progress.empty()
                 status_container.error("Error detected in the process...Check the logs for more details")
-                break
+                st.session_state.output_file = None
+                st.session_state.output_filename = None
+                st.session_state.process = None
+                st.session_state.pid = None
+                st.session_state.task_running = False
+                st.rerun()
             elif "Prediction complete" in line:
                 progress.empty()
                 status_container.success("Task completed successfully!")
@@ -315,43 +329,90 @@ def download_button():
         show_download_button(output_file.to_csv(index=False),output_filename)
 
 def generate_task_file(user_data_dir):
+    file_list = []
+    if st.session_state.train_file_name is not None:
+        file_list.append("train.csv")
+    if st.session_state.test_file_name is not None:
+        file_list.append("test.csv")
+    if st.session_state.sample_output_file_name is not None:
+        file_list.append("sample_output.csv")
     competition_files_path = os.path.join(user_data_dir, "task_files.txt")
-    csv_file_names = [file_name for file_name in st.session_state.uploaded_files.keys() if file_name.endswith(".csv")]
     with open(competition_files_path, "w") as f:
-        f.write("\n".join(csv_file_names))
+        f.write("\n".join(file_list))
+
+def train_uploader():
+    train_file = st.file_uploader("Upload Train Dataset", key="train_file_uploader")
+    user_data_dir = get_user_data_dir()
+
+    if train_file is not None:
+        save_uploaded_file(train_file, os.path.join(user_data_dir, "train.csv"))
+        train_df = pd.read_csv(train_file)
+        st.session_state.train_file_name = train_file.name
+        st.session_state.train_file_df = train_df
+    if st.session_state.train_file_name is not None:
+        st.write(st.session_state.train_file_name)
+        with st.expander("Show/Hide File Data"):
+            st.write(st.session_state.train_file_df.head())
+
+def test_uploader():
+    test_file = st.file_uploader("Upload Test Dataset")
+    user_data_dir = get_user_data_dir()
+    if test_file is not None:
+        save_uploaded_file(test_file, os.path.join(user_data_dir, "test.csv"))
+        test_df = pd.read_csv(test_file)
+        st.session_state.test_file_name = test_file.name
+        st.session_state.test_file_df = test_df
+    if st.session_state.test_file_name is not None:
+        st.write(st.session_state.test_file_name)
+        with st.expander("Show/Hide File Data"):
+            st.write(st.session_state.test_file_df.head())
+
+def sample_output_uploader():
+    sample_output_file = st.file_uploader("Upload Sample Output Dataset (Optional)", key="sample_output_file_uploader")
+    user_data_dir = get_user_data_dir()
+    if sample_output_file is not None:
+        save_uploaded_file(sample_output_file, os.path.join(user_data_dir, "sample_output.csv"))
+        sample_output_df = pd.read_csv(sample_output_file)
+        st.session_state.sample_output_file_name = sample_output_file.name
+        st.session_state.sample_output_file_df = sample_output_df
+    if st.session_state.sample_output_file_name is not None:
+        st.write(st.session_state.sample_output_file_name)
+        with st.expander("Show/Hide File Data"):
+            st.write(st.session_state.sample_output_file_df.head())
+
 
 def file_uploader():
-    uploaded_files = st.file_uploader("Select the training dataset", accept_multiple_files=True)
-    user_data_dir = get_user_data_dir()
-    if 'uploaded_files' not in st.session_state:
-        st.session_state.uploaded_files = {}
-    if uploaded_files:
-        st.markdown('''
-            <style>
-                .stFileUploaderFile {display: none}
-            <style>''',
-                    unsafe_allow_html=True)
-        for file in uploaded_files:
-            if file.name not in st.session_state.uploaded_files.keys():
-                if file.type == 'text/csv':
-                    df = pd.read_csv(file)
-                    save_uploaded_file(file, user_data_dir)
-                    st.session_state.uploaded_files[file.name] = df
-                elif file.type == 'text/plain':
-                    save_uploaded_file(file, user_data_dir)
-                    stringio = StringIO(file.getvalue().decode("utf-8"))
-                    st.session_state.uploaded_files[file.name] = stringio
-    if st.session_state.uploaded_files:
-        st.write("Uploaded Files:")
-        for file_name, file_contents in st.session_state.uploaded_files.items():
-            st.write(f"- {file_name}")
-            if file_name.endswith('.csv'):
-                df = file_contents
-                with st.expander("Show/Hide File Data"):
-                    st.write(df.head())
-            elif file_name.endswith('.txt'):
-                with st.expander("Show/Hide File Data"):
-                    st.text_area(label=file_name,value=file_contents.getvalue(),label_visibility="collapsed")
+    css = '''
+    <style>
+        [data-testid='stFileUploader'] {
+            width: max-content;
+        }
+        [data-testid='stFileUploader'] section {
+            padding: 0;
+            float: left;
+        }
+        [data-testid='stFileUploader'] section > input + div {
+            display: none;
+        }
+        [data-testid='stFileUploader'] section + div {
+            float: right;
+            padding-top: 0;
+        }
+
+    </style>
+    '''
+    # st.markdown(css, unsafe_allow_html=True)
+    st.markdown('''
+               <style>
+                   .stFileUploaderFile {display: none}
+               <style>''',
+                unsafe_allow_html=True)
+    train_uploader()
+    test_uploader()
+    sample_output_uploader()
+
+
+
 
 def toggle_running_state():
     st.session_state.task_running = True
@@ -364,9 +425,9 @@ def run_button():
     user_data_dir = get_user_data_dir()
     if st.button(label="Run AutoGluon Assistant", on_click=toggle_running_state,
                  disabled=st.session_state.task_running):
-        if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
-            generate_task_file(user_data_dir)
-            run_autogluon_assistant(CONFIG_DIR, user_data_dir)
+        if st.session_state.train_file_name and st.session_state.test_file_name:
+                generate_task_file(user_data_dir)
+                run_autogluon_assistant(CONFIG_DIR, user_data_dir)
         else:
             st.warning("Please upload files before running the task.")
             st.session_state.task_running = False
@@ -396,28 +457,47 @@ def initial_session_state():
         st.session_state.return_code = None
     if "task_canceled" not in st.session_state:
         st.session_state.task_canceled = False
+    if "train_file_name" not in st.session_state:
+        st.session_state.train_file_name = None
+    if "train_file_df" not in st.session_state:
+        st.session_state.train_file_df = None
+    if "test_file_name" not in st.session_state:
+        st.session_state.test_file_name = None
+    if "test_file_df" not in st.session_state:
+        st.session_state.test_file_df = None
+    if "sample_output_file_name" not in st.session_state:
+        st.session_state.sample_output_file_name = None
+    if "sample_output_file_df" not in st.session_state:
+        st.session_state.sample_output_file_df = None
 
 def main():
     initial_session_state()
     set_params()
-    display_header()
-    st.write("")
-    st.write("")
-    display_description()
-    file_uploader()
-    run_button()
-    if st.session_state.task_running:
-        show_cancel_task_button()
-    if st.session_state.task_running:
-        show_real_time_logs()
-    elif not st.session_state.task_running and not st.session_state.task_canceled:
-        show_logs()
-    elif st.session_state.task_canceled:
-        show_cancel_container()
+    col1, col2 = st.columns([1, 2])
+    with col2:
+        display_header()
+        st.write("")
+        st.write("")
+        # display_description()
+        # description_file_uploader()
+        # file_uploader()
+        run_button()
+        if st.session_state.task_running:
+            show_cancel_task_button()
+        if st.session_state.task_running:
+            show_real_time_logs()
+        elif not st.session_state.task_running and not st.session_state.task_canceled:
+            show_logs()
+        elif st.session_state.task_canceled:
+            show_cancel_container()
+    with col1:
+        display_description()
+        description_file_uploader()
+        file_uploader()
 
     generate_output_file()
     download_button()
-    st.write(st.session_state)
+
 
 
 if __name__ == "__main__":
