@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import base64
 from pathlib import Path
-
+from autogluon_assistant.Streamlit.style.style import styles,options
 from streamlit_navigation_bar import st_navbar
 import os
 import uuid
@@ -10,11 +10,14 @@ import glob
 import subprocess
 import psutil
 import streamlit.components.v1 as components
+from streamlit_extras.add_vertical_space import add_vertical_space
+from streamlit_extras.stylable_container import stylable_container
 
-st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide")
+
+st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide",initial_sidebar_state="collapsed")
 
 # navigation header
-page = st_navbar(["Run Autogluon","Dataset"], selected="Run Autogluon")
+page = st_navbar(["Run Autogluon","Dataset"], selected="Run Autogluon",styles=styles,options=options)
 
 if page == "Dataset":
     st.switch_page("pages/preview.py")
@@ -24,7 +27,14 @@ BASE_DATA_DIR = './user_data'
 
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 
-
+st.markdown(
+    """
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    """,
+    unsafe_allow_html=True
+)
+with open('task_style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # image_path = "src/autogluon_assistant/Streamlit/images/logo.png"
 
@@ -74,52 +84,116 @@ def load_value(key):
     st.session_state["_"+key] = st.session_state[key]
 
 def set_params():
-    if 'config_overrides' not in st.session_state:
-        st.session_state.config_overrides = []
-    if "preset" not in st.session_state:
-        st.session_state.preset = None
-    if "time_limit" not in st.session_state:
-        st.session_state.time_limit = None
-    if "transformers" not in st.session_state:
-        st.session_state.transformers = []
-    if "llm" not in st.session_state:
-        st.session_state.llm = None
-
-    with st.sidebar:
-        st.image("./images/logo.png")
+    col1, col2, col3, col4 = st.columns(4,gap='medium')
+    with col1:
         config_autogluon_preset()
+    with col2:
         config_time_limit()
+    with col3:
         config_transformer()
+    with col4:
         config_llm()
     update_config_overrides()
+    add_vertical_space(2)
 
 @st.fragment
 def config_autogluon_preset():
-    preset_options = ["Best Quality", "High Quality", "Good Quality", "Medium Quality"]
-    load_value("preset")
-    st.selectbox("Autogluon Preset", index=None, placeholder="Autogluon Preset", options=preset_options, key="_preset",
-                 on_change=store_value, args=["preset"])
+    with st.container(border=True, height=150):
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            st.html(
+                """
+                 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                <i class="fa-solid fa-gear" style="font-size: 50px; margin-top: 30px;color: #023e8a;"></i>
+                </div>
+                """
+            )
+        with col2:
+            st.html(
+                """
+                <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 16px;">
+                    <h1 style="font-size: 20px;color:#023e8a; ">Autogluon Preset</h1>
+                </div>
+                """
+            )
+            preset_options = ["Best Quality", "High Quality", "Good Quality", "Medium Quality"]
+            load_value("preset")
+            st.selectbox("Autogluon Preset", index=None, placeholder="Autogluon Preset", options=preset_options, key="_preset",
+                         on_change=store_value, args=["preset"],label_visibility="collapsed")
 
 @st.fragment
 def config_time_limit():
-    time_limit_options = ["30s", "1 min", "15 mins", "30 mins", "1 hr", "2 hrs", "4 hrs"]
-    load_value("time_limit")
-    st.selectbox("Time Limit", index=None, placeholder="Time Limit", options=time_limit_options, key="_time_limit",
-                 on_change=store_value, args=["time_limit"])
+    with st.container(border=True, height=150):
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            st.html(
+                """
+                 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                <i class="fa-solid fa-clock" style="font-size: 50px; margin-top: 30px;color: #023e8a;"></i>
+                </div>
+                """
+            )
+        with col2:
+            st.html(
+                """
+                <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 16px;">
+                    <h1 style="font-size: 20px;color:#023e8a; ">Time Limit</h1>
+                </div>
+                """
+            )
+            time_limit_options = ["30s", "1 min", "15 mins", "30 mins", "1 hr", "2 hrs", "4 hrs"]
+            load_value("time_limit")
+            st.selectbox("Time Limit", index=None, placeholder="Time Limit", options=time_limit_options, key="_time_limit",on_change=store_value, args=["time_limit"],label_visibility="collapsed")
 
 @st.fragment
 def config_transformer():
-    transformer_options = ["OpenFE", "CAAFE"]
-    load_value("transformers")
-    st.multiselect("Feature Transformers", placeholder="Feature Transformers", options=transformer_options,
-                   key="_transformers", on_change=store_value, args=["transformers"])
+    with st.container(border=True, height=150):
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            st.html(
+                """
+                 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                <i class="fa-brands fa-buromobelexperte" style="font-size: 50px; margin-top: 30px;color: #023e8a;"></i>
+                </div>
+                """
+            )
+        with col2:
+            st.html(
+                """
+                <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 0;">
+                    <h1 style="font-size: 19px;color:#023e8a; ">Feature Transformers</h1>
+                </div>
+                """
+            )
+            transformer_options = ["OpenFE", "CAAFE"]
+            load_value("transformers")
+            st.multiselect("Feature Transformers", placeholder="Feature Transformers", options=transformer_options,
+                   key="_transformers", on_change=store_value, args=["transformers"],label_visibility="collapsed")
 
 @st.fragment
 def config_llm():
-    llm_options = ["GPT 3.5-Turbo", "GPT 4", "Claude 3 - Sonnet"]
-    load_value("llm")
-    st.selectbox("Choose a LLM model", index=None, placeholder="Choose a LLM model", options=llm_options, key="_llm",
-                 on_change=store_value, args=["llm"])
+    with st.container(border=True, height=150):
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            st.html(
+                """
+                 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                <i class="fa-solid fa-robot" style="font-size: 50px; margin-top: 30px;color: #023e8a;"></i>
+                </div>
+                """
+            )
+        with col2:
+            st.html(
+                """
+                <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 16px;">
+                    <h1 style="font-size: 20px;color:#023e8a; ">LLM Model</h1>
+                </div>
+                """
+            )
+            llm_options = ["GPT 3.5-Turbo", "GPT 4", "Claude 3 - Sonnet"]
+            load_value("llm")
+            st.selectbox("Choose a LLM model", index=None, placeholder="Choose a LLM model", options=llm_options, key="_llm",
+                 on_change=store_value, args=["llm"],label_visibility="collapsed")
 
 def save_description_file(description):
     user_data_dir = get_user_data_dir()
@@ -134,7 +208,7 @@ def store_value_and_save_file(key):
 def description_file_uploader():
     if "description_uploader_key" not in st.session_state:
         st.session_state.description_uploader_key = 0
-    uploaded_file = st.file_uploader("Upload task description file", type="txt", key=st.session_state.description_uploader_key)
+    uploaded_file = st.file_uploader("Upload task description file", type="txt", key=st.session_state.description_uploader_key,help="Accepted file format: .txt",label_visibility="collapsed")
     if uploaded_file:
         task_description = uploaded_file.read().decode("utf-8")
         st.session_state.task_description = task_description
@@ -145,22 +219,22 @@ def description_file_uploader():
 @st.fragment
 def display_description():
     load_value("task_description")
-    st.text_area(label='Task Description',placeholder="Enter your task description : ",value=st.session_state.task_description,key="_task_description",on_change=store_value_and_save_file, args=["task_description"])
+    st.text_area(label='Task Description',placeholder="Enter your task description : ",value=st.session_state.task_description,key="_task_description",on_change=store_value_and_save_file, args=["task_description"],height=180,label_visibility="collapsed")
 
 
 
 def display_header():
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.image("./images/logo.png")
+    image = './app/static/logo.png'
     st.markdown(
-        """
+        f"""
         <div style="text-align: center;max-height: 150px;">
-            <h1 style="margin: 0;color: #1779be">Empower your ML with Zero Lines of Code</h1>
+           <img src='{image}' alt='Logo' style='width:300px;'>
+            <h1 style="margin: 0;color: #00428e; margin-bottom: 5px">Empower your ML with Zero Lines of Code</h1>
         </div>
         """,
         unsafe_allow_html=True
     )
+    add_vertical_space(6)
 
 def get_user_data_dir():
     # Generate a unique directory name for the user session if it doesn't exist
@@ -263,11 +337,9 @@ def show_real_time_logs():
         }
         logs_css = """
             <style>
-                /* Set height for the stExpanderDetails */
                 div[data-testid="stExpanderDetails"] {
                     height: 300px !important;
-                    background-color: lightgrey;
-                    overflow-y: auto; /* Ensures content scrolls if it overflows */
+                    overflow-y: auto; 
                 }
             </style>
             """
@@ -341,21 +413,20 @@ def generate_task_file(user_data_dir):
         f.write("\n".join(file_list))
 
 def train_uploader():
-    train_file = st.file_uploader("Upload Train Dataset", key="train_file_uploader")
+    train_file = st.file_uploader("Upload Train Dataset", key="train_file_uploader",label_visibility="collapsed")
     user_data_dir = get_user_data_dir()
-
     if train_file is not None:
         save_uploaded_file(train_file, os.path.join(user_data_dir, "train.csv"))
         train_df = pd.read_csv(train_file)
         st.session_state.train_file_name = train_file.name
         st.session_state.train_file_df = train_df
     if st.session_state.train_file_name is not None:
-        st.write(st.session_state.train_file_name)
-        with st.expander("Show/Hide File Data"):
-            st.write(st.session_state.train_file_df.head())
+        with st.popover(st.session_state.train_file_name,use_container_width=True):
+            st.write(st.session_state.train_file_df.head(10))
+    add_vertical_space(1)
 
 def test_uploader():
-    test_file = st.file_uploader("Upload Test Dataset")
+    test_file = st.file_uploader("Upload Test Dataset", key = 'test_file_uploader',label_visibility="collapsed")
     user_data_dir = get_user_data_dir()
     if test_file is not None:
         save_uploaded_file(test_file, os.path.join(user_data_dir, "test.csv"))
@@ -363,12 +434,12 @@ def test_uploader():
         st.session_state.test_file_name = test_file.name
         st.session_state.test_file_df = test_df
     if st.session_state.test_file_name is not None:
-        st.write(st.session_state.test_file_name)
-        with st.expander("Show/Hide File Data"):
-            st.write(st.session_state.test_file_df.head())
+        with st.popover(st.session_state.test_file_name, use_container_width=True):
+            st.write(st.session_state.test_file_df.head(10))
+    add_vertical_space(1)
 
 def sample_output_uploader():
-    sample_output_file = st.file_uploader("Upload Sample Output Dataset (Optional)", key="sample_output_file_uploader")
+    sample_output_file = st.file_uploader("Upload Sample Output Dataset (Optional)", key="sample_output_file_uploader",label_visibility="collapsed")
     user_data_dir = get_user_data_dir()
     if sample_output_file is not None:
         save_uploaded_file(sample_output_file, os.path.join(user_data_dir, "sample_output.csv"))
@@ -376,40 +447,54 @@ def sample_output_uploader():
         st.session_state.sample_output_file_name = sample_output_file.name
         st.session_state.sample_output_file_df = sample_output_df
     if st.session_state.sample_output_file_name is not None:
-        st.write(st.session_state.sample_output_file_name)
-        with st.expander("Show/Hide File Data"):
-            st.write(st.session_state.sample_output_file_df.head())
-
+        with st.popover(st.session_state.sample_output_file_name, use_container_width=True):
+            st.write(st.session_state.sample_output_file_df.head(10))
+    add_vertical_space(1)
 
 def file_uploader():
-    css = '''
-    <style>
-        [data-testid='stFileUploader'] {
-            width: max-content;
-        }
-        [data-testid='stFileUploader'] section {
-            padding: 0;
-            float: left;
-        }
-        [data-testid='stFileUploader'] section > input + div {
-            display: none;
-        }
-        [data-testid='stFileUploader'] section + div {
-            float: right;
-            padding-top: 0;
-        }
-
-    </style>
-    '''
-    # st.markdown(css, unsafe_allow_html=True)
-    st.markdown('''
-               <style>
-                   .stFileUploaderFile {display: none}
-               <style>''',
-                unsafe_allow_html=True)
-    train_uploader()
-    test_uploader()
-    sample_output_uploader()
+    col1, col2, col3 = st.columns(3,gap="large")
+    with col1:
+        with stylable_container(key='train_file_uploader',css_styles="""
+            {
+                border: 1px solid rgba(49, 51, 63, 0.2);
+                border-radius: 2rem;
+                padding: calc(1em - 1px);
+                background-color:#00428e;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                box-shadow: 0 4px 8px gray;
+            }
+        """):
+            train_uploader()
+    with col2:
+        with stylable_container(key='test_file_uploader', css_styles="""
+                   {
+                       border: 1px solid rgba(49, 51, 63, 0.2);
+                       border-radius: 2rem;
+                       padding: calc(1em - 1px);
+                       background-color: #00428e;
+                       display: flex;
+                       flex-direction: column;
+                       align-items: center;
+                       box-shadow: 0 4px 8px gray;
+                   }
+               """):
+            test_uploader()
+    with col3:
+        with stylable_container(key='sample_output_file_uploader', css_styles="""
+                    {
+                        border: 1px solid rgba(49, 51, 63, 0.2);
+                        border-radius: 2rem;
+                        padding: calc(1em - 1px);
+                        background-color: #00428e;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        box-shadow: 0 4px 8px gray;
+                    }
+                """):
+            sample_output_uploader()
 
 
 
@@ -422,21 +507,33 @@ def toggle_cancel_state():
     st.session_state.task_canceled = True
 
 def run_button():
-    user_data_dir = get_user_data_dir()
-    if st.button(label="Run AutoGluon Assistant", on_click=toggle_running_state,
-                 disabled=st.session_state.task_running):
-        if st.session_state.train_file_name and st.session_state.test_file_name:
-                generate_task_file(user_data_dir)
-                run_autogluon_assistant(CONFIG_DIR, user_data_dir)
-        else:
-            st.warning("Please upload files before running the task.")
-            st.session_state.task_running = False
+    col1, col2, col3 = st.columns(3)
+    with col2:
+        user_data_dir = get_user_data_dir()
+        if st.button(label="Run AutoGluon Assistant", on_click=toggle_running_state,
+                     disabled=st.session_state.task_running):
+            if st.session_state.train_file_name and st.session_state.test_file_name:
+                    generate_task_file(user_data_dir)
+                    run_autogluon_assistant(CONFIG_DIR, user_data_dir)
+            else:
+                st.warning("Please upload files before running the task.")
+                st.session_state.task_running = False
 
 def show_cancel_container():
     status_container = st.empty()
     status_container.info("Task has been cancelled")
 
 def initial_session_state():
+    if 'config_overrides' not in st.session_state:
+        st.session_state.config_overrides = []
+    if "preset" not in st.session_state:
+        st.session_state.preset = None
+    if "time_limit" not in st.session_state:
+        st.session_state.time_limit = None
+    if "transformers" not in st.session_state:
+        st.session_state.transformers = []
+    if "llm" not in st.session_state:
+        st.session_state.llm = None
     if "pid" not in st.session_state:
         st.session_state.pid = None
     if "logs" not in st.session_state:
@@ -470,33 +567,52 @@ def initial_session_state():
     if "sample_output_file_df" not in st.session_state:
         st.session_state.sample_output_file_df = None
 
+
+def set_description():
+    col1, col2 = st.columns([3,1],gap='large')
+    with col1:
+        st.html(
+            """
+            <div style="display: flex; align-items: center; justify-content: flex-start; height: 40px;padding-bottom: 16px;">
+                <h1 style="font-size: 20px;color:#023e8a; ">Task Description</h1>
+            </div>
+            """
+        )
+        display_description()
+    with col2:
+        st.html(
+            """
+            <div style="display: flex; align-items: center; justify-content: flex-start; height: 40px;padding-bottom: 16px;">
+                <h1 style="font-size: 20px;color:#023e8a; "></h1>
+            </div>
+            """
+        )
+        description_file_uploader()
+    add_vertical_space(4)
+
+
+
+
 def main():
     initial_session_state()
+    display_header()
     set_params()
-    col1, col2 = st.columns([1, 2])
-    with col2:
-        display_header()
-        st.write("")
-        st.write("")
-        # display_description()
-        # description_file_uploader()
-        # file_uploader()
-        run_button()
-        if st.session_state.task_running:
-            show_cancel_task_button()
-        if st.session_state.task_running:
-            show_real_time_logs()
-        elif not st.session_state.task_running and not st.session_state.task_canceled:
-            show_logs()
-        elif st.session_state.task_canceled:
-            show_cancel_container()
-    with col1:
-        display_description()
-        description_file_uploader()
-        file_uploader()
+    set_description()
+    file_uploader()
+    run_button()
+    if st.session_state.task_running:
+        show_cancel_task_button()
+    if st.session_state.task_running:
+        show_real_time_logs()
+    elif not st.session_state.task_running and not st.session_state.task_canceled:
+        show_logs()
+    elif st.session_state.task_canceled:
+        show_cancel_container()
+
 
     generate_output_file()
     download_button()
+    # st.write(st.session_state)
 
 
 

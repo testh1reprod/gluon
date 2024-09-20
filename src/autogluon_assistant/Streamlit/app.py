@@ -1,12 +1,14 @@
 import streamlit as st
 from streamlit_navigation_bar import st_navbar
+from style.style import styles,options
 
 st.set_page_config(
     page_title="Hello",
     page_icon="👋",
 )
+pages = ["Run Autogluon","Dataset"]
 
-page = st_navbar(["Run Autogluon","Dataset"])
+page = st_navbar(pages,styles=styles,options=options)
 
 if page == "Run Autogluon":
     st.switch_page("pages/task.py")

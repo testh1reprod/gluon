@@ -1,0 +1,14 @@
+.appview-container .main .block-container{
+       padding-left: 2rem;
+        padding-right: 10rem;
+}
+
+.stHorizontalBlock {
+    height: 100vh; /* Full height of the viewport */
+    display: flex; /* Use flexbox for alignment */
+    flex-direction: column; /* Vertical stacking */
+    justify-content: space-between; /* Optional: Distribute space between items */
+}
+li.menu-item {
+   margin:0 0 10px 0;
+}

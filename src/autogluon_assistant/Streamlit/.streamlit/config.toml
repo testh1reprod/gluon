@@ -1,2 +1,9 @@
 [server]
 maxUploadSize = 2048
+enableStaticServing = true
+[theme]
+primaryColor="#023e8a"
+backgroundColor="#FFFFFF"
+secondaryBackgroundColor="#f8f9fa"
+textColor="#001f54"
+font="serif"
