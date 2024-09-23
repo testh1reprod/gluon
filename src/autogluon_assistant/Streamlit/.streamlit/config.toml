@@ -2,8 +2,10 @@
 maxUploadSize = 2048
 enableStaticServing = true
 [theme]
-primaryColor="#023e8a"
+primaryColor="#4C7DE7"
 backgroundColor="#FFFFFF"
 secondaryBackgroundColor="#f8f9fa"
-textColor="#001f54"
+textColor="#000000"
 font="serif"
+[client]
+showSidebarNavigation = false

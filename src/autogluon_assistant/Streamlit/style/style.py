@@ -1,8 +1,7 @@
 styles = {
     "nav": {
-        "background-color": "#023e8a",
+        "background-color": "#4C7DE7",
         "height":"4rem",
-        # "justify-content": "left",
     },
     "img": {
         "padding-right": "14px",

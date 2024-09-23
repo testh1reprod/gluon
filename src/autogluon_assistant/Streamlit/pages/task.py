@@ -1,7 +1,5 @@
 import streamlit as st
 import pandas as pd
-import base64
-from pathlib import Path
 from autogluon_assistant.Streamlit.style.style import styles,options
 from streamlit_navigation_bar import st_navbar
 import os
@@ -17,10 +15,12 @@ from streamlit_extras.stylable_container import stylable_container
 st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide",initial_sidebar_state="collapsed")
 
 # navigation header
-page = st_navbar(["Run Autogluon","Dataset"], selected="Run Autogluon",styles=styles,options=options)
+page = st_navbar(["Home","Run Autogluon","Dataset"], selected="Run Autogluon",styles=styles,options=options)
 
 if page == "Dataset":
     st.switch_page("pages/preview.py")
+if page == 'Home':
+    st.switch_page("pages/home.py")
 
 CONFIG_DIR = '../../../config'
 BASE_DATA_DIR = './user_data'
@@ -36,18 +36,7 @@ st.markdown(
 with open('task_style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-# image_path = "src/autogluon_assistant/Streamlit/images/logo.png"
 
-def img_to_bytes(img_path):
-    img_bytes = Path(img_path).read_bytes()
-    encoded = base64.b64encode(img_bytes).decode()
-    return encoded
-
-def img_to_html(img_path):
-    img_html = "<img src='data:image/png;base64,{}' class='img-fluid'>".format(
-      img_to_bytes(img_path)
-    )
-    return img_html
 
 def update_config_overrides():
     config_overrides = []
@@ -229,7 +218,7 @@ def display_header():
         f"""
         <div style="text-align: center;max-height: 150px;">
            <img src='{image}' alt='Logo' style='width:300px;'>
-            <h1 style="margin: 0;color: #00428e; margin-bottom: 5px">Empower your ML with Zero Lines of Code</h1>
+            <h1 style="margin: 0;color: black; margin-bottom: 5px">Empower your ML with Zero Lines of Code</h1>
         </div>
         """,
         unsafe_allow_html=True
@@ -396,6 +385,10 @@ def show_real_time_logs():
 
 def download_button():
     if st.session_state.output_file is not None:
+        step5 = """
+                 <h3 style="color:#023e8a;">Step 5: Download the output file</h3>
+                 """
+        st.html(step5)
         output_file = st.session_state.output_file
         output_filename = st.session_state.output_filename
         show_download_button(output_file.to_csv(index=False),output_filename)
@@ -495,6 +488,8 @@ def file_uploader():
                     }
                 """):
             sample_output_uploader()
+    add_vertical_space(3)
+
 
 
 
@@ -507,17 +502,15 @@ def toggle_cancel_state():
     st.session_state.task_canceled = True
 
 def run_button():
-    col1, col2, col3 = st.columns(3)
-    with col2:
-        user_data_dir = get_user_data_dir()
-        if st.button(label="Run AutoGluon Assistant", on_click=toggle_running_state,
-                     disabled=st.session_state.task_running):
-            if st.session_state.train_file_name and st.session_state.test_file_name:
-                    generate_task_file(user_data_dir)
-                    run_autogluon_assistant(CONFIG_DIR, user_data_dir)
-            else:
-                st.warning("Please upload files before running the task.")
-                st.session_state.task_running = False
+    user_data_dir = get_user_data_dir()
+    if st.button(label="Run AutoGluon Assistant", on_click=toggle_running_state,
+                 disabled=st.session_state.task_running):
+        if st.session_state.train_file_name and st.session_state.test_file_name:
+                generate_task_file(user_data_dir)
+                run_autogluon_assistant(CONFIG_DIR, user_data_dir)
+        else:
+            st.warning("Please upload files before running the task.")
+            st.session_state.task_running = False
 
 def show_cancel_container():
     status_container = st.empty()
@@ -574,7 +567,7 @@ def set_description():
         st.html(
             """
             <div style="display: flex; align-items: center; justify-content: flex-start; height: 40px;padding-bottom: 16px;">
-                <h1 style="font-size: 20px;color:#023e8a; ">Task Description</h1>
+                <h1 style="font-size: 20px;color:#023e8a; "></h1>
             </div>
             """
         )
@@ -596,9 +589,25 @@ def set_description():
 def main():
     initial_session_state()
     display_header()
+    step1 = """
+    <h3 style="color:#023e8a;">Step 1: Configure your parameters</h3>
+    """
+    st.html(step1)
     set_params()
+    step2 = """
+      <h3 style="color:#023e8a;">Step 2: Enter or Upload your task description </h3>
+      """
+    st.html(step2)
     set_description()
+    step3 = """
+       <h3 style="color:#023e8a;">Step 3: Upload Train and Test files </h3>
+       """
+    st.html(step3)
     file_uploader()
+    step4 = """
+         <h3 style="color:#023e8a;">Step 4: Run your task</h3>
+         """
+    st.html(step4)
     run_button()
     if st.session_state.task_running:
         show_cancel_task_button()
@@ -608,7 +617,7 @@ def main():
         show_logs()
     elif st.session_state.task_canceled:
         show_cancel_container()
-
+    st.header("Step 4")
 
     generate_output_file()
     download_button()

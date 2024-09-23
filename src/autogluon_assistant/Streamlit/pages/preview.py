@@ -4,12 +4,14 @@ from st_aggrid import GridOptionsBuilder, AgGrid
 from autogluon_assistant.Streamlit.style.style import styles,options
 import hydralit_components as hc
 
-st.set_page_config(page_title="Preview Dataset",initial_sidebar_state="collapsed",layout="wide",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png")
+st.set_page_config(page_title="Preview Dataset",initial_sidebar_state="expanded",layout="wide",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png")
 # Navigation header
-page = st_navbar(["Run Autogluon","Dataset"], selected="Dataset",styles=styles,options=options)
+page = st_navbar(["Home","Run Autogluon","Dataset"], selected="Dataset",styles=styles,options=options)
 
 if page == "Run Autogluon":
     st.switch_page("pages/task.py")
+if page == 'Home':
+    st.switch_page("pages/home.py")
 
 with open('preview_style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
@@ -24,10 +26,10 @@ def preview_dataset():
             {'icon': "bi bi-file-earmark-bar-graph", 'label': "Sample Output File"},
             {'icon': "bi bi-file-earmark-arrow-down", 'label': "Output File"}
         ]
-        over_theme = {}
+        theme = {"border-radius": "0"}
         font_fmt = {'font-class': 'h2', 'font-size': '150%'}
-        selected_file = hc.option_bar(option_definition=option_data, key='PrimaryOption',
-                                      override_theme=over_theme, font_styling=font_fmt, horizontal_orientation=False)
+        selected_file = hc.option_bar(option_definition=option_data, key='PrimaryOption',override_theme=theme,
+                                       font_styling=font_fmt, horizontal_orientation=False)
     with col2:
         selected_file_container = st.container()
         with selected_file_container:
