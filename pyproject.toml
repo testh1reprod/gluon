@@ -20,6 +20,7 @@ dependencies = [
     "rich",
     "s3fs",
     "joblib",
+    "python-calamine",
 ]
 
 [project.optional-dependencies]
@@ -62,7 +63,6 @@ known_third_party = [
     "numpy",
     "omegaconf",
     "openai",
-    "openpyxl",
     "pandas",
     "psutil",
     "pydantic",
