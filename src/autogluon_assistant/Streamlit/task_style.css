@@ -14,6 +14,18 @@
     justify-content: center;
     align-items: center;
 }
+/*Description file uploader*/
+div[data-testid='stFileUploader'] > section[aria-label="Upload task description file"] > input + div {
+    display: none;
+}
+div[data-testid='stFileUploader'] > section[aria-label="Upload task description file"]{
+    width:100%;
+    padding: 0;
+    height: 50%;
+    background-color: transparent;
+}
+
+
 /*Train Dataset file uploader*/
 
 div[data-testid='stFileUploader'] > section[aria-label="Upload Train Dataset"] > input + div {
@@ -23,18 +35,18 @@ div[data-testid='stFileUploader'] > section[aria-label="Upload Train Dataset"] >
 div[data-testid='stFileUploader'] > section[aria-label="Upload Train Dataset"]{
     width:100%;
     padding: 0;
-    height: 50%;
+    height: 10%;
     background-color: transparent;
 }
 section[aria-label="Upload Train Dataset"][data-testid='stFileUploaderDropzone'] > [data-testid='baseButton-secondary'] {
-        margin-top: 4px;
+        margin-top: 0;
         margin-bottom: -1px;
         text-indent: -9999px;
         line-height: 0;
         width: 80%;
         border: none;
-        background: #00428e;
-        color:#f0f4ff;
+        background: transparent;
+        color:#4C7DE7;
         &::after {
             line-height: initial;
             content: "Upload Train Dataset";
@@ -56,14 +68,14 @@ div[data-testid='stFileUploader'] > section[aria-label="Upload Test Dataset"]{
 
 }
 section[aria-label="Upload Test Dataset"][data-testid='stFileUploaderDropzone'] > [data-testid='baseButton-secondary'] {
-        margin-top: 4px;
+        margin-top: 0;
         margin-bottom: -1px;
         text-indent: -9999px;
         line-height: 0;
         width: 80%;
         border: none;
-        background: #00428e;
-        color:#f0f4ff;
+        background: transparent;
+        color:#4C7DE7;
         &::after {
             line-height: initial;
             content: "Upload Test Dataset";
@@ -84,14 +96,14 @@ div[data-testid='stFileUploader'] > section[aria-label="Upload Sample Output Dat
     background-color: transparent;
 }
 section[aria-label="Upload Sample Output Dataset (Optional)"][data-testid='stFileUploaderDropzone'] > [data-testid='baseButton-secondary'] {
-        margin-top: 4px;
+        margin-top: 0;
         margin-bottom: -1px;
         text-indent: -9999px;
         line-height: 0;
         width: 80%;
         border: none;
-        background: #00428e;
-        color:#f0f4ff;
+        background: transparent;
+        color:#4C7DE7;
         text-align: left;
         &::after {
             line-height: initial;

@@ -10,9 +10,10 @@ import psutil
 import streamlit.components.v1 as components
 from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_extras.stylable_container import stylable_container
-
+from streamlit_cookies_controller import CookieController
 
 st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide",initial_sidebar_state="collapsed")
+controller = CookieController()
 
 # navigation header
 page = st_navbar(["Home","Run Autogluon","Dataset"], selected="Run Autogluon",styles=styles,options=options)
@@ -72,117 +73,114 @@ def store_value(key):
 def load_value(key):
     st.session_state["_"+key] = st.session_state[key]
 
-def set_params():
-    col1, col2, col3, col4 = st.columns(4,gap='medium')
+def run_section():
+    step1 = """
+        <h3 style="color:#4C7DE7;">Run Autogluon</h3>
+        """
+    st.html(step1)
+    col1, col2, col3 = st.columns([10.9, 0.2, 9],gap='medium')
     with col1:
-        config_autogluon_preset()
+        col11, col12 = st.columns(2)
+        with col11:
+            config_autogluon_preset()
+            config_time_limit()
+        with col12:
+            config_transformer()
+            config_llm()
+        set_description()
     with col2:
-        config_time_limit()
+        st.html(
+            '''
+                <div class="divider-vertical-line"></div>
+                <style>
+                    .divider-vertical-line {
+                        border-left: 2px solid rgba(49, 51, 63, 0.2);
+                        height: 590px;
+                        margin: auto;
+                    }
+                </style>
+            '''
+        )
     with col3:
-        config_transformer()
-    with col4:
-        config_llm()
+        file_uploader()
     update_config_overrides()
-    add_vertical_space(2)
+    st.markdown("---",unsafe_allow_html=True)
+    colx, coly = st.columns([9,3])
+    with coly:
+        run_button()
+        if st.session_state.task_running:
+            show_cancel_task_button()
+
+    if st.session_state.task_running:
+        show_real_time_logs()
+    elif not st.session_state.task_running and not st.session_state.task_canceled:
+        show_logs()
+    elif st.session_state.task_canceled:
+        show_cancel_container()
+    generate_output_file()
+    colxx, colyy,colzz = st.columns([5,2,5])
+    with colyy:
+        download_button()
+
+
+
+
 
 @st.fragment
 def config_autogluon_preset():
-    with st.container(border=True, height=150):
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            st.html(
-                """
-                 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                <i class="fa-solid fa-gear" style="font-size: 50px; margin-top: 30px;color: #023e8a;"></i>
-                </div>
-                """
-            )
-        with col2:
-            st.html(
-                """
-                <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 16px;">
-                    <h1 style="font-size: 20px;color:#023e8a; ">Autogluon Preset</h1>
-                </div>
-                """
-            )
-            preset_options = ["Best Quality", "High Quality", "Good Quality", "Medium Quality"]
-            load_value("preset")
-            st.selectbox("Autogluon Preset", index=None, placeholder="Autogluon Preset", options=preset_options, key="_preset",
-                         on_change=store_value, args=["preset"],label_visibility="collapsed")
+    st.html(
+        """
+        <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 0;">
+            <h1 style="font-size: 20px;color:#4C7DE7; ">Autogluon Preset</h1>
+        </div>
+        """
+    )
+    preset_options = ["Best Quality", "High Quality", "Good Quality", "Medium Quality"]
+    load_value("preset")
+    st.selectbox("Autogluon Preset", index=None, placeholder="Autogluon Preset", options=preset_options, key="_preset",
+                 on_change=store_value, args=["preset"],label_visibility="collapsed")
 
 @st.fragment
 def config_time_limit():
-    with st.container(border=True, height=150):
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            st.html(
-                """
-                 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                <i class="fa-solid fa-clock" style="font-size: 50px; margin-top: 30px;color: #023e8a;"></i>
-                </div>
-                """
-            )
-        with col2:
-            st.html(
-                """
-                <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 16px;">
-                    <h1 style="font-size: 20px;color:#023e8a; ">Time Limit</h1>
-                </div>
-                """
-            )
-            time_limit_options = ["30s", "1 min", "15 mins", "30 mins", "1 hr", "2 hrs", "4 hrs"]
-            load_value("time_limit")
-            st.selectbox("Time Limit", index=None, placeholder="Time Limit", options=time_limit_options, key="_time_limit",on_change=store_value, args=["time_limit"],label_visibility="collapsed")
+
+    st.html(
+        """
+        <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 0;">
+            <h1 style="font-size: 20px;color:#4C7DE7; ">Time Limit</h1>
+        </div>
+        """
+    )
+    time_limit_options = ["30s", "1 min", "15 mins", "30 mins", "1 hr", "2 hrs", "4 hrs"]
+    load_value("time_limit")
+    st.selectbox("Time Limit", index=None, placeholder="Time Limit", options=time_limit_options, key="_time_limit",on_change=store_value, args=["time_limit"],label_visibility="collapsed")
 
 @st.fragment
 def config_transformer():
-    with st.container(border=True, height=150):
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            st.html(
-                """
-                 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                <i class="fa-brands fa-buromobelexperte" style="font-size: 50px; margin-top: 30px;color: #023e8a;"></i>
-                </div>
-                """
-            )
-        with col2:
-            st.html(
-                """
-                <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 0;">
-                    <h1 style="font-size: 19px;color:#023e8a; ">Feature Transformers</h1>
-                </div>
-                """
-            )
-            transformer_options = ["OpenFE", "CAAFE"]
-            load_value("transformers")
-            st.multiselect("Feature Transformers", placeholder="Feature Transformers", options=transformer_options,
-                   key="_transformers", on_change=store_value, args=["transformers"],label_visibility="collapsed")
+    st.html(
+        """
+        <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 0;">
+            <h1 style="font-size: 19px;color:#4C7DE7; ">Feature Transformers</h1>
+        </div>
+        """
+    )
+    transformer_options = ["OpenFE", "CAAFE"]
+    load_value("transformers")
+    st.multiselect("Feature Transformers", placeholder="Feature Transformers", options=transformer_options,
+           key="_transformers", on_change=store_value, args=["transformers"],label_visibility="collapsed")
 
 @st.fragment
 def config_llm():
-    with st.container(border=True, height=150):
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            st.html(
-                """
-                 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                <i class="fa-solid fa-robot" style="font-size: 50px; margin-top: 30px;color: #023e8a;"></i>
-                </div>
-                """
-            )
-        with col2:
-            st.html(
-                """
-                <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 16px;">
-                    <h1 style="font-size: 20px;color:#023e8a; ">LLM Model</h1>
-                </div>
-                """
-            )
-            llm_options = ["GPT 3.5-Turbo", "GPT 4", "Claude 3 - Sonnet"]
-            load_value("llm")
-            st.selectbox("Choose a LLM model", index=None, placeholder="Choose a LLM model", options=llm_options, key="_llm",
-                 on_change=store_value, args=["llm"],label_visibility="collapsed")
+    st.html(
+        """
+        <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 0;">
+            <h1 style="font-size: 20px;color:#4C7DE7; ">LLM Model</h1>
+        </div>
+        """
+    )
+    llm_options = ["GPT 3.5-Turbo", "GPT 4", "Claude 3 - Sonnet"]
+    load_value("llm")
+    st.selectbox("Choose a LLM model", index=None, placeholder="Choose a LLM model", options=llm_options, key="_llm",
+         on_change=store_value, args=["llm"],label_visibility="collapsed")
 
 def save_description_file(description):
     user_data_dir = get_user_data_dir()
@@ -208,7 +206,7 @@ def description_file_uploader():
 @st.fragment
 def display_description():
     load_value("task_description")
-    st.text_area(label='Task Description',placeholder="Enter your task description : ",value=st.session_state.task_description,key="_task_description",on_change=store_value_and_save_file, args=["task_description"],height=180,label_visibility="collapsed")
+    st.text_area(label='Task Description',placeholder="Enter your task description : ",value=st.session_state.task_description,key="_task_description",on_change=store_value_and_save_file, args=["task_description"],height=250,label_visibility="collapsed")
 
 
 
@@ -245,11 +243,11 @@ def save_uploaded_file(file, file_path):
 # This function is to make sure click on the download button does not reload the entire app (a temporary workaround)
 @st.fragment
 def show_download_button(data,file_name):
-    st.download_button(label="Download the output file", data=data,file_name=file_name,mime="text/csv")
+    st.download_button(label="💾  Download the output file", data=data,file_name=file_name,mime="text/csv")
 
 def show_cancel_task_button():
     try:
-        if st.button("Stop Task", on_click=toggle_cancel_state):
+        if st.button("⏹️   Stop Task", on_click=toggle_cancel_state):
             p = st.session_state.process
             print("Stopping the task ...")
             p.terminate()
@@ -385,10 +383,6 @@ def show_real_time_logs():
 
 def download_button():
     if st.session_state.output_file is not None:
-        step5 = """
-                 <h3 style="color:#023e8a;">Step 5: Download the output file</h3>
-                 """
-        st.html(step5)
         output_file = st.session_state.output_file
         output_filename = st.session_state.output_filename
         show_download_button(output_file.to_csv(index=False),output_filename)
@@ -413,10 +407,6 @@ def train_uploader():
         train_df = pd.read_csv(train_file)
         st.session_state.train_file_name = train_file.name
         st.session_state.train_file_df = train_df
-    if st.session_state.train_file_name is not None:
-        with st.popover(st.session_state.train_file_name,use_container_width=True):
-            st.write(st.session_state.train_file_df.head(10))
-    add_vertical_space(1)
 
 def test_uploader():
     test_file = st.file_uploader("Upload Test Dataset", key = 'test_file_uploader',label_visibility="collapsed")
@@ -426,10 +416,6 @@ def test_uploader():
         test_df = pd.read_csv(test_file)
         st.session_state.test_file_name = test_file.name
         st.session_state.test_file_df = test_df
-    if st.session_state.test_file_name is not None:
-        with st.popover(st.session_state.test_file_name, use_container_width=True):
-            st.write(st.session_state.test_file_df.head(10))
-    add_vertical_space(1)
 
 def sample_output_uploader():
     sample_output_file = st.file_uploader("Upload Sample Output Dataset (Optional)", key="sample_output_file_uploader",label_visibility="collapsed")
@@ -439,59 +425,77 @@ def sample_output_uploader():
         sample_output_df = pd.read_csv(sample_output_file)
         st.session_state.sample_output_file_name = sample_output_file.name
         st.session_state.sample_output_file_df = sample_output_df
+
+def file_uploader():
+    with stylable_container(key='train_file_uploader',css_styles="""
+        {
+            border: 1px solid rgba(49, 51, 63, 0.2);
+            padding: calc(1em - 1px);
+            background-color:transparent;
+            display: flex;
+            border-radius: 10px;
+            flex-direction: column;
+            align-items: center;
+        }
+    """):
+        st.html(
+            """
+             <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+            <i class="fa-brands fa-buromobelexperte" style="font-size: 40px; margin-top: 30px;color: #4C7DE7;"></i>
+            </div>
+            """
+        )
+        train_uploader()
+    if st.session_state.train_file_name is not None:
+        with st.popover(st.session_state.train_file_name,use_container_width=True):
+            st.write(st.session_state.train_file_df.head(10))
+
+    with stylable_container(key='test_file_uploader', css_styles="""
+               {
+                   border: 1px solid rgba(49, 51, 63, 0.2);
+                   padding: calc(1em - 1px);
+                   background-color: transparent;
+                   display: flex;
+                    border-radius: 10px;
+                   flex-direction: column;
+                   align-items: center;
+               }
+           """):
+        st.html(
+            """
+             <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+            <i class="fa-solid fa-gear" style="font-size: 40px; margin-top: 30px;color: #4C7DE7;"></i>
+            </div>
+            """
+        )
+        test_uploader()
+    if st.session_state.test_file_name is not None:
+        with st.popover(st.session_state.test_file_name, use_container_width=True):
+            st.write(st.session_state.test_file_df.head(10))
+
+    with stylable_container(key='sample_output_file_uploader', css_styles="""
+                {
+                    border: 1px solid rgba(49, 51, 63, 0.2);
+                    padding: calc(1em - 1px);
+                    background-color: transparent;
+                    display: flex;
+                    border-radius: 10px;
+                    flex-direction: column;
+                    align-items: center;
+                }
+            """):
+        st.html(
+            """
+             <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+            <i class="fa-solid fa-file-csv" style="font-size: 40px; margin-top: 30px;color: #4C7DE7;"></i>
+            </div>
+            """
+        )
+        sample_output_uploader()
     if st.session_state.sample_output_file_name is not None:
         with st.popover(st.session_state.sample_output_file_name, use_container_width=True):
             st.write(st.session_state.sample_output_file_df.head(10))
-    add_vertical_space(1)
-
-def file_uploader():
-    col1, col2, col3 = st.columns(3,gap="large")
-    with col1:
-        with stylable_container(key='train_file_uploader',css_styles="""
-            {
-                border: 1px solid rgba(49, 51, 63, 0.2);
-                border-radius: 2rem;
-                padding: calc(1em - 1px);
-                background-color:#00428e;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                box-shadow: 0 4px 8px gray;
-            }
-        """):
-            train_uploader()
-    with col2:
-        with stylable_container(key='test_file_uploader', css_styles="""
-                   {
-                       border: 1px solid rgba(49, 51, 63, 0.2);
-                       border-radius: 2rem;
-                       padding: calc(1em - 1px);
-                       background-color: #00428e;
-                       display: flex;
-                       flex-direction: column;
-                       align-items: center;
-                       box-shadow: 0 4px 8px gray;
-                   }
-               """):
-            test_uploader()
-    with col3:
-        with stylable_container(key='sample_output_file_uploader', css_styles="""
-                    {
-                        border: 1px solid rgba(49, 51, 63, 0.2);
-                        border-radius: 2rem;
-                        padding: calc(1em - 1px);
-                        background-color: #00428e;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        box-shadow: 0 4px 8px gray;
-                    }
-                """):
-            sample_output_uploader()
     add_vertical_space(3)
-
-
-
 
 
 def toggle_running_state():
@@ -503,7 +507,7 @@ def toggle_cancel_state():
 
 def run_button():
     user_data_dir = get_user_data_dir()
-    if st.button(label="Run AutoGluon Assistant", on_click=toggle_running_state,
+    if st.button(label="🔘 Run AutoGluon Assistant", on_click=toggle_running_state,
                  disabled=st.session_state.task_running):
         if st.session_state.train_file_name and st.session_state.test_file_name:
                 generate_task_file(user_data_dir)
@@ -562,25 +566,15 @@ def initial_session_state():
 
 
 def set_description():
-    col1, col2 = st.columns([3,1],gap='large')
-    with col1:
-        st.html(
-            """
-            <div style="display: flex; align-items: center; justify-content: flex-start; height: 40px;padding-bottom: 16px;">
-                <h1 style="font-size: 20px;color:#023e8a; "></h1>
-            </div>
-            """
-        )
-        display_description()
-    with col2:
-        st.html(
-            """
-            <div style="display: flex; align-items: center; justify-content: flex-start; height: 40px;padding-bottom: 16px;">
-                <h1 style="font-size: 20px;color:#023e8a; "></h1>
-            </div>
-            """
-        )
-        description_file_uploader()
+    st.html(
+        """
+        <div style="display: flex; align-items: center; justify-content: flex-start; height: 40px;padding-bottom: 0px;">
+            <h1 style="font-size: 20px;color:#4C7DE7; ">Enter or Upload your task description</h1>
+        </div>
+        """
+    )
+    display_description()
+    description_file_uploader()
     add_vertical_space(4)
 
 
@@ -589,38 +583,8 @@ def set_description():
 def main():
     initial_session_state()
     display_header()
-    step1 = """
-    <h3 style="color:#023e8a;">Step 1: Configure your parameters</h3>
-    """
-    st.html(step1)
-    set_params()
-    step2 = """
-      <h3 style="color:#023e8a;">Step 2: Enter or Upload your task description </h3>
-      """
-    st.html(step2)
-    set_description()
-    step3 = """
-       <h3 style="color:#023e8a;">Step 3: Upload Train and Test files </h3>
-       """
-    st.html(step3)
-    file_uploader()
-    step4 = """
-         <h3 style="color:#023e8a;">Step 4: Run your task</h3>
-         """
-    st.html(step4)
-    run_button()
-    if st.session_state.task_running:
-        show_cancel_task_button()
-    if st.session_state.task_running:
-        show_real_time_logs()
-    elif not st.session_state.task_running and not st.session_state.task_canceled:
-        show_logs()
-    elif st.session_state.task_canceled:
-        show_cancel_container()
-    st.header("Step 4")
+    run_section()
 
-    generate_output_file()
-    download_button()
     # st.write(st.session_state)
 
 
