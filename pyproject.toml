@@ -62,6 +62,7 @@ known_third_party = [
     "numpy",
     "omegaconf",
     "openai",
+    "openpyxl",
     "pandas",
     "psutil",
     "pydantic",
