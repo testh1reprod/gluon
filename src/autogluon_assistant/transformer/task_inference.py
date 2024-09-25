@@ -83,8 +83,9 @@ class LLMParserTransformer(BaseTransformer):
                     HumanMessage(content=prompt),
                 ]
             )
-
+            logger.debug(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
             output = self.llm(chat_prompt.format_messages())
+            logger.debug(f"LLM output:\n{output}")
 
             return self.parser.parse(output.content)
         except OutputParserException as e:
