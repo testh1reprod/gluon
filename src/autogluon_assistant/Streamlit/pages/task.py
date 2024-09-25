@@ -1,27 +1,23 @@
 import streamlit as st
 import pandas as pd
-from autogluon_assistant.Streamlit.style.style import styles,options
-from streamlit_navigation_bar import st_navbar
 import os
 import uuid
 import glob
 import subprocess
 import psutil
 import streamlit.components.v1 as components
+st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide",initial_sidebar_state="collapsed")
 from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_extras.stylable_container import stylable_container
 from streamlit_cookies_controller import CookieController
+from nav_bar import nav_bar
+from tutorial import main as tutorial
+from feature import main as feature
+from demo import main as demo
+from preview import preview_dataset
 
-st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide",initial_sidebar_state="collapsed")
 controller = CookieController()
 
-# navigation header
-page = st_navbar(["Home","Run Autogluon","Dataset"], selected="Run Autogluon",styles=styles,options=options)
-
-if page == "Dataset":
-    st.switch_page("pages/preview.py")
-if page == 'Home':
-    st.switch_page("pages/home.py")
 
 CONFIG_DIR = '../../../config'
 BASE_DATA_DIR = './user_data'
@@ -33,6 +29,14 @@ st.markdown(
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     """,
     unsafe_allow_html=True
+)
+
+# Bootstrap 4.1.3
+st.markdown(
+    """
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    """,unsafe_allow_html=True
+
 )
 with open('task_style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
@@ -74,12 +78,19 @@ def load_value(key):
     st.session_state["_"+key] = st.session_state[key]
 
 def run_section():
-    step1 = """
-        <h3 style="color:#4C7DE7;">Run Autogluon</h3>
-        """
-    st.html(step1)
-    col1, col2, col3 = st.columns([10.9, 0.2, 9],gap='medium')
-    with col1:
+    st.markdown("""
+           <h1 style='
+               font-weight: light;
+               padding-left: 20px;
+               padding-right: 20px;
+               margin-left:60px;
+               font-size: 2em;
+           '>
+               Run Autogluon
+           </h1>
+       """, unsafe_allow_html=True)
+    col1, col2, col3,col4,col5= st.columns([1,10.9, 0.2, 10.9,1],gap='large')
+    with col2:
         col11, col12 = st.columns(2)
         with col11:
             config_autogluon_preset()
@@ -88,7 +99,7 @@ def run_section():
             config_transformer()
             config_llm()
         set_description()
-    with col2:
+    with col3:
         st.html(
             '''
                 <div class="divider-vertical-line"></div>
@@ -101,26 +112,27 @@ def run_section():
                 </style>
             '''
         )
-    with col3:
+    with col4:
         file_uploader()
     update_config_overrides()
-    st.markdown("---",unsafe_allow_html=True)
-    colx, coly = st.columns([9,3])
-    with coly:
+    _, mid_pos,_ = st.columns([1,22,1],gap='large')
+    with mid_pos:
         run_button()
         if st.session_state.task_running:
             show_cancel_task_button()
-
-    if st.session_state.task_running:
-        show_real_time_logs()
-    elif not st.session_state.task_running and not st.session_state.task_canceled:
-        show_logs()
-    elif st.session_state.task_canceled:
-        show_cancel_container()
+    _, mid_pos, _ = st.columns([1, 22, 1], gap='large')
+    with mid_pos:
+        if st.session_state.task_running:
+            show_real_time_logs()
+        elif not st.session_state.task_running and not st.session_state.task_canceled:
+            show_logs()
+        elif st.session_state.task_canceled:
+            show_cancel_container()
     generate_output_file()
-    colxx, colyy,colzz = st.columns([5,2,5])
-    with colyy:
+    _, download_pos,_ = st.columns([5,2,5])
+    with download_pos:
         download_button()
+    st.markdown("---", unsafe_allow_html=True)
 
 
 
@@ -128,13 +140,6 @@ def run_section():
 
 @st.fragment
 def config_autogluon_preset():
-    st.html(
-        """
-        <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 0;">
-            <h1 style="font-size: 20px;color:#4C7DE7; ">Autogluon Preset</h1>
-        </div>
-        """
-    )
     preset_options = ["Best Quality", "High Quality", "Good Quality", "Medium Quality"]
     load_value("preset")
     st.selectbox("Autogluon Preset", index=None, placeholder="Autogluon Preset", options=preset_options, key="_preset",
@@ -143,26 +148,12 @@ def config_autogluon_preset():
 @st.fragment
 def config_time_limit():
 
-    st.html(
-        """
-        <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 0;">
-            <h1 style="font-size: 20px;color:#4C7DE7; ">Time Limit</h1>
-        </div>
-        """
-    )
     time_limit_options = ["30s", "1 min", "15 mins", "30 mins", "1 hr", "2 hrs", "4 hrs"]
     load_value("time_limit")
     st.selectbox("Time Limit", index=None, placeholder="Time Limit", options=time_limit_options, key="_time_limit",on_change=store_value, args=["time_limit"],label_visibility="collapsed")
 
 @st.fragment
 def config_transformer():
-    st.html(
-        """
-        <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 0;">
-            <h1 style="font-size: 19px;color:#4C7DE7; ">Feature Transformers</h1>
-        </div>
-        """
-    )
     transformer_options = ["OpenFE", "CAAFE"]
     load_value("transformers")
     st.multiselect("Feature Transformers", placeholder="Feature Transformers", options=transformer_options,
@@ -170,13 +161,6 @@ def config_transformer():
 
 @st.fragment
 def config_llm():
-    st.html(
-        """
-        <div style="display: flex; align-items: center; justify-content: center; height: 40px;padding-bottom: 0;">
-            <h1 style="font-size: 20px;color:#4C7DE7; ">LLM Model</h1>
-        </div>
-        """
-    )
     llm_options = ["GPT 3.5-Turbo", "GPT 4", "Claude 3 - Sonnet"]
     load_value("llm")
     st.selectbox("Choose a LLM model", index=None, placeholder="Choose a LLM model", options=llm_options, key="_llm",
@@ -206,22 +190,7 @@ def description_file_uploader():
 @st.fragment
 def display_description():
     load_value("task_description")
-    st.text_area(label='Task Description',placeholder="Enter your task description : ",value=st.session_state.task_description,key="_task_description",on_change=store_value_and_save_file, args=["task_description"],height=250,label_visibility="collapsed")
-
-
-
-def display_header():
-    image = './app/static/logo.png'
-    st.markdown(
-        f"""
-        <div style="text-align: center;max-height: 150px;">
-           <img src='{image}' alt='Logo' style='width:300px;'>
-            <h1 style="margin: 0;color: black; margin-bottom: 5px">Empower your ML with Zero Lines of Code</h1>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    add_vertical_space(6)
+    st.text_area(label='Dataset Description',placeholder="Enter your task description : ",value=st.session_state.task_description,key="_task_description",on_change=store_value_and_save_file, args=["task_description"],height=250)
 
 def get_user_data_dir():
     # Generate a unique directory name for the user session if it doesn't exist
@@ -243,11 +212,11 @@ def save_uploaded_file(file, file_path):
 # This function is to make sure click on the download button does not reload the entire app (a temporary workaround)
 @st.fragment
 def show_download_button(data,file_name):
-    st.download_button(label="💾  Download the output file", data=data,file_name=file_name,mime="text/csv")
+    st.download_button(label="💾&nbsp;&nbsp;Download the output file", data=data,file_name=file_name,mime="text/csv")
 
 def show_cancel_task_button():
     try:
-        if st.button("⏹️   Stop Task", on_click=toggle_cancel_state):
+        if st.button("⏹️&nbsp;&nbsp;Stop Task", on_click=toggle_cancel_state):
             p = st.session_state.process
             print("Stopping the task ...")
             p.terminate()
@@ -273,7 +242,6 @@ def generate_output_file():
         process = st.session_state.process
         process.wait()
         st.session_state.task_running = False
-        st.write("current running state",st.session_state.task_running)
         st.session_state.return_code = process.returncode
         st.session_state.process = None
         if st.session_state.return_code == 0:
@@ -440,8 +408,8 @@ def file_uploader():
     """):
         st.html(
             """
-             <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-            <i class="fa-brands fa-buromobelexperte" style="font-size: 40px; margin-top: 30px;color: #4C7DE7;"></i>
+             <div style="display: flex; align-items: center; justify-content: center; height: 80%;">
+            <i class="fa-brands fa-buromobelexperte" style="font-size: 40px; margin-top: 30px;color: #1590e1;"></i>
             </div>
             """
         )
@@ -463,8 +431,8 @@ def file_uploader():
            """):
         st.html(
             """
-             <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-            <i class="fa-solid fa-gear" style="font-size: 40px; margin-top: 30px;color: #4C7DE7;"></i>
+             <div style="display: flex; align-items: center; justify-content: center; height: 80%;">
+            <i class="fa-solid fa-gear" style="font-size: 40px; margin-top: 30px;color: #1590e1;"></i>
             </div>
             """
         )
@@ -486,8 +454,8 @@ def file_uploader():
             """):
         st.html(
             """
-             <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-            <i class="fa-solid fa-file-csv" style="font-size: 40px; margin-top: 30px;color: #4C7DE7;"></i>
+             <div style="display: flex; align-items: center; justify-content: center; height: 80%;">
+            <i class="fa-solid fa-file-csv" style="font-size: 40px; margin-top: 30px;color: #1590e1;"></i>
             </div>
             """
         )
@@ -507,7 +475,7 @@ def toggle_cancel_state():
 
 def run_button():
     user_data_dir = get_user_data_dir()
-    if st.button(label="🔘 Run AutoGluon Assistant", on_click=toggle_running_state,
+    if st.button(label="🔘&nbsp;&nbsp;Run!", on_click=toggle_running_state,
                  disabled=st.session_state.task_running):
         if st.session_state.train_file_name and st.session_state.test_file_name:
                 generate_task_file(user_data_dir)
@@ -566,24 +534,24 @@ def initial_session_state():
 
 
 def set_description():
-    st.html(
-        """
-        <div style="display: flex; align-items: center; justify-content: flex-start; height: 40px;padding-bottom: 0px;">
-            <h1 style="font-size: 20px;color:#4C7DE7; ">Enter or Upload your task description</h1>
-        </div>
-        """
-    )
     display_description()
     description_file_uploader()
     add_vertical_space(4)
 
-
-
-
 def main():
     initial_session_state()
-    display_header()
+    nav_bar()
+    tutorial()
+    demo()
+    feature()
     run_section()
+    preview_dataset()
+
+    st.markdown("""
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    """, unsafe_allow_html=True)
 
     # st.write(st.session_state)
 

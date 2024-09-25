@@ -1,19 +1,12 @@
 import streamlit as st
-from streamlit_navigation_bar import st_navbar
-from style.style import styles,options
 
-st.set_page_config(
-    page_title="Hello",
-    page_icon="👋",
-)
-pages = ["Home","Run Autogluon","Dataset"]
+from pages.nav_bar import nav_bar
 
-page = st_navbar(pages,styles=styles,options=options)
+st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide",initial_sidebar_state="collapsed")
 
-if page == "Run Autogluon":
-    st.switch_page("pages/task.py")
-if page == "Dataset":
-    st.switch_page("pages/preview.py")
-if page == "Home":
-    st.switch_page("pages/home.py")
+
+
+
+nav_bar()
+
 
