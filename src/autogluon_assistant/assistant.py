@@ -1,11 +1,11 @@
 import logging
 import signal
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 
-from autogluon_assistant.llm import AssistantChatOpenAI, LLMFactory
+from autogluon_assistant.llm import AssistantChatBedrock, AssistantChatOpenAI, LLMFactory
 
 from .predictor import AutogluonTabularPredictor
 from .task import TabularPredictionTask
@@ -43,7 +43,7 @@ class TabularPredictionAssistant:
 
     def __init__(self, config: DictConfig) -> None:
         self.config = config
-        self.llm: AssistantChatOpenAI = LLMFactory.get_chat_model(config.llm)
+        self.llm: Union[AssistantChatOpenAI, AssistantChatBedrock] = LLMFactory.get_chat_model(config.llm)
         self.predictor = AutogluonTabularPredictor(config.autogluon)
         self.feature_transformers_config = config.feature_transformers
 

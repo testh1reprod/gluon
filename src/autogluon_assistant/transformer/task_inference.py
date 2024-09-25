@@ -11,7 +11,7 @@ from langchain_core.exceptions import OutputParserException
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
-from autogluon_assistant.llm import AssistantChatOpenAI
+from autogluon_assistant.llm import AssistantChatBedrock, AssistantChatOpenAI
 from autogluon_assistant.llm.prompts import (
     basic_intro_prompt,
     basic_system_prompt,
@@ -59,7 +59,7 @@ class LLMParserTransformer(BaseTransformer):
 
     traits: Type[BaseModel]
 
-    def __init__(self, llm: AssistantChatOpenAI, *args, **kwargs):
+    def __init__(self, llm: Union[AssistantChatOpenAI, AssistantChatBedrock], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.llm = llm
 
