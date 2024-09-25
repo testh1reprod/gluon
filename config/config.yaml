@@ -27,6 +27,7 @@ llm:
   api_key_location: OPENAI_API_KEY
   model: gpt-4-1106-preview
   # model: gpt-3.5-turbo
+  # Note: bedrock is only supported in limited AWS regions
   # provider: bedrock
   # model: "anthropic.claude-3-sonnet-20240229-v1:0"
   # api_key_location: BEDROCK_API_KEY
