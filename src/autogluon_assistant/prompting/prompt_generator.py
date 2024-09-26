@@ -4,7 +4,7 @@ from typing import Dict, Any, List
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from ..constants import NO_ID_COLUMN_IDENTIFIED
+from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_ID_COLUMN_IDENTIFIED
 
 
 class PromptGenerator(ABC):
@@ -45,7 +45,7 @@ class PromptGenerator(ABC):
 class FilenamePromptGenerator(PromptGenerator):
     fields = ["train_data", "test_data", "output_data"]
 
-    def __init__(self, data_description: str, filenames: str):
+    def __init__(self, data_description: str, filenames: list):
         super().__init__(data_description)
         self.filenames = filenames
 
@@ -53,7 +53,7 @@ class FilenamePromptGenerator(PromptGenerator):
         return "\n\n".join([
             self.basic_intro_prompt,
             self.data_description_prompt,
-            f"# Available Files\n{self.filenames}",
+            f"# Available Files\n{", ".join(self.filenames)}",
             "If there are zip (e.g. .zip or .gz) versions of files and non-zipped versions of the files, choose the non-zip version. For example, return 'train.csv' rather than 'train.csv.zip'.",
             self.get_field_parsing_prompt()
         ])
@@ -62,17 +62,15 @@ class FilenamePromptGenerator(PromptGenerator):
 class LabelColumnPromptGenerator(PromptGenerator):
     fields = ["label_column"]
 
-    def __init__(self, data_description: str, evaluation_description: str, columns_in_train_not_test: str):
+    def __init__(self, data_description: str, column_names: list):
         super().__init__(data_description)
-        self.evaluation_description = evaluation_description
-        self.columns_in_train_not_test = columns_in_train_not_test
+        self.column_names = column_names
 
     def generate_prompt(self) -> str:
         return "\n\n".join([
             self.basic_intro_prompt,
             self.data_description_prompt,
-            f"# Evaluation Description\n{self.evaluation_description}",
-            f"Based on the data description, which one of these columns is likely to be the label column:\n{self.columns_in_train_not_test}",
+            f"Based on the data description, which one of these columns is likely to be the label column:\n{"' ".join(self.column_names)}",
             self.get_field_parsing_prompt()
         ])
 
@@ -99,10 +97,9 @@ class IdColumnPromptGenerator(PromptGenerator):
 class EvalMetricPromptGenerator(PromptGenerator):
     fields = ["eval_metric"]
 
-    def __init__(self, data_description: str, metrics: str, metric_descriptions: str):
+    def __init__(self, data_description: str, metrics: str):
         super().__init__(data_description)
         self.metrics = metrics
-        self.metric_descriptions = metric_descriptions
 
     def generate_prompt(self) -> str:
         return "\n\n".join([
@@ -110,9 +107,9 @@ class EvalMetricPromptGenerator(PromptGenerator):
             self.data_description_prompt,
             f"""
 Based on the information provided, identify the correct evaluation metric to be used from among these KEYS:
-{self.metrics}
+{", ".join(self.metrics)}
 The descriptions of these metrics are:
-{self.metric_descriptions}
+{", ".join([METRICS_DESCRIPTION[metric] for metric in self.metrics])}
 respectively.
 If the exact metric is not in the list provided, then choose the metric that you think best approximates the one in the task description.
 Only respond with the exact names of the metrics mentioned in KEYS. Do not respond with the metric descriptions.

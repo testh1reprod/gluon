@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 import difflib
 import logging
 from typing import Dict, List, Type, Union
@@ -22,25 +21,25 @@ from autogluon_assistant.prompting import (
 from autogluon_assistant.task import TabularPredictionTask
 
 from .base import BaseTransformer
+from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION
 
 logger = logging.getLogger(__name__)
 
 
-class TaskParser(ABC):
+class TaskInference():
     """Parses data and metadata of a task with the aid of an instruction-tuned LLM."""
 
-    def __init__(self, llm: AssistantChatOpenAI, *args, **kwargs):
+    def __init__(self, llm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.llm = llm
         self.prompt_generator = None
+        self.valid_values = None
 
-    @property
-    def parser(self):
-        pass
-
-    @abstractmethod
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        pass
+        parser_output = self._chat_and_parse_prompt_output()
+        for key in parser_output:
+            setattr(task, key, parser_output[key])
+        return task
 
     def _chat_and_parse_prompt_output(
         self,
@@ -52,66 +51,71 @@ class TaskParser(ABC):
             output = self.llm(chat_prompt.format_messages())
             logger.debug(f"LLM output:\n{output}")
 
-            return self.parser.parse(output.content)
+            parsed_output = self.parser.parse(output.content)
         except OutputParserException as e:
             logger.error(f"Failed to parse output: {e}")
             logger.error(self.llm.describe())  # noqa
             raise e
+        
+        if self.valid_values:
+            for key, parsed_value in parsed_output.items():
+                if parsed_value not in self.valid_values:
+                    close_matches = difflib.get_close_matches(parsed_value, self.valid_values)
+                    if len(close_matches) == 0:
+                        raise ValueError(f"Parsed value: {parsed_eval_metric} for key {key} not recognized")
+                    parsed_output[key] = close_matches[0]
+
+        return parsed_output
 
 
-class FilenameInferenceTransformer(TaskParser):
+class FilenameInference(TaskInference):
     """Uses an LLM to locate the filenames of the train, test, and output data,
     and assigns them to the respective properties of the task.
     """
-
-    def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        composite_prompt = [
-            basic_intro_prompt,
-            data_description_template.format(task.data_description),
-            task_files_template.format(task.get_filenames()),
-            zip_file_prompt,
-            parse_fields_template.format(" ".join(self.traits.__fields__.keys())),
-            format_instructions_template.format(self.parser.get_format_instructions()),
-        ]
-        parser_output = self._chat_and_parse_prompt_output(composite_prompt, basic_system_prompt)
-
-        task.train_data = parser_output["train"]
-        task.test_data = parser_output["test"]
-        task.output_data = parser_output["output"]
-
-        return task
+    def __init__(self, llm, data_description: str, filenames: list, *args, **kwargs):
+        super().__init__(llm, *args, **kwargs)
+        self.valid_values = filenames
+        self.prompt_generator = FilenamePromptGenerator(data_description=data_description, filenames=filenames)
 
 
-class ProblemTypeInferenceTransformer(BaseTransformer):
+# TODO: add inference
+class ProblemTypeInference(TaskInference):
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
         task.metadata["problem_type"] = infer_problem_type(task.train_data[task.label_column], silent=True)
         return task
 
 
-class LabelColumnInferenceTransformer(LLMParserTransformer):
-    traits = LabelColumnTrait
+class LabelColumnInference(TaskInference):
+    def __init__(self, llm, data_description: str, column_names: list, *args, **kwargs):
+        super().__init__(llm, *args, **kwargs)
+        self.valid_values = column_names
+        self.prompt_generator = LabelColumnPromptGenerator(data_description=data_description, column_names=column_names)
+
+
+class EvalMetricInference(TaskInference):
+    def __init__(self, llm, data_description: str, problem_type: str, *args, **kwargs):
+        super().__init__(llm, *args, **kwargs)
+        self.metrics = METRICS_DESCRIPTION.keys() if problem_type is None else METRICS_BY_PROBLEM_TYPE[problem_type]
+        self.valid_values = self.metrics
+        self.prompt_generator = EvalMetricPromptGenerator(data_description=data_description, metrics=self.metrics)
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        composite_prompt = [
-            basic_intro_prompt,
-            data_description_template.format(task.data_description),
-            evaluation_description_template.format(task.evaluation_description),
-            columns_in_train_not_test_template.format("\n".join(task.columns_in_train_but_not_test)),
-            parse_fields_template.format(" ".join(self.parser.__fields__.keys())),
-            format_instructions_template.format(self.parser.get_format_instructions()),
-        ]
 
         try:
-            parser_output = self._chat_and_parse_prompt_output(composite_prompt, basic_system_prompt)
-            task.metadata["label_column"] = parser_output["label_column"]
-        except OutputParserException as e:
-            # Use the fallback method to infer the label column
-            task.metadata["label_column"] = task._infer_label_column_from_output_data()
-            if not task.metadata["label_column"]:
-                # raise the error if the fallback logic returns an Empty/None value
-                raise e
+            parser_output = self._chat_and_parse_prompt_output()
+        except OutputParserException:
+            logger.warning("Langchain failed to parse eval metric output. Will use default eval metric")
+        except ValueError as e:
+            logger.warning(
+                "Unrecognized eval metric parsed by the LLM. Will use default eval metric."
+                f"The parser output was {parser_output}, and exception was {str(e)}"
+            )
+        except Exception as e:
+            # TODO: fix whatever the Unknown exception is
+            logger.warning(f"Unknown exception {e} during eval metric parsing. Will use default eval metric.")
 
         return task
+
 
 
 class AbstractIdColumnInferenceTransformer(LLMParserTransformer):
@@ -204,79 +208,4 @@ class TrainIdColumnDropTransformer(AbstractIdColumnInferenceTransformer):
             task.metadata["dropped_train_id_column"] = True
 
         task.metadata["train_id_column"] = train_id_column
-        return task
-
-
-class EvalMetricInferenceTransformer(LLMParserTransformer):
-    traits = EvalMetricTrait
-
-    metrics_by_problem_type = {
-        "binary": [
-            ("roc_auc", "Area under the receiver operating characteristics (ROC) curve"),
-            ("log_loss", "Log loss, also known as logarithmic loss"),
-            ("accuracy", "Accuracy"),
-            ("f1", "F1 score"),
-            ("quadratic_kappa", "Quadratic kappa, i.e., the Cohen kappa metric"),
-            ("balanced_accuracy", "Balanced accuracy, i.e., the arithmetic mean of sensitivity and specificity"),
-        ],
-        "multiclass": [
-            ("roc_auc", "Area under the receiver operating characteristics (ROC) curve"),
-            ("log_loss", "Log loss, also known as logarithmic loss"),
-            ("accuracy", "Accuracy"),
-            ("f1", "F1 score"),
-            ("quadratic_kappa", "Quadratic kappa, i.e., the Cohen kappa metric"),
-            ("balanced_accuracy", "Balanced accuracy, i.e., the arithmetic mean of sensitivity and specificity"),
-        ],
-        "regression": [
-            ("root_mean_squared_error", "Root mean squared error (RMSE)"),
-            ("mean_squared_error", "Mean squared error (MSE)"),
-            ("mean_absolute_error", "Mean absolute error (MAE)"),
-            ("r2", "R-squared"),
-            ("root_mean_squared_logarithmic_error", "Root mean squared logarithmic error (RMSLE)"),
-        ],
-    }
-
-    def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        all_metrics = []
-        for problem_type in self.metrics_by_problem_type:
-            all_metrics.extend(self.metrics_by_problem_type[problem_type])
-
-        candidate_metrics = (
-            all_metrics if task.problem_type is None else self.metrics_by_problem_type[task.problem_type]
-        )
-
-        composite_prompt = [
-            basic_intro_prompt,
-            data_description_template.format(task.data_description),
-            eval_metric_prompt.format(
-                evaluation_description=task.evaluation_description,
-                metrics="\n".join([name for name, _ in candidate_metrics]),
-                metric_descriptions="\n".join([desc for _, desc in candidate_metrics]),
-            ),
-            parse_fields_template.format(" ".join(self.parser.__fields__.keys())),
-            format_instructions_template.format(self.parser.get_format_instructions()),
-        ]
-        try:
-            parser_output = self._chat_and_parse_prompt_output(composite_prompt, basic_system_prompt)
-            allowed_eval_metrics = [name for name, _ in all_metrics]
-            parsed_eval_metric = parser_output["eval_metric"]
-
-            if parsed_eval_metric not in allowed_eval_metrics:
-                close_matches = difflib.get_close_matches(parsed_eval_metric, allowed_eval_metrics)
-                if len(close_matches) == 0:
-                    raise ValueError(f"Eval metric: {parsed_eval_metric} not recognized")
-                parsed_eval_metric = close_matches[0]
-
-            logger.info(f"Using parsed eval metric: {parsed_eval_metric}")
-            task.metadata["eval_metric"] = parsed_eval_metric
-        except OutputParserException:
-            logger.warning("Langchain failed to parse eval metric output. Will use default eval metric")
-        except ValueError as e:
-            logger.warning(
-                "Unrecognized eval metric parsed by the LLM. Will use default eval metric."
-                f"The parser output was {parser_output}, and exception was {str(e)}"
-            )
-        except Exception:
-            logger.warning("Unknown exception during eval metric parsing. Will use default eval metric.")
-
         return task
