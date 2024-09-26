@@ -65,7 +65,6 @@ class TabularPredictionAssistant:
                 FilenameInferenceTransformer(llm=self.llm),
                 LabelColumnInferenceTransformer(llm=self.llm),
                 TestIdColumnTransformer(llm=self.llm),
-                TrainIdColumnDropTransformer(llm=self.llm),
                 ProblemTypeInferenceTransformer(),
             ]
             + ([EvalMetricInferenceTransformer(llm=self.llm)] if self.config.infer_eval_metric else [])
@@ -74,6 +73,8 @@ class TabularPredictionAssistant:
                 if self.feature_transformers_config
                 else []
             )
+            # Avoid dropping Train ID Column before DFS transformer; Drop at last
+            + [TrainIdColumnDropTransformer(llm=self.llm)]
         )
         for transformer in task_preprocessors:
             try:
