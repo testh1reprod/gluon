@@ -4,7 +4,7 @@ from typing import Dict, Any, List
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_ID_COLUMN_IDENTIFIED
+from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES
 
 
 class PromptGenerator(ABC):
@@ -73,21 +73,32 @@ class LabelColumnPromptGenerator(PromptGenerator):
             f"Based on the data description, which one of these columns is likely to be the label column:\n{"' ".join(self.column_names)}",
             self.get_field_parsing_prompt()
         ])
+    
 
-
-class IdColumnPromptGenerator(PromptGenerator):
-    fields = ["id_column"]
-
-    def __init__(self, data_description: str, test_columns: str, output_id_column: str = ""):
-        super().__init__(data_description)
-        self.test_columns = test_columns
-        self.output_id_column = output_id_column
+class ProblemTypePromptGenerator(PromptGenerator):
+    fields = ["problem_type"]
 
     def generate_prompt(self) -> str:
         return "\n\n".join([
             self.basic_intro_prompt,
-            self.data_description_prompt + f"\n\nThe output Id column is: {self.output_id_column}" if self.output_id_column else "",
-            f"Which column from the following list of data columns is most likely to be the Id column:\n{self.test_columns}\n"
+            self.data_description_prompt,
+            f"Based on the information provided, identify the correct problem_type to be used from among these KEYS: {", ".join(PROBLEM_TYPES)}",
+            self.get_field_parsing_prompt()
+        ])
+
+
+class IDColumnPromptGenerator(PromptGenerator):
+    fields = ["id_column"]
+
+    def __init__(self, data_description: str, column_names: list):
+        super().__init__(data_description)
+        self.column_names = column_names
+
+    def generate_prompt(self) -> str:
+        return "\n\n".join([
+            self.basic_intro_prompt,
+            self.data_description_prompt,
+            f"Based on the data description, which one of these columns is likely to be the Id column:\n{"' ".join(self.column_names)}",
             f"If no reasonable Id column is present, for example if all the columns appear to be similarly named feature columns, "
             f"response with the value {NO_ID_COLUMN_IDENTIFIED}",
             self.get_field_parsing_prompt()

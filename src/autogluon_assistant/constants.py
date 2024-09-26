@@ -4,6 +4,7 @@ NO_ID_COLUMN_IDENTIFIED = "NO_ID_COLUMN_IDENTIFIED"
 BINARY = "binary"
 MULTICLASS = "multiclass"
 REGRESSION = "regression"
+PROBLEM_TYPES = [BINARY, MULTICLASS, REGRESSION]
 
 # Metric constants
 ROC_AUC = "roc_auc"
