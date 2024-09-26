@@ -31,19 +31,22 @@ def get_task(path: Path) -> TabularPredictionTask:
 
 
 def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFrame) -> pd.DataFrame:
-    test_ids = task.test_data[task.test_id_column]
-    output_ids = task.output_data[task.output_id_column]
+    if task.test_id_column is not None:
+        test_ids = task.test_data[task.test_id_column]
+        output_ids = task.output_data[task.output_id_column]
 
-    if not test_ids.equals(output_ids):
-        rprint("[orange]Warning: Test IDs and output IDs do not match![/orange]")
+        if not test_ids.equals(output_ids):
+            rprint("[orange]Warning: Test IDs and output IDs do not match![/orange]")
 
-    outputs = pd.concat(
-        [
-            task.test_data[task.test_id_column],
-            predictions,
-        ],
-        axis="columns",
-    )
+        outputs = pd.concat(
+            [
+                task.test_data[task.test_id_column],
+                predictions,
+            ],
+            axis="columns",
+        )
+    else:
+        outputs = predictions
 
     outputs.columns = task.output_columns
     return outputs

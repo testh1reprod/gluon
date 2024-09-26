@@ -223,7 +223,7 @@ class TabularPredictionTask:
 
     @property
     def test_id_column(self) -> Optional[str]:
-        return self.metadata.get("test_id_column", self.test_data.columns[0])
+        return self.metadata.get("test_id_column", None)
 
     @property
     def output_id_column(self) -> Optional[str]:
