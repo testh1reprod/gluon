@@ -47,23 +47,27 @@ class TaskInference():
             setattr(task, key, parser_output[key])
         return task
 
+    def parse_output(self, output):
+        assert self.prompt_generator is not None, "prompt_generator is not initialized"
+        return self.prompt_generator.parser.parse(output.content)
+
     def _chat_and_parse_prompt_output(
         self,
     ) -> Dict[str, str]:
         """Chat with the LLM and parse the output"""
         try:
             chat_prompt = self.prompt_generator.generate_chat_prompt()
-            logger.debug(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
+            logger.info(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
             output = self.llm(chat_prompt.format_messages())
-            logger.debug(f"LLM output:\n{output}")
+            logger.info(f"LLM output:\n{output}")
 
-            parsed_output = self.parser.parse(output.content)
+            parsed_output = self.parse_output(output)
         except OutputParserException as e:
             logger.error(f"Failed to parse output: {e}")
             logger.error(self.llm.describe())  # noqa
             raise e
         
-        if self.valid_values:
+        if self.valid_values is not None:
             for key, parsed_value in parsed_output.items():
                 if parsed_value not in self.valid_values:
                     close_matches = difflib.get_close_matches(parsed_value, self.valid_values)
@@ -85,13 +89,14 @@ class FilenameInference(TaskInference):
     and assigns them to the respective properties of the task.
     """
     def initialize_task(self, task):
-        self.valid_values = task.filepaths
-        self.prompt_generator = FilenamePromptGenerator(data_description=task.metadata["description"], filenames=task.filepaths)
+        filenames = [str(path) for path in task.filepaths]
+        self.valid_values = filenames
+        self.prompt_generator = FilenamePromptGenerator(data_description=task.metadata["description"], filenames=filenames)
 
 
 class LabelColumnInference(TaskInference):
     def initialize_task(self, task):
-        column_names = task.train_data.columns()
+        column_names = list(task.train_data.columns)
         self.valid_values = column_names
         self.prompt_generator = LabelColumnPromptGenerator(data_description=task.metadata["description"], column_names=column_names)
 
@@ -105,7 +110,7 @@ class ProblemTypeInference(TaskInference):
 
 class TestIDColumnInference(TaskInference):
     def initialize_task(self, task):
-        column_names = task.test_data.columns()
+        column_names = list(task.test_data.columns)
         self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
         self.fallback_value = NO_ID_COLUMN_IDENTIFIED
         self.prompt_generator = TestIDColumnPromptGenerator(data_description=task.metadata["description"], column_names=column_names)
@@ -113,7 +118,7 @@ class TestIDColumnInference(TaskInference):
 
 class OutputIDColumnInference(TaskInference):
     def initialize_task(self, task):
-        column_names = task.output_data.columns()
+        column_names = list(task.output_data.columns)
         self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
         self.fallback_value = NO_ID_COLUMN_IDENTIFIED
         self.prompt_generator = OutputIDColumnPromptGenerator(data_description=task.metadata["description"], column_names=column_names)

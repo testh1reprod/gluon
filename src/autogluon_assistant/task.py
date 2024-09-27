@@ -46,7 +46,7 @@ class TabularPredictionTask:
         }
 
     def __repr__(self) -> str:
-        return f"TabularPredictionTask(name={self.metadata["name"]}, description={self.metadata["description"][:100]}, {len(self.dataset_mapping)} datasets)"
+        return f"TabularPredictionTask(name={self.metadata['name']}, description={self.metadata['description'][:100]}, {len(self.dataset_mapping)} datasets)"
 
     @staticmethod
     def read_task_file(task_path: Path, filename_pattern: str, default_filename: str = "description.txt") -> str:
@@ -98,7 +98,14 @@ class TabularPredictionTask:
 
     @classmethod
     def from_path(cls, task_root_dir: Path, name: Optional[str] = None) -> "TabularPredictionTask":
-        task_data_filenames: List[str] = None  # relative path for all files under task_root_dir
+        # Get all filenames under task_root_dir
+        task_data_filenames = []
+        for root, _, files in os.walk(task_root_dir):
+            for file in files:
+                # Get the relative path
+                relative_path = os.path.relpath(os.path.join(root, file), task_root_dir)
+                task_data_filenames.append(relative_path)
+
         
         data_description = cls.read_task_file(task_root_dir, "**/data.txt")
         evaluation_description = cls.read_task_file(task_root_dir, "**/evaluation.txt")
@@ -107,8 +114,7 @@ class TabularPredictionTask:
         )
 
         return cls(
-            description=full_description,
-            filepaths=[task_data_filenames / fn for fn in task_data_filenames],
+            filepaths=[task_root_dir / fn for fn in task_data_filenames],
             metadata=dict(
                 name=task_root_dir.name,
                 description=full_description,
@@ -270,6 +276,11 @@ class TabularPredictionTask:
         return self.metadata["eval_metric"] or (
             self.preferred_eval_metrics[self.problem_type] if self.problem_type else None
         )
+        
+    @eval_metric.setter
+    def eval_metric(self, eval_metric: str) -> None:
+        self.metadata["eval_metric"] = eval_metric
+
 
     def load_task_data(self, dataset_key: Union[str, str]) -> TabularDataset:
         """Load the competition file for the task."""

@@ -36,7 +36,7 @@ def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFra
         output_ids = task.output_data[task.output_id_column]
 
         if not test_ids.equals(output_ids):
-            rprint("[orange]Warning: Test IDs and output IDs do not match![/orange]")
+            rprint(f"[orange]Warning: Test IDs and output IDs do not match![/orange]")
 
         outputs = pd.concat(
             [
@@ -108,10 +108,10 @@ def run_assistant(
 
     if config.save_artifacts.enabled:
         # Determine the artifacts_dir with or without timestamp
-        artifacts_dir_name = f"{task.metadata["name"]}_artifacts"
+        artifacts_dir_name = f"{task.metadata['name']}_artifacts"
         if config.save_artifacts.append_timestamp:
             current_timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            artifacts_dir_name = f"{task.metadata["name"]}_artifacts_{current_timestamp}"
+            artifacts_dir_name = f"{task.metadata['name']}_artifacts_{current_timestamp}"
 
         full_save_path = f"{config.save_artifacts.path.rstrip('/')}/{artifacts_dir_name}"
 
