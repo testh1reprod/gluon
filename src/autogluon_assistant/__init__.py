@@ -54,7 +54,7 @@ def run_assistant(
         str, typer.Argument(help="Path to the configuration directory, which includes a config.yaml file")
     ],
     task_path: Annotated[str, typer.Argument(help="Directory where task files are included")],
-    output_filename: Annotated[Optional[str], typer.Argument(help="Output File")],
+    output_filename: Annotated[Optional[str], typer.Option(help="Output File")] = "",
     config_overrides: Annotated[Optional[str], typer.Option(help="Overrides for the config in Hydra format")] = "",
 ) -> str:
     """Run AutoGluon-Assistant on a task defined in a path."""
