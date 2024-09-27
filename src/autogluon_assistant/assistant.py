@@ -56,14 +56,14 @@ class TabularPredictionAssistant:
 
     def handle_exception(self, stage: str, exception: Exception):
         raise Exception(str(exception), stage)
-    
+
     def inference_task(self, task: TabularPredictionTask) -> TabularPredictionTask:
         task_inference_preprocessors = [
-                FilenameInference,
-                LabelColumnInference,
-                ProblemTypeInference,
-                TestIDColumnInference,
-                OutputIDColumnInference,
+            FilenameInference,
+            LabelColumnInference,
+            ProblemTypeInference,
+            TestIDColumnInference,
+            OutputIDColumnInference,
         ]
         if self.config.infer_eval_metric:
             task_inference_preprocessors += [EvalMetricInference]
@@ -77,7 +77,7 @@ class TabularPredictionAssistant:
                     task = preprocessor.transform(task)
             except Exception as e:
                 self.handle_exception(f"Task inference preprocessing: {preprocessor_class}", e)
-        
+
         return task
 
     def preprocess_task(self, task: TabularPredictionTask) -> TabularPredictionTask:

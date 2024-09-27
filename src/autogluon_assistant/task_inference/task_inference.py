@@ -27,7 +27,7 @@ from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_ID_COLU
 logger = logging.getLogger(__name__)
 
 
-class TaskInference():
+class TaskInference:
     """Parses data and metadata of a task with the aid of an instruction-tuned LLM."""
 
     def __init__(self, llm, *args, **kwargs):
@@ -66,7 +66,7 @@ class TaskInference():
             logger.error(f"Failed to parse output: {e}")
             logger.error(self.llm.describe())  # noqa
             raise e
-        
+
         if self.valid_values is not None:
             for key, parsed_value in parsed_output.items():
                 if parsed_value not in self.valid_values:
@@ -74,11 +74,11 @@ class TaskInference():
                     if len(close_matches) == 0:
                         if self.fallback_value:
                             logger.warning(
-                                f"Unrecognized value: {parsed_value} for key {key} parsed by the LLM." 
+                                f"Unrecognized value: {parsed_value} for key {key} parsed by the LLM."
                                 f"Will use default value: {self.fallback_value}."
                             )
                         else:
-                            raise ValueError(f"Unrecognized value: {parsed_value} for key {key} parsed by the LLM." )
+                            raise ValueError(f"Unrecognized value: {parsed_value} for key {key} parsed by the LLM.")
                     parsed_output[key] = close_matches[0]
 
         return parsed_output
@@ -88,17 +88,22 @@ class FilenameInference(TaskInference):
     """Uses an LLM to locate the filenames of the train, test, and output data,
     and assigns them to the respective properties of the task.
     """
+
     def initialize_task(self, task):
         filenames = [str(path) for path in task.filepaths]
         self.valid_values = filenames
-        self.prompt_generator = FilenamePromptGenerator(data_description=task.metadata["description"], filenames=filenames)
+        self.prompt_generator = FilenamePromptGenerator(
+            data_description=task.metadata["description"], filenames=filenames
+        )
 
 
 class LabelColumnInference(TaskInference):
     def initialize_task(self, task):
         column_names = list(task.train_data.columns)
         self.valid_values = column_names
-        self.prompt_generator = LabelColumnPromptGenerator(data_description=task.metadata["description"], column_names=column_names)
+        self.prompt_generator = LabelColumnPromptGenerator(
+            data_description=task.metadata["description"], column_names=column_names
+        )
 
 
 class ProblemTypeInference(TaskInference):
@@ -113,7 +118,9 @@ class TestIDColumnInference(TaskInference):
         column_names = list(task.test_data.columns)
         self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
         self.fallback_value = NO_ID_COLUMN_IDENTIFIED
-        self.prompt_generator = TestIDColumnPromptGenerator(data_description=task.metadata["description"], column_names=column_names)
+        self.prompt_generator = TestIDColumnPromptGenerator(
+            data_description=task.metadata["description"], column_names=column_names
+        )
 
 
 class OutputIDColumnInference(TaskInference):
@@ -121,7 +128,9 @@ class OutputIDColumnInference(TaskInference):
         column_names = list(task.output_data.columns)
         self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
         self.fallback_value = NO_ID_COLUMN_IDENTIFIED
-        self.prompt_generator = OutputIDColumnPromptGenerator(data_description=task.metadata["description"], column_names=column_names)
+        self.prompt_generator = OutputIDColumnPromptGenerator(
+            data_description=task.metadata["description"], column_names=column_names
+        )
 
 
 class EvalMetricInference(TaskInference):
@@ -131,4 +140,6 @@ class EvalMetricInference(TaskInference):
         self.valid_values = self.metrics
         if problem_type:
             self.fallback_value = METRICS_BY_PROBLEM_TYPE[problem_type][0]
-        self.prompt_generator = EvalMetricPromptGenerator(data_description=task.metadata["description"], metrics=self.metrics)
+        self.prompt_generator = EvalMetricPromptGenerator(
+            data_description=task.metadata["description"], metrics=self.metrics
+        )

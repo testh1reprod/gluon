@@ -106,7 +106,6 @@ class TabularPredictionTask:
                 relative_path = os.path.relpath(os.path.join(root, file), task_root_dir)
                 task_data_filenames.append(relative_path)
 
-        
         data_description = cls.read_task_file(task_root_dir, "**/data.txt")
         evaluation_description = cls.read_task_file(task_root_dir, "**/evaluation.txt")
         full_description = cls.read_task_file(task_root_dir, "description.txt") or "\n\n".join(
@@ -136,9 +135,7 @@ class TabularPredictionTask:
         """Return all filenames for the task."""
         return [f.name for f in self.filepaths]
 
-    def _set_task_files(
-        self, dataset_name_mapping: Dict[str, Union[str, Path, pd.DataFrame, TabularDataset]]
-    ) -> None:
+    def _set_task_files(self, dataset_name_mapping: Dict[str, Union[str, Path, pd.DataFrame, TabularDataset]]) -> None:
         """Set the task files for the task."""
         for k, v in dataset_name_mapping.items():
             if isinstance(v, (pd.DataFrame, TabularDataset)):
@@ -266,7 +263,7 @@ class TabularPredictionTask:
     @property
     def problem_type(self) -> Optional[str]:
         return self.metadata["problem_type"] or self._find_problem_type_in_description()
-    
+
     @problem_type.setter
     def problem_type(self, problem_type: str) -> None:
         self.metadata["problem_type"] = problem_type
@@ -276,11 +273,10 @@ class TabularPredictionTask:
         return self.metadata["eval_metric"] or (
             self.preferred_eval_metrics[self.problem_type] if self.problem_type else None
         )
-        
+
     @eval_metric.setter
     def eval_metric(self, eval_metric: str) -> None:
         self.metadata["eval_metric"] = eval_metric
-
 
     def load_task_data(self, dataset_key: Union[str, str]) -> TabularDataset:
         """Load the competition file for the task."""
