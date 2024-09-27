@@ -12,6 +12,7 @@ from rich import print as rprint
 from typing_extensions import Annotated
 
 from .assistant import TabularPredictionAssistant
+from .constants import NO_ID_COLUMN_IDENTIFIED
 from .task import TabularPredictionTask
 
 logging.basicConfig(level=logging.INFO)
@@ -31,7 +32,7 @@ def get_task(path: Path) -> TabularPredictionTask:
 
 
 def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFrame) -> pd.DataFrame:
-    if task.test_id_column is not None:
+    if task.test_id_column is not None and task.test_id_column != NO_ID_COLUMN_IDENTIFIED:
         test_ids = task.test_data[task.test_id_column]
         output_ids = task.output_data[task.output_id_column]
 

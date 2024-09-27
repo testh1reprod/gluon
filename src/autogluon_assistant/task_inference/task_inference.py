@@ -33,11 +33,11 @@ class TaskInference():
     def __init__(self, llm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.llm = llm
+        self.fallback_value = None
 
     def initialize_task(self, task):
         self.prompt_generator = None
         self.valid_values = None
-        self.fallback_value = None
         pass
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
