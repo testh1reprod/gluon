@@ -103,6 +103,14 @@ class IDColumnPromptGenerator(PromptGenerator):
             f"response with the value {NO_ID_COLUMN_IDENTIFIED}",
             self.get_field_parsing_prompt()
         ])
+    
+
+class TestIDColumnPromptGenerator(IDColumnPromptGenerator):
+    fields = ["test_id_column"]
+
+
+class OutputIDColumnPromptGenerator(IDColumnPromptGenerator):
+    fields = ["output_id_column"]
 
 
 class EvalMetricPromptGenerator(PromptGenerator):

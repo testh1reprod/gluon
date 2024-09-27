@@ -15,13 +15,13 @@ from autogluon_assistant.llm import AssistantChatOpenAI
 from autogluon_assistant.prompting import (
     EvalMetricPromptGenerator,
     FilenamePromptGenerator,
-    IdColumnPromptGenerator,
     LabelColumnPromptGenerator,
+    OutputIDColumnPromptGenerator,
     ProblemTypePromptGenerator,
+    TestIDColumnPromptGenerator,
 )
 from autogluon_assistant.task import TabularPredictionTask
 
-from .base import BaseTransformer
 from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES
 
 logger = logging.getLogger(__name__)
@@ -33,11 +33,15 @@ class TaskInference():
     def __init__(self, llm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.llm = llm
+
+    def initialize_task(self, task):
         self.prompt_generator = None
         self.valid_values = None
         self.fallback_value = None
+        pass
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
+        self.initialize_task(task)
         parser_output = self._chat_and_parse_prompt_output()
         for key in parser_output:
             setattr(task, key, parser_output[key])
@@ -80,40 +84,46 @@ class FilenameInference(TaskInference):
     """Uses an LLM to locate the filenames of the train, test, and output data,
     and assigns them to the respective properties of the task.
     """
-    def __init__(self, llm, data_description: str, filenames: list, *args, **kwargs):
-        super().__init__(llm, *args, **kwargs)
-        self.valid_values = filenames
-        self.prompt_generator = FilenamePromptGenerator(data_description=data_description, filenames=filenames)
-
-
-class ProblemTypeInference(TaskInference):
-    def __init__(self, llm, data_description: str, labels: pd.DataFrame, *args, **kwargs):
-        super().__init__(llm, *args, **kwargs)
-        self.valid_values = PROBLEM_TYPES
-        self.fallback_value = infer_problem_type(labels, silent=True)
-        self.prompt_generator = ProblemTypePromptGenerator(data_description=data_description)
+    def initialize_task(self, task):
+        self.valid_values = task.filepaths
+        self.prompt_generator = FilenamePromptGenerator(data_description=task.metadata["description"], filenames=task.filepaths)
 
 
 class LabelColumnInference(TaskInference):
-    def __init__(self, llm, data_description: str, column_names: list, *args, **kwargs):
-        super().__init__(llm, *args, **kwargs)
+    def initialize_task(self, task):
+        column_names = task.train_data.columns()
         self.valid_values = column_names
-        self.prompt_generator = LabelColumnPromptGenerator(data_description=data_description, column_names=column_names)
+        self.prompt_generator = LabelColumnPromptGenerator(data_description=task.metadata["description"], column_names=column_names)
 
 
-class IDColumnInference(TaskInference):
-    def __init__(self, llm, data_description: str, column_names: list, *args, **kwargs):
-        super().__init__(llm, *args, **kwargs)
+class ProblemTypeInference(TaskInference):
+    def initialize_task(self, task):
+        self.valid_values = PROBLEM_TYPES
+        self.fallback_value = infer_problem_type(task.train_data[task.label_column], silent=True)
+        self.prompt_generator = ProblemTypePromptGenerator(data_description=task.metadata["description"])
+
+
+class TestIDColumnInference(TaskInference):
+    def initialize_task(self, task):
+        column_names = task.test_data.columns()
         self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
         self.fallback_value = NO_ID_COLUMN_IDENTIFIED
-        self.prompt_generator = IDColumnInference(data_description=data_description, column_names=column_names)
+        self.prompt_generator = TestIDColumnPromptGenerator(data_description=task.metadata["description"], column_names=column_names)
+
+
+class OutputIDColumnInference(TaskInference):
+    def initialize_task(self, task):
+        column_names = task.output_data.columns()
+        self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
+        self.fallback_value = NO_ID_COLUMN_IDENTIFIED
+        self.prompt_generator = OutputIDColumnPromptGenerator(data_description=task.metadata["description"], column_names=column_names)
 
 
 class EvalMetricInference(TaskInference):
-    def __init__(self, llm, data_description: str, problem_type: str, *args, **kwargs):
-        super().__init__(llm, *args, **kwargs)
+    def initialize_task(self, task):
+        problem_type = task.problem_type
         self.metrics = METRICS_DESCRIPTION.keys() if problem_type is None else METRICS_BY_PROBLEM_TYPE[problem_type]
         self.valid_values = self.metrics
         if problem_type:
             self.fallback_value = METRICS_BY_PROBLEM_TYPE[problem_type][0]
-        self.prompt_generator = EvalMetricPromptGenerator(data_description=data_description, metrics=self.metrics)
+        self.prompt_generator = EvalMetricPromptGenerator(data_description=task.metadata["description"], metrics=self.metrics)

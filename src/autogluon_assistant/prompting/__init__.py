@@ -1,1 +1,1 @@
-from .prompt_generator import FilenamePromptGenerator, LabelColumnPromptGenerator, IDColumnPromptGenerator, EvalMetricPromptGenerator, ProblemTypePromptGenerator
+from .prompt_generator import FilenamePromptGenerator, LabelColumnPromptGenerator, TestIDColumnPromptGenerator, OutputIDColumnPromptGenerator, EvalMetricPromptGenerator, ProblemTypePromptGenerator

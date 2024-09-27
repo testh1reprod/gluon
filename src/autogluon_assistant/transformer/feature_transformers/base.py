@@ -31,7 +31,7 @@ class BaseFeatureTransformer(BaseTransformer):
                 train_y=train_y,
                 target_column_name=task.label_column,
                 problem_type=task.problem_type,
-                dataset_description=task.data_description,
+                dataset_description=task.description,
             )
         except TransformTimeoutError:
             logger.warning(f"FeatureTransformer {self.__class__.__name__} timed out.")
