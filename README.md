@@ -67,5 +67,5 @@ the `config_overrides` parameter with Hydra syntax from the command line.
 
 Here’s an example command with some configuration overrides:
 ```
-autogluon-assistant ./config ./data --config-overrides "autogluon.predictor_fit_kwargs.time_limit=120 autogluon.predictor_fit_kwargs.verbosity=3 autogluon.predictor_fit_kwargs.presets=medium_quality llm.temperature=0.7 llm.max_tokens=256"
+autogluon-assistant ./config ./data --output-filename my_output.csv --config-overrides "autogluon.predictor_fit_kwargs.time_limit=120 autogluon.predictor_fit_kwargs.verbosity=3 autogluon.predictor_fit_kwargs.presets=medium_quality llm.temperature=0.7 llm.max_tokens=256"
 ```

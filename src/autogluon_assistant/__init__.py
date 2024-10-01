@@ -54,6 +54,7 @@ def run_assistant(
         str, typer.Argument(help="Path to the configuration directory, which includes a config.yaml file")
     ],
     task_path: Annotated[str, typer.Argument(help="Directory where task files are included")],
+    output_filename: Annotated[Optional[str], typer.Option(help="Output File")] = "",
     config_overrides: Annotated[Optional[str], typer.Option(help="Overrides for the config in Hydra format")] = "",
 ) -> str:
     """Run AutoGluon-Assistant on a task defined in a path."""
@@ -95,7 +96,8 @@ def run_assistant(
 
     predictions = assistant.predict(task)
 
-    output_filename = f"aga-output-{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    if not output_filename:
+        output_filename = f"aga-output-{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv"
     with open(output_filename, "w") as fp:
         make_prediction_outputs(task, predictions).to_csv(fp, index=False)
 
