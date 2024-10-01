@@ -58,9 +58,8 @@ def features():
         <div class="feature-container">
             <div class="feature-title">LLM based Task Understanding</div>
             <div class="feature-description">
-                Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit,
-                sed quia consequuntur magni dolores eos qui ratione voluptatem sequi
-                nesciunt. Neque porro quisquam est.
+                Leverage the power of Large Language Models to automatically interpret and understand complex tasks. 
+                Autogluon Assistant analyzes user inputs and requirements, translating them into actionable machine learning objectives without manual intervention.
             </div>
             <a href="#" class="learn-more-btn">Learn more</a>
         </div>
@@ -72,9 +71,8 @@ def features():
         <div class="feature-container">
             <div class="feature-title">Automated Feature Engineering</div>
             <div class="feature-description">
-                Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit,
-                sed quia consequuntur magni dolores eos qui ratione voluptatem sequi
-                nesciunt. Neque porro quisquam est.
+                Streamline your data preparation process with our advanced automated feature engineering.
+                Our AI identifies relevant features, handles transformations, and creates new meaningful variables, significantly reducing time spent on data preprocessing.
             </div>
             <a href="#" class="learn-more-btn">Learn more</a>
         </div>
@@ -86,9 +84,8 @@ def features():
         <div class="feature-container">
             <div class="feature-title">Powered by AutoGluon Tabular</div>
             <div class="feature-description">
-                Consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
-                Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet,
-                consectetur, adipisci velit, sed quia non numquam.
+                Benefit from the robust capabilities of AutoGluon Tabular, a cutting-edge AutoML framework. 
+                Automatically train and tune a diverse set of models for your tabular data, ensuring optimal performance without the need for extensive machine learning expertise.
             </div>
             <a href="#" class="learn-more-btn">Learn more</a>
         </div>
@@ -100,9 +97,8 @@ def features():
         <div class="feature-container">
             <div class="feature-title">Multi-Table Support</div>
             <div class="feature-description">
-                Eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui
-                dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non
-                numquam eius modi tempora.
+               Effortlessly work with complex, relational datasets through our multi-table support feature. 
+               Autogluon Assistant intelligently manages relationships between multiple tables, allowing for comprehensive analysis and modeling of intricate data structures.
             </div>
             <a href="#" class="learn-more-btn">Learn more</a>
         </div>

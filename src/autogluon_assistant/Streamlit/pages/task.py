@@ -1,48 +1,20 @@
 import streamlit as st
-import pandas as pd
 import os
+import pandas as pd
 import uuid
 import glob
 import subprocess
 import psutil
 import streamlit.components.v1 as components
-st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide",initial_sidebar_state="collapsed")
-from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_extras.stylable_container import stylable_container
-from streamlit_cookies_controller import CookieController
-from nav_bar import nav_bar
-from tutorial import main as tutorial
-from feature import main as feature
-from demo import main as demo
-from preview import preview_dataset
+from streamlit_extras.add_vertical_space import add_vertical_space
 
-controller = CookieController()
 
 
 CONFIG_DIR = '../../../config'
 BASE_DATA_DIR = './user_data'
 
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
-
-st.markdown(
-    """
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    """,
-    unsafe_allow_html=True
-)
-
-# Bootstrap 4.1.3
-st.markdown(
-    """
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    """,unsafe_allow_html=True
-
-)
-with open('task_style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
-
-
 def update_config_overrides():
     config_overrides = []
     if st.session_state.preset:
@@ -70,74 +42,11 @@ def update_config_overrides():
         config_overrides.append(f"llm.model={llm_mapping[st.session_state.llm]}")
 
     st.session_state.config_overrides = config_overrides
-
 # These two functions are to save widget values in Session State to preserve them between pages
 def store_value(key):
     st.session_state[key] = st.session_state["_"+key]
 def load_value(key):
     st.session_state["_"+key] = st.session_state[key]
-
-def run_section():
-    st.markdown("""
-           <h1 style='
-               font-weight: light;
-               padding-left: 20px;
-               padding-right: 20px;
-               margin-left:60px;
-               font-size: 2em;
-           '>
-               Run Autogluon
-           </h1>
-       """, unsafe_allow_html=True)
-    col1, col2, col3,col4,col5= st.columns([1,10.9, 0.2, 10.9,1],gap='large')
-    with col2:
-        col11, col12 = st.columns(2)
-        with col11:
-            config_autogluon_preset()
-            config_time_limit()
-        with col12:
-            config_transformer()
-            config_llm()
-        set_description()
-    with col3:
-        st.html(
-            '''
-                <div class="divider-vertical-line"></div>
-                <style>
-                    .divider-vertical-line {
-                        border-left: 2px solid rgba(49, 51, 63, 0.2);
-                        height: 590px;
-                        margin: auto;
-                    }
-                </style>
-            '''
-        )
-    with col4:
-        file_uploader()
-    update_config_overrides()
-    _, mid_pos,_ = st.columns([1,22,1],gap='large')
-    with mid_pos:
-        run_button()
-        if st.session_state.task_running:
-            show_cancel_task_button()
-    _, mid_pos, _ = st.columns([1, 22, 1], gap='large')
-    with mid_pos:
-        if st.session_state.task_running:
-            show_real_time_logs()
-        elif not st.session_state.task_running and not st.session_state.task_canceled:
-            show_logs()
-        elif st.session_state.task_canceled:
-            show_cancel_container()
-    generate_output_file()
-    _, download_pos,_ = st.columns([5,2,5])
-    with download_pos:
-        download_button()
-    st.markdown("---", unsafe_allow_html=True)
-
-
-
-
-
 @st.fragment
 def config_autogluon_preset():
     preset_options = ["Best Quality", "High Quality", "Good Quality", "Medium Quality"]
@@ -190,15 +99,27 @@ def description_file_uploader():
 @st.fragment
 def display_description():
     load_value("task_description")
-    st.text_area(label='Dataset Description',placeholder="Enter your task description : ",value=st.session_state.task_description,key="_task_description",on_change=store_value_and_save_file, args=["task_description"],height=250)
+    st.text_area(label='Dataset Description',placeholder="Enter your task description : ",key="_task_description",on_change=store_value_and_save_file, args=["task_description"],height=250)
+
+def get_user_session_id():
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+    return st.session_state.user_session_id
+
+
+def generate_output_filename():
+    user_session_id = get_user_session_id()
+    unique_id = user_session_id[:8]
+    timestamp = pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')
+    output_filename = f"output_{unique_id}_{timestamp}.csv"
+    return output_filename
 
 def get_user_data_dir():
     # Generate a unique directory name for the user session if it doesn't exist
     if 'user_data_dir' not in st.session_state:
-        unique_dir = str(uuid.uuid4())
+        unique_dir = st.session_state.user_session_id
         st.session_state.user_data_dir = os.path.join(BASE_DATA_DIR, unique_dir)
         os.makedirs(st.session_state.user_data_dir, exist_ok=True)
-
     return st.session_state.user_data_dir
 
 def save_uploaded_file(file, file_path):
@@ -245,24 +166,24 @@ def generate_output_file():
         st.session_state.return_code = process.returncode
         st.session_state.process = None
         if st.session_state.return_code == 0:
-            csv_files = glob.glob("*.csv")
-            if csv_files:
-                latest_csv = max(csv_files, key=os.path.getmtime)
-                latest_csv_name = os.path.basename(latest_csv)
-                df = pd.read_csv(latest_csv)
+            output_filename = st.session_state.output_filename
+            if output_filename:
+                df = pd.read_csv(output_filename)
                 st.session_state.output_file = df
-                st.session_state.output_filename = latest_csv_name
                 st.rerun()
             else:
-                st.warning("No CSV file generated.")
+                st.error(f"CSV file not found: {output_filename}")
+
 
 # Run the autogluon-assistant command
 def run_autogluon_assistant(config_dir, data_dir):
         command = ['autogluon-assistant', config_dir, data_dir]
         if st.session_state.config_overrides:
             command.extend(['--config-overrides', ' '.join(st.session_state.config_overrides)])
+        output_filename = generate_output_filename()
+        command.extend(['--output-filename', output_filename])
         st.session_state.output_file = None
-        st.session_state.output_filename = None
+        st.session_state.output_filename = output_filename
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         st.session_state.process = process
         st.session_state.pid = process.pid
@@ -350,7 +271,7 @@ def show_real_time_logs():
         print("process is None")
 
 def download_button():
-    if st.session_state.output_file is not None:
+    if st.session_state.output_file is not None and st.session_state.task_running is False:
         output_file = st.session_state.output_file
         output_filename = st.session_state.output_filename
         show_download_button(output_file.to_csv(index=False),output_filename)
@@ -488,73 +409,71 @@ def show_cancel_container():
     status_container = st.empty()
     status_container.info("Task has been cancelled")
 
-def initial_session_state():
-    if 'config_overrides' not in st.session_state:
-        st.session_state.config_overrides = []
-    if "preset" not in st.session_state:
-        st.session_state.preset = None
-    if "time_limit" not in st.session_state:
-        st.session_state.time_limit = None
-    if "transformers" not in st.session_state:
-        st.session_state.transformers = []
-    if "llm" not in st.session_state:
-        st.session_state.llm = None
-    if "pid" not in st.session_state:
-        st.session_state.pid = None
-    if "logs" not in st.session_state:
-        st.session_state.logs = ""
-    if "process" not in st.session_state:
-        st.session_state.process = None
-    if 'clicked' not in st.session_state:
-        st.session_state.clicked = False
-    if "task_running" not in st.session_state:
-        st.session_state.task_running = False
-    if "output_file" not in st.session_state:
-        st.session_state.output_file = None
-    if "output_filename" not in st.session_state:
-        st.session_state.output_filename = None
-    if "task_description" not in st.session_state:
-        st.session_state.task_description = ""
-    if "return_code" not in st.session_state:
-        st.session_state.return_code = None
-    if "task_canceled" not in st.session_state:
-        st.session_state.task_canceled = False
-    if "train_file_name" not in st.session_state:
-        st.session_state.train_file_name = None
-    if "train_file_df" not in st.session_state:
-        st.session_state.train_file_df = None
-    if "test_file_name" not in st.session_state:
-        st.session_state.test_file_name = None
-    if "test_file_df" not in st.session_state:
-        st.session_state.test_file_df = None
-    if "sample_output_file_name" not in st.session_state:
-        st.session_state.sample_output_file_name = None
-    if "sample_output_file_df" not in st.session_state:
-        st.session_state.sample_output_file_df = None
-
-
 def set_description():
     display_description()
     description_file_uploader()
     add_vertical_space(4)
 
-def main():
-    initial_session_state()
-    nav_bar()
-    tutorial()
-    demo()
-    feature()
-    run_section()
-    preview_dataset()
-
+def run_section():
     st.markdown("""
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    """, unsafe_allow_html=True)
+           <h1 style='
+               font-weight: light;
+               padding-left: 20px;
+               padding-right: 20px;
+               margin-left:60px;
+               font-size: 2em;
+           '>
+               Run Autogluon
+           </h1>
+       """, unsafe_allow_html=True)
+    col1, col2, col3,col4,col5= st.columns([1,10.9, 0.2, 10.9,1],gap='large')
+    with col2:
+        col11, col12 = st.columns(2)
+        with col11:
+            config_autogluon_preset()
+            config_time_limit()
+        with col12:
+            config_transformer()
+            config_llm()
+        set_description()
+    with col3:
+        st.html(
+            '''
+                <div class="divider-vertical-line"></div>
+                <style>
+                    .divider-vertical-line {
+                        border-left: 2px solid rgba(49, 51, 63, 0.2);
+                        height: 590px;
+                        margin: auto;
+                    }
+                </style>
+            '''
+        )
+    with col4:
+        file_uploader()
+    update_config_overrides()
+    _, mid_pos,_ = st.columns([1,22,1],gap='large')
+    with mid_pos:
+        run_button()
+        if st.session_state.task_running:
+            show_cancel_task_button()
+    _, mid_pos, _ = st.columns([1, 22, 1], gap='large')
+    with mid_pos:
+        if st.session_state.task_running:
+            show_real_time_logs()
+        elif not st.session_state.task_running and not st.session_state.task_canceled:
+            show_logs()
+        elif st.session_state.task_canceled:
+            show_cancel_container()
+    generate_output_file()
+    _, download_pos,_ = st.columns([5,2,5])
+    with download_pos:
+        download_button()
+    st.markdown("---", unsafe_allow_html=True)
 
-    # st.write(st.session_state)
-
+def main():
+    get_user_session_id()
+    run_section()
 
 
 if __name__ == "__main__":

@@ -1,12 +1,9 @@
 import streamlit as st
 from streamlit_extras.add_vertical_space import add_vertical_space
 
-with open('home_style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
 
 def video():
-    video_file = open("./video/aga-ui-09-23_speed.mp4", "rb")
+    video_file = open("./video/demo.mp4", "rb")
     video_bytes = video_file.read()
     st.video(video_bytes,muted=True,autoplay=True)
 
