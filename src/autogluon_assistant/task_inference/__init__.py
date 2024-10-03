@@ -3,6 +3,7 @@ from .task_inference import (
     ProblemTypeInference,
     LabelColumnInference,
     TestIDColumnInference,
+    TrainIDColumnInference,
     OutputIDColumnInference,
     EvalMetricInference,
 )

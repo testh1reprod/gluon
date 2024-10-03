@@ -17,6 +17,7 @@ from .task_inference import (
     OutputIDColumnInference,
     ProblemTypeInference,
     TestIDColumnInference,
+    TrainIDColumnInference,
 )
 
 logger = logging.getLogger(__name__)
@@ -62,8 +63,9 @@ class TabularPredictionAssistant:
             FilenameInference,
             LabelColumnInference,
             ProblemTypeInference,
-            TestIDColumnInference,
             OutputIDColumnInference,
+            TrainIDColumnInference,
+            TestIDColumnInference,
         ]
         if self.config.infer_eval_metric:
             task_inference_preprocessors += [EvalMetricInference]
