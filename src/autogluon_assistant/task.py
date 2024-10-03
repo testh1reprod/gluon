@@ -23,11 +23,13 @@ class TabularPredictionTask:
         self,
         filepaths: List[Path],
         metadata: Dict[str, Any],
+        name: Optional[str] = "",
+        description: Optional[str] = "",
         cache_data: bool = True,
     ):
         self.metadata: Dict[str, Any] = {
-            "name": "",
-            "description": "",
+            "name": name,
+            "description": description,
             "label_column": None,
             "problem_type": None,
             "eval_metric": None,  # string, keying Autogluon Tabular metrics
