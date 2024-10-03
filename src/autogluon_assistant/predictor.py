@@ -59,6 +59,7 @@ class AutogluonTabularPredictor(Predictor):
             ("train", task.train_data),
             ("test", task.test_data),
         ):
+            print(data)
             self.metadata["dataset_summary"][key] = data.describe().to_dict()
             self.metadata["feature_metadata_raw"][key] = FeatureMetadata.from_df(data).to_dict()
             self.metadata["feature_missing_values"][key] = (data.isna().sum() / len(data)).to_dict()

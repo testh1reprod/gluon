@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import difflib
 import logging
 from typing import Dict, List, Type, Union
@@ -19,6 +20,7 @@ from autogluon_assistant.prompting import (
     OutputIDColumnPromptGenerator,
     ProblemTypePromptGenerator,
     TestIDColumnPromptGenerator,
+    TrainIDColumnPromptGenerator,
 )
 from autogluon_assistant.task import TabularPredictionTask
 
@@ -114,27 +116,42 @@ class ProblemTypeInference(TaskInference):
         self.fallback_value = infer_problem_type(task.train_data[task.label_column], silent=True)
         self.prompt_generator = ProblemTypePromptGenerator(data_description=task.metadata["description"])
 
-
-class TestIDColumnInference(TaskInference):
-    def initialize_task(self, task, description=None):
-        column_names = list(task.test_data.columns)
-        self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
+class BaseIDColumnInference(TaskInference):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.valid_values = []
         self.fallback_value = NO_ID_COLUMN_IDENTIFIED
+        self.prompt_generator = None
+
+    def initialize_task(self, task, description=None):
+        column_names = list(self.get_data(task).columns)
+        # Assume ID column can only appear in first 3 columns
+        if len(column_names) >= 3:
+            column_names = column_names[:3]
+        self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
         if not description:
             description = task.metadata["description"]
-        self.prompt_generator = TestIDColumnPromptGenerator(
-            data_description=task.metadata["description"], column_names=column_names
+        self.prompt_generator = self.get_prompt_generator()(
+            data_description=description, column_names=column_names
         )
 
+    def get_data(self, task):
+        pass
+
+    def get_prompt_generator(self):
+        pass
+
+    def get_id_column_name(self):
+        pass
+
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        try:
-            self.initialize_task(task)
-            parser_output = self._chat_and_parse_prompt_output()
-        except ValueError as e:
-            # task description may have instruction for the output ID
-            # which does not apply to test ID
+        self.initialize_task(task)
+        parser_output = self._chat_and_parse_prompt_output()
+        id_column_name = self.get_id_column_name()
+        
+        if parser_output[id_column_name] == NO_ID_COLUMN_IDENTIFIED:
             logger.warning(
-                f"Failed to infer test ID column with data descriptions: {e}."
+                f"Failed to infer ID column with data descriptions. "
                 "Retry the inference without data descriptions."
             )
             self.initialize_task(task, 
@@ -142,91 +159,76 @@ class TestIDColumnInference(TaskInference):
                                 )
             parser_output = self._chat_and_parse_prompt_output()
 
-        test_id_column = parser_output["test_id_column"]
+        id_column = parser_output[id_column_name]
+        id_column = self.process_id_column(task, id_column)
+        setattr(task, id_column_name, id_column)
+        return task
 
+    def process_id_column(self, task, id_column):
+        pass
+
+class TestIDColumnInference(BaseIDColumnInference):
+    def get_data(self, task):
+        return task.test_data
+
+    def get_prompt_generator(self):
+        return TestIDColumnPromptGenerator
+
+    def get_id_column_name(self):
+        return "test_id_column"
+
+    def process_id_column(self, task, id_column):
         if task.output_id_column != NO_ID_COLUMN_IDENTIFIED:
             # if output data has id column but test data does not
-            if test_id_column == NO_ID_COLUMN_IDENTIFIED:
+            if id_column == NO_ID_COLUMN_IDENTIFIED:
+                if task.output_id_column not in task.test_data:
+                    id_column = task.output_id_column
+                else:
+                    id_column = "id_column"
                 new_test_data = task.test_data.copy()
-                new_test_data[task.output_id_column] == task.output_data[task.output_id_column]
+                new_test_data[id_column] = task.output_data[task.output_id_column]
                 task.test_data = new_test_data
-                test_id_column = task.output_id_column
             # if output data has id column that is different from test id column name
-            elif test_id_column != task.output_id_column:
-                new_test_data = task.test_data.copy()
-                new_test_data = new_test_data.rename(columns={test_id_column: task.output_id_column})
-                test_id_column = task.output_id_column
+            #elif id_column != task.output_id_column:
+            #    new_test_data = task.test_data.copy()
+            #    new_test_data = new_test_data.rename(columns={id_column: task.output_id_column})
+            #    task.test_data = new_test_data
+            #    id_column = task.output_id_column
 
-        setattr(task, "test_id_column", test_id_column)
-        return task
+        return id_column
 
+class TrainIDColumnInference(BaseIDColumnInference):
+    def get_data(self, task):
+        return task.train_data
 
-class TrainIDColumnInference(TaskInference):
-    def initialize_task(self, task, description=None):
-        column_names = list(task.train_data.columns)
-        self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
-        self.fallback_value = NO_ID_COLUMN_IDENTIFIED
-        if not description:
-            description = task.metadata["description"]
-        self.prompt_generator = TestIDColumnPromptGenerator(
-            data_description=task.metadata["description"], column_names=column_names
-        )
+    def get_prompt_generator(self):
+        return TrainIDColumnPromptGenerator
 
-    def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        try:
-            self.initialize_task(task)
-            parser_output = self._chat_and_parse_prompt_output()
-        except ValueError as e:
-            # task description may have instruction for the output ID
-            # which does not apply to test ID
-            logger.warning(
-                f"Failed to infer test ID column with data descriptions: {e}."
-                "Retry the inference without data descriptions."
-            )
-            self.initialize_task(task, 
-                                 description="Missing data description. Please infer the ID column based on given column names."
-                                )
-            parser_output = self._chat_and_parse_prompt_output()
+    def get_id_column_name(self):
+        return "train_id_column"
 
-        train_id_column = parser_output["test_id_column"]
-
-        if train_id_column != NO_ID_COLUMN_IDENTIFIED:
-            task.train_data = task.train_data.drop(columns=[train_id_column])
-            logger.info(f"Dropping ID column {train_id_column} from training data.")
+    def process_id_column(self, task, id_column):
+        if id_column != NO_ID_COLUMN_IDENTIFIED:
+            new_train_data = task.train_data.copy()
+            new_train_data = new_train_data.drop(columns=[id_column])
+            task.train_data = new_train_data
+            logger.info(f"Dropping ID column {id_column} from training data.")
             task.metadata["dropped_train_id_column"] = True
-        
-        task.metadata["train_id_column"] = train_id_column
-        return task
 
+        return id_column
 
-class OutputIDColumnInference(TaskInference):
-    def initialize_task(self, task):
-        column_names = list(task.output_data.columns)
-        self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
-        self.fallback_value = NO_ID_COLUMN_IDENTIFIED
-        self.prompt_generator = OutputIDColumnPromptGenerator(
-            data_description=task.metadata["description"], column_names=column_names
-        )
+class OutputIDColumnInference(BaseIDColumnInference):
+    def get_data(self, task):
+        return task.output_data
 
-    def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        try:
-            self.initialize_task(task)
-            parser_output = self._chat_and_parse_prompt_output()
-        except ValueError as e:
-            # task description may have instruction for the output ID
-            # which does not apply to test ID
-            logger.warning(
-                f"Failed to infer test ID column with data descriptions: {e}."
-                "Retry the inference without data descriptions."
-            )
-            self.initialize_task(task, 
-                                 description="Missing data description. Please infer the ID column based on given column names."
-                                )
-            parser_output = self._chat_and_parse_prompt_output()
+    def get_prompt_generator(self):
+        return OutputIDColumnPromptGenerator
 
-        for key in parser_output:
-            setattr(task, key, parser_output[key])
-        return task
+    def get_id_column_name(self):
+        return "output_id_column"
+
+    def process_id_column(self, task, id_column):
+        return id_column
 
 class EvalMetricInference(TaskInference):
     def initialize_task(self, task):

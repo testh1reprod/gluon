@@ -124,6 +124,8 @@ class IDColumnPromptGenerator(PromptGenerator):
 class TestIDColumnPromptGenerator(IDColumnPromptGenerator):
     fields = ["test_id_column"]
 
+class TrainIDColumnPromptGenerator(IDColumnPromptGenerator):
+    fields = ["train_id_column"]
 
 class OutputIDColumnPromptGenerator(IDColumnPromptGenerator):
     fields = ["output_id_column"]

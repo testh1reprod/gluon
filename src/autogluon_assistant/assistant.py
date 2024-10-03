@@ -80,6 +80,8 @@ class TabularPredictionAssistant:
             except Exception as e:
                 self.handle_exception(f"Task inference preprocessing: {preprocessor_class}", e)
 
+        logger.info(f"###LLM Inference Results:###\n{task.metadata}")
+
         return task
 
     def preprocess_task(self, task: TabularPredictionTask) -> TabularPredictionTask:
