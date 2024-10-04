@@ -1,4 +1,9 @@
+# Task Inference
+NO_FILE_IDENTIFIED = "NO_FILE_IDENTIFIED"
 NO_ID_COLUMN_IDENTIFIED = "NO_ID_COLUMN_IDENTIFIED"
+
+# Supported File Types
+TEXT_EXTENSIONS = ['.txt', '.md', '.csv', '.json', '.yml', '.yaml', '.xml', '.log']
 
 # Data types
 TRAIN = "train"

@@ -1,5 +1,6 @@
 from .task_inference import (
-    FilenameInference,
+    DataFileNameInference,
+    DescriptionFileNameInference,
     ProblemTypeInference,
     LabelColumnInference,
     TestIDColumnInference,

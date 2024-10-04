@@ -108,17 +108,17 @@ class TabularPredictionTask:
                 relative_path = os.path.relpath(os.path.join(root, file), task_root_dir)
                 task_data_filenames.append(relative_path)
 
-        data_description = cls.read_task_file(task_root_dir, "**/data.txt")
-        evaluation_description = cls.read_task_file(task_root_dir, "**/evaluation.txt")
-        full_description = cls.read_task_file(task_root_dir, "description.txt") or "\n\n".join(
-            [data_description, evaluation_description]
-        )
+        #data_description = cls.read_task_file(task_root_dir, "**/data.txt")
+        #evaluation_description = cls.read_task_file(task_root_dir, "**/evaluation.txt")
+        #full_description = cls.read_task_file(task_root_dir, "description.txt") or "\n\n".join(
+        #    [data_description, evaluation_description]
+        #)
 
         return cls(
             filepaths=[task_root_dir / fn for fn in task_data_filenames],
             metadata=dict(
                 name=task_root_dir.name,
-                description=full_description,
+                #description=full_description,
             ),
         )
 

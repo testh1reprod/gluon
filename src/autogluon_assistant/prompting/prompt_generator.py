@@ -1,17 +1,19 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Dict, Any, List
 
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 
-from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES
+from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_FILE_IDENTIFIED, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES, TEXT_EXTENSIONS
+from ..utils import is_text_file
 
 
 class PromptGenerator(ABC):
     fields = None
 
-    def __init__(self, data_description: str):
+    def __init__(self, data_description: str = ""):
         self.data_description = data_description
         self.parser = self.create_parser()
 
@@ -50,7 +52,40 @@ class PromptGenerator(ABC):
         return StructuredOutputParser.from_response_schemas(response_schemas)
 
 
-class FilenamePromptGenerator(PromptGenerator):
+class DescriptionFileNamePromptGenerator(PromptGenerator):
+    fields = ["data_description_file", "evaluation_description_file"]
+
+    def __init__(self, filenames: list):
+        super().__init__()
+        self.filenames = filenames
+
+    def read_file_safely(self, filename: Path) -> str | None:
+        try:
+            return filename.read_text()
+        except UnicodeDecodeError:
+            return None
+    
+    def generate_prompt(self) -> str:
+        file_content_prompts = "# Available Files And First Line in The File\n"
+        for filename in map(Path, self.filenames):
+            if is_text_file(filename):
+                content = self.read_file_safely(filename)
+                if content is not None:
+                    first_line = content.split('\n')[0].strip()
+                    if len(first_line) > 100:
+                        first_line = first_line[:100] + "..."
+                    file_content_prompts += f"File:\n{filename}\nFirst Line:\n{first_line}\n"
+        
+        file_content_prompts += f"Please find the files to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file."
+        
+        return "\n\n".join([
+            self.basic_intro_prompt,
+            file_content_prompts,
+            self.get_field_parsing_prompt(),
+        ])
+
+
+class DataFileNamePromptGenerator(PromptGenerator):
     fields = ["train_data", "test_data", "output_data"]
 
     def __init__(self, data_description: str, filenames: list):
@@ -63,7 +98,7 @@ class FilenamePromptGenerator(PromptGenerator):
                 self.basic_intro_prompt,
                 self.data_description_prompt,
                 f"# Available Files\n{', '.join(self.filenames)}",
-                "If there are zip (e.g. .zip or .gz) versions of files and non-zipped versions of the files, choose the non-zip version. For example, return 'train.csv' rather than 'train.csv.zip'.",
+                "If there are zip (e.g. .zip or .gz) versions of files and non-zipped versions of the files, choose the non-zip version.",
                 self.get_field_parsing_prompt(),
             ]
         )

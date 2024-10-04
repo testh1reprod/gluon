@@ -1,5 +1,6 @@
 from .prompt_generator import (
-    FilenamePromptGenerator,
+    DataFileNamePromptGenerator,
+    DescriptionFileNamePromptGenerator,
     LabelColumnPromptGenerator,
     TestIDColumnPromptGenerator,
     TrainIDColumnPromptGenerator,

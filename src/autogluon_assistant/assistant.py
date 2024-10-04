@@ -12,7 +12,8 @@ from .task import TabularPredictionTask
 from .transformer import TransformTimeoutError
 from .task_inference import (
     EvalMetricInference,
-    FilenameInference,
+    DataFileNameInference,
+    DescriptionFileNameInference,
     LabelColumnInference,
     OutputIDColumnInference,
     ProblemTypeInference,
@@ -60,7 +61,8 @@ class TabularPredictionAssistant:
 
     def inference_task(self, task: TabularPredictionTask) -> TabularPredictionTask:
         task_inference_preprocessors = [
-            FilenameInference,
+            DescriptionFileNameInference,
+            DataFileNameInference,
             LabelColumnInference,
             ProblemTypeInference,
             OutputIDColumnInference,

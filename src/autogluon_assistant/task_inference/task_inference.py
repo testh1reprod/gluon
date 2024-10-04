@@ -15,7 +15,8 @@ from pydantic import BaseModel, Field
 from autogluon_assistant.llm import AssistantChatOpenAI
 from autogluon_assistant.prompting import (
     EvalMetricPromptGenerator,
-    FilenamePromptGenerator,
+    DataFileNamePromptGenerator,
+    DescriptionFileNamePromptGenerator,
     LabelColumnPromptGenerator,
     OutputIDColumnPromptGenerator,
     ProblemTypePromptGenerator,
@@ -24,7 +25,7 @@ from autogluon_assistant.prompting import (
 )
 from autogluon_assistant.task import TabularPredictionTask
 
-from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES
+from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_FILE_IDENTIFIED, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES
 
 logger = logging.getLogger(__name__)
 
@@ -59,9 +60,9 @@ class TaskInference:
         """Chat with the LLM and parse the output"""
         try:
             chat_prompt = self.prompt_generator.generate_chat_prompt()
-            logger.debug(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
+            logger.info(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
             output = self.llm(chat_prompt.format_messages())
-            logger.debug(f"LLM output:\n{output}")
+            logger.info(f"LLM output:\n{output}")
 
             parsed_output = self.parse_output(output)
         except OutputParserException as e:
@@ -88,7 +89,47 @@ class TaskInference:
         return parsed_output
 
 
-class FilenameInference(TaskInference):
+class DescriptionFileNameInference(TaskInference):
+    """Uses an LLM to locate the filenames of the train, test, and output data,
+    and assigns them to the respective properties of the task.
+    """
+
+    def initialize_task(self, task):
+        filenames = [str(path) for path in task.filepaths]
+        self.valid_values = filenames + [NO_FILE_IDENTIFIED]
+        self.prompt_generator = DescriptionFileNamePromptGenerator(filenames=filenames)
+
+    def _read_descriptions(self, parser_output: dict) -> str:
+        description_parts = []
+        for key, file_paths in parser_output.items():
+            if isinstance(file_paths, str):
+                file_paths = [file_paths]  # Convert single string to list
+            
+            for file_path in file_paths:
+                if file_path == NO_FILE_IDENTIFIED:
+                    continue
+                else:
+                    try:
+                        with open(file_path, 'r') as file:
+                            content = file.read()
+                            description_parts.append(f"{key}: {content}")
+                    except FileNotFoundError:
+                        continue
+                    except IOError:
+                        continue
+        
+        return "\n\n".join(description_parts)
+
+    def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
+        self.initialize_task(task)
+        parser_output = self._chat_and_parse_prompt_output()
+        descriptions_read = self._read_descriptions(parser_output)
+        if descriptions_read:
+            task.metadata["description"] = descriptions_read
+        return task
+
+
+class DataFileNameInference(TaskInference):
     """Uses an LLM to locate the filenames of the train, test, and output data,
     and assigns them to the respective properties of the task.
     """
@@ -96,7 +137,7 @@ class FilenameInference(TaskInference):
     def initialize_task(self, task):
         filenames = [str(path) for path in task.filepaths]
         self.valid_values = filenames
-        self.prompt_generator = FilenamePromptGenerator(
+        self.prompt_generator = DataFileNamePromptGenerator(
             data_description=task.metadata["description"], filenames=filenames
         )
 
