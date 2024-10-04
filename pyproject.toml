@@ -16,6 +16,7 @@ dependencies = [
     "openfe",
     "pydantic==1.10.13",
     "caafe@git+https://github.com/gidler/CAAFE.git@main",
+    "matplotlib>=3.9.2",
     "typer",
     "rich",
     "s3fs",
