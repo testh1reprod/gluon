@@ -3,20 +3,17 @@ from st_aggrid import GridOptionsBuilder, AgGrid
 
 def get_available_files():
     files = []
-    file_types = {
-        'train_file_name': 'Train File',
-        'test_file_name': 'Test File',
-        'sample_output_file_name': 'Sample Output File',
-        'output_filename': 'Output File'
-    }
-    for key, label in file_types.items():
-        if st.session_state[key] is not None:
-            files.append(f"{label}: {st.session_state[key]}")
+    if st.session_state.uploaded_files is not None:
+        uploaded_files = st.session_state.uploaded_files
+        files = list(uploaded_files.keys())
     return files
 
 
 @st.fragment
 def preview_dataset():
+    """
+        Displays a preview of the uploaded dataset in the Streamlit app.
+   """
     st.markdown("""
         <h1 style='
             font-weight: light;
@@ -32,41 +29,21 @@ def preview_dataset():
     with col2:
         file_options = get_available_files()
         selected_file = st.selectbox("Preview Uploaded File", options=file_options,index = None,placeholder="Select the file to preview",label_visibility="collapsed")
-        if st.session_state.train_file_name is None and st.session_state.test_file_name is None and st.session_state.sample_output_file_name is None:
+        if st.session_state.uploaded_files is None:
             st.info("file not uploaded yet.", icon="ℹ️")
             return
         if selected_file is not None:
-            file_type, file_name = selected_file.split(': ', 1)
             st.markdown(f"""
             <div class="file-view-bar">
-                <span class="file-view-label">Viewing File:</span> {file_name}
+                <span class="file-view-label">Viewing File:</span> {selected_file}
             </div>
             """, unsafe_allow_html=True)
-            if file_type == "Train File" and st.session_state.train_file_df is not None:
-                gb = GridOptionsBuilder.from_dataframe(st.session_state.train_file_df)
-                gb.configure_pagination()
-                gridOptions = gb.build()
-                AgGrid(st.session_state.train_file_df, gridOptions=gridOptions,
-                       enable_enterprise_modules=False)
-            elif file_type == "Test File" and st.session_state.test_file_df is not None:
-                gb = GridOptionsBuilder.from_dataframe(st.session_state.test_file_df)
-                gb.configure_pagination()
-                gridOptions = gb.build()
-                AgGrid(st.session_state.test_file_df, gridOptions=gridOptions,
-                       enable_enterprise_modules=False)
-            elif file_type == "Sample Output File" and st.session_state.sample_output_file_df is not None:
-                gb = GridOptionsBuilder.from_dataframe(st.session_state.sample_output_file_df)
-                gb.configure_pagination()
-                gridOptions = gb.build()
-                AgGrid(st.session_state.sample_output_file_df, gridOptions=gridOptions,
-                       enable_enterprise_modules=False)
-            elif file_type == "Output File" and st.session_state.output_filename is not None:
-                st.subheader(f"Preview of '{st.session_state.output_filename}'")
-                gb = GridOptionsBuilder.from_dataframe(st.session_state.output_file)
-                gb.configure_pagination()
-                gridOptions = gb.build()
-                AgGrid(st.session_state.output_file, gridOptions=gridOptions,
-                       enable_enterprise_modules=False)
+            gb = GridOptionsBuilder.from_dataframe(st.session_state.uploaded_files[selected_file]['df'])
+            gb.configure_pagination()
+            gridOptions = gb.build()
+            AgGrid(st.session_state.uploaded_files[selected_file]['df'], gridOptions=gridOptions,
+                   enable_enterprise_modules=False)
+
 
 def main():
     preview_dataset()

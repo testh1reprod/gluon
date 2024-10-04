@@ -2,11 +2,9 @@ import streamlit as st
 import os
 import pandas as pd
 import uuid
-import glob
 import subprocess
 import psutil
 import streamlit.components.v1 as components
-from streamlit_extras.stylable_container import stylable_container
 from streamlit_extras.add_vertical_space import add_vertical_space
 
 
@@ -16,6 +14,9 @@ BASE_DATA_DIR = './user_data'
 
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 def update_config_overrides():
+    """
+        Update the configuration overrides based on the current session state.
+    """
     config_overrides = []
     if st.session_state.preset:
         preset_mapping = {"Best Quality": "best_quality", "High Quality": "high_quality",
@@ -42,10 +43,23 @@ def update_config_overrides():
         config_overrides.append(f"llm.model={llm_mapping[st.session_state.llm]}")
 
     st.session_state.config_overrides = config_overrides
-# These two functions are to save widget values in Session State to preserve them between pages
+
 def store_value(key):
+    """
+        Store a value in the session state.
+
+        Args:
+            key (str): The key to store the value under in the session state.
+    """
     st.session_state[key] = st.session_state["_"+key]
+
 def load_value(key):
+    """
+        Load a value from the session state into a temporary key.
+
+        Args:
+            key (str): The key to load the value from in the session state.
+    """
     st.session_state["_"+key] = st.session_state[key]
 @st.fragment
 def config_autogluon_preset():
@@ -76,6 +90,12 @@ def config_llm():
          on_change=store_value, args=["llm"],label_visibility="collapsed")
 
 def save_description_file(description):
+    """
+        Save the task description to a file in the user's data directory.
+
+        Args:
+            description (str): The task description to save.
+    """
     user_data_dir = get_user_data_dir()
     description_file = os.path.join(user_data_dir, "description.txt")
     with open(description_file, "w") as f:
@@ -102,12 +122,24 @@ def display_description():
     st.text_area(label='Dataset Description',placeholder="Enter your task description : ",key="_task_description",on_change=store_value_and_save_file, args=["task_description"],height=250)
 
 def get_user_session_id():
+    """
+        Get or generate a unique user session ID.
+
+        Returns:
+            str: A unique identifier for the current user session.
+    """
     if 'user_session_id' not in st.session_state:
         st.session_state.user_session_id = str(uuid.uuid4())
     return st.session_state.user_session_id
 
 
 def generate_output_filename():
+    """
+        Generate a unique output filename based on the user session ID and current timestamp.
+
+        Returns:
+            str: A unique filename for the output CSV file.
+    """
     user_session_id = get_user_session_id()
     unique_id = user_session_id[:8]
     timestamp = pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')
@@ -115,22 +147,42 @@ def generate_output_filename():
     return output_filename
 
 def get_user_data_dir():
-    # Generate a unique directory name for the user session if it doesn't exist
+    """
+        Get or create a unique directory for the current user session.
+
+        Returns:
+            str: The path to the user's data directory.
+    """
     if 'user_data_dir' not in st.session_state:
         unique_dir = st.session_state.user_session_id
         st.session_state.user_data_dir = os.path.join(BASE_DATA_DIR, unique_dir)
         os.makedirs(st.session_state.user_data_dir, exist_ok=True)
     return st.session_state.user_data_dir
 
-def save_uploaded_file(file, file_path):
-    if file.type == 'text/csv':
+def clear_directory(directory):
+    """
+    Before saving the files to the user's directory, clear the directory first
+    """
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            print(f'Failed to delete {file_path}. Reason: {e}')
+
+def save_uploaded_file(file, directory):
+    """
+        Save an uploaded file to the specified directory.
+
+        Args:
+            file (UploadedFile): The file uploaded by the user.
+            directory (str): The directory to save the file in.
+    """
+    file_path = os.path.join(directory, file.name)
+    if not os.path.exists(file_path):
         with open(file_path, 'wb') as f:
             f.write(file.getbuffer())
-    elif file.type == 'text/plain':
-        with open(file_path, "w") as f:
-            f.write(file.read().decode("utf-8"))
 
-# This function is to make sure click on the download button does not reload the entire app (a temporary workaround)
 @st.fragment
 def show_download_button(data,file_name):
     st.download_button(label="💾&nbsp;&nbsp;Download the output file", data=data,file_name=file_name,mime="text/csv")
@@ -159,6 +211,10 @@ def show_cancel_task_button():
         st.error(f"An error occurred: {e}")
 
 def generate_output_file():
+    """
+        Generate and store the output file after task completion.
+
+    """
     if st.session_state.process is not None:
         process = st.session_state.process
         process.wait()
@@ -175,20 +231,33 @@ def generate_output_file():
                 st.error(f"CSV file not found: {output_filename}")
 
 
-# Run the autogluon-assistant command
 def run_autogluon_assistant(config_dir, data_dir):
-        command = ['autogluon-assistant', config_dir, data_dir]
-        if st.session_state.config_overrides:
-            command.extend(['--config-overrides', ' '.join(st.session_state.config_overrides)])
-        output_filename = generate_output_filename()
-        command.extend(['--output-filename', output_filename])
-        st.session_state.output_file = None
-        st.session_state.output_filename = output_filename
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        st.session_state.process = process
-        st.session_state.pid = process.pid
+    """
+       Run the AutoGluon assistant with the specified configuration and data directories.
+
+       This function constructs the command to run the AutoGluon assistant, including
+       any config overrides, and starts the process. The process object and output
+       filename are stored in the session state.
+
+       Args:
+           config_dir (str): The path to the configuration directory.
+           data_dir (str): The path to the data directory.
+    """
+    command = ['autogluon-assistant', config_dir, data_dir]
+    if st.session_state.config_overrides:
+        command.extend(['--config-overrides', ' '.join(st.session_state.config_overrides)])
+    output_filename = generate_output_filename()
+    command.extend(['--output-filename', output_filename])
+    st.session_state.output_file = None
+    st.session_state.output_filename = output_filename
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    st.session_state.process = process
+    st.session_state.pid = process.pid
 
 def show_logs():
+    """
+       Display logs and task status when task is finished.
+    """
     if st.session_state.logs:
         status_container = st.empty()
         log_container = st.empty()
@@ -199,6 +268,9 @@ def show_logs():
             status_container.error("Error detected in the process...Check the logs for more details")
 
 def show_real_time_logs():
+    """
+        Display real-time logs and progress updates for the running task.
+    """
     if st.session_state.process is not None:
         process = st.session_state.process
         st.session_state.logs = ""
@@ -220,7 +292,7 @@ def show_real_time_logs():
             </style>
             """
         st.markdown(logs_css, unsafe_allow_html=True)
-        # # hide the iframe container
+        # hide the iframe container
         st.markdown(
             f"""
                 <style>
@@ -271,120 +343,47 @@ def show_real_time_logs():
         print("process is None")
 
 def download_button():
+    """
+        Create and display a download button for the output file.
+    """
     if st.session_state.output_file is not None and st.session_state.task_running is False:
         output_file = st.session_state.output_file
         output_filename = st.session_state.output_filename
         show_download_button(output_file.to_csv(index=False),output_filename)
 
 def generate_task_file(user_data_dir):
-    file_list = []
-    if st.session_state.train_file_name is not None:
-        file_list.append("train.csv")
-    if st.session_state.test_file_name is not None:
-        file_list.append("test.csv")
-    if st.session_state.sample_output_file_name is not None:
-        file_list.append("sample_output.csv")
+    """
+        Generate a task file containing names of uploaded CSV files.
+
+        Args:
+            user_data_dir (str): Path to the user's data directory.
+    """
     competition_files_path = os.path.join(user_data_dir, "task_files.txt")
+    csv_file_names = [file_name for file_name in st.session_state.uploaded_files.keys() if file_name.endswith(".csv")]
     with open(competition_files_path, "w") as f:
-        f.write("\n".join(file_list))
+        f.write("\n".join(csv_file_names))
 
-def train_uploader():
-    train_file = st.file_uploader("Upload Train Dataset", key="train_file_uploader",label_visibility="collapsed")
-    user_data_dir = get_user_data_dir()
-    if train_file is not None:
-        save_uploaded_file(train_file, os.path.join(user_data_dir, "train.csv"))
-        train_df = pd.read_csv(train_file)
-        st.session_state.train_file_name = train_file.name
-        st.session_state.train_file_df = train_df
-
-def test_uploader():
-    test_file = st.file_uploader("Upload Test Dataset", key = 'test_file_uploader',label_visibility="collapsed")
-    user_data_dir = get_user_data_dir()
-    if test_file is not None:
-        save_uploaded_file(test_file, os.path.join(user_data_dir, "test.csv"))
-        test_df = pd.read_csv(test_file)
-        st.session_state.test_file_name = test_file.name
-        st.session_state.test_file_df = test_df
-
-def sample_output_uploader():
-    sample_output_file = st.file_uploader("Upload Sample Output Dataset (Optional)", key="sample_output_file_uploader",label_visibility="collapsed")
-    user_data_dir = get_user_data_dir()
-    if sample_output_file is not None:
-        save_uploaded_file(sample_output_file, os.path.join(user_data_dir, "sample_output.csv"))
-        sample_output_df = pd.read_csv(sample_output_file)
-        st.session_state.sample_output_file_name = sample_output_file.name
-        st.session_state.sample_output_file_df = sample_output_df
+def save_all_files(user_data_dir):
+    """
+    When the task starts to run, save all the user's uploaded files to user's directory
+    """
+    clear_directory(user_data_dir)
+    for file_name, file_data in st.session_state.uploaded_files.items():
+        save_uploaded_file(file_data['file'], user_data_dir)
 
 def file_uploader():
-    with stylable_container(key='train_file_uploader',css_styles="""
-        {
-            border: 1px solid rgba(49, 51, 63, 0.2);
-            padding: calc(1em - 1px);
-            background-color:transparent;
-            display: flex;
-            border-radius: 10px;
-            flex-direction: column;
-            align-items: center;
+    """
+        Handle file uploads
+    """
+    st.markdown("#### Upload Dataset")
+    uploaded_files = st.file_uploader("Select the dataset", accept_multiple_files=True,label_visibility="collapsed",type=['csv','xlsx'])
+    st.session_state.uploaded_files = {}
+    for file in uploaded_files:
+        df = pd.read_csv(file)
+        st.session_state.uploaded_files[file.name] = {
+            'file': file,
+            'df': df
         }
-    """):
-        st.html(
-            """
-             <div style="display: flex; align-items: center; justify-content: center; height: 80%;">
-            <i class="fa-brands fa-buromobelexperte" style="font-size: 40px; margin-top: 30px;color: #1590e1;"></i>
-            </div>
-            """
-        )
-        train_uploader()
-    if st.session_state.train_file_name is not None:
-        with st.popover(st.session_state.train_file_name,use_container_width=True):
-            st.write(st.session_state.train_file_df.head(10))
-
-    with stylable_container(key='test_file_uploader', css_styles="""
-               {
-                   border: 1px solid rgba(49, 51, 63, 0.2);
-                   padding: calc(1em - 1px);
-                   background-color: transparent;
-                   display: flex;
-                    border-radius: 10px;
-                   flex-direction: column;
-                   align-items: center;
-               }
-           """):
-        st.html(
-            """
-             <div style="display: flex; align-items: center; justify-content: center; height: 80%;">
-            <i class="fa-solid fa-gear" style="font-size: 40px; margin-top: 30px;color: #1590e1;"></i>
-            </div>
-            """
-        )
-        test_uploader()
-    if st.session_state.test_file_name is not None:
-        with st.popover(st.session_state.test_file_name, use_container_width=True):
-            st.write(st.session_state.test_file_df.head(10))
-
-    with stylable_container(key='sample_output_file_uploader', css_styles="""
-                {
-                    border: 1px solid rgba(49, 51, 63, 0.2);
-                    padding: calc(1em - 1px);
-                    background-color: transparent;
-                    display: flex;
-                    border-radius: 10px;
-                    flex-direction: column;
-                    align-items: center;
-                }
-            """):
-        st.html(
-            """
-             <div style="display: flex; align-items: center; justify-content: center; height: 80%;">
-            <i class="fa-solid fa-file-csv" style="font-size: 40px; margin-top: 30px;color: #1590e1;"></i>
-            </div>
-            """
-        )
-        sample_output_uploader()
-    if st.session_state.sample_output_file_name is not None:
-        with st.popover(st.session_state.sample_output_file_name, use_container_width=True):
-            st.write(st.session_state.sample_output_file_df.head(10))
-    add_vertical_space(3)
 
 
 def toggle_running_state():
@@ -395,10 +394,14 @@ def toggle_cancel_state():
     st.session_state.task_canceled = True
 
 def run_button():
+    """
+        Create and handle the "Run" button for starting the AutoGluon task.
+    """
     user_data_dir = get_user_data_dir()
     if st.button(label="🔘&nbsp;&nbsp;Run!", on_click=toggle_running_state,
                  disabled=st.session_state.task_running):
-        if st.session_state.train_file_name and st.session_state.test_file_name:
+        if st.session_state.uploaded_files is not None:
+                save_all_files(user_data_dir)
                 generate_task_file(user_data_dir)
                 run_autogluon_assistant(CONFIG_DIR, user_data_dir)
         else:
@@ -406,15 +409,27 @@ def run_button():
             st.session_state.task_running = False
 
 def show_cancel_container():
+    """
+        Display a cancellation message when the task is cancelled.
+    """
     status_container = st.empty()
     status_container.info("Task has been cancelled")
 
 def set_description():
+    """
+        Set up the description section of the user interface.
+
+        This function calls helper functions to display a description and set up
+        a file uploader for the description
+    """
     display_description()
     description_file_uploader()
     add_vertical_space(4)
 
 def run_section():
+    """
+        Set up and display the 'Run AutoGluon' section of the user interface.
+    """
     st.markdown("""
            <h1 style='
                font-weight: light;

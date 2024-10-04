@@ -29,98 +29,16 @@ div[data-testid='stFileUploader'] > section[aria-label="Upload task description 
     background-color: transparent;
 }
 
-
-/*Train Dataset file uploader*/
-
-div[data-testid='stFileUploader'] > section[aria-label="Upload Train Dataset"] > input + div {
-    display: none;
+/*File Uploader*/
+div[data-testid='stFileUploader'] > section[aria-label="Select the dataset"] > input + div {
+    margin: 0;
+    padding: 20px;
 }
-
-div[data-testid='stFileUploader'] > section[aria-label="Upload Train Dataset"]{
+div[data-testid='stFileUploader'] > section[aria-label="Select the dataset"]{
     width:100%;
-    padding: 0;
-    height: 10%;
-    background-color: transparent;
-}
-section[aria-label="Upload Train Dataset"][data-testid='stFileUploaderDropzone'] > [data-testid='baseButton-secondary'] {
-        margin-top: 0;
-        margin-bottom: -1px;
-        text-indent: -9999px;
-        line-height: 0;
-        width: 80%;
-        border: none;
-        background: transparent;
-        color:#18A0FB;
-        font-family: "Inter", sans-serif;
-        &::after {
-            line-height: initial;
-            content: "Upload Train Dataset";
-            text-indent: 0;
-            font-weight: bold;
-
-      }
-    }
-
-/*Test Dataset Uploader*/
-div[data-testid='stFileUploader'] > section[aria-label="Upload Test Dataset"] > input + div {
-    display: none;
-}
-div[data-testid='stFileUploader'] > section[aria-label="Upload Test Dataset"]{
-    width:100%;
-    padding: 0;
-    height: 50%;
-    background-color: transparent;
+    height: 300px;
 
 }
-section[aria-label="Upload Test Dataset"][data-testid='stFileUploaderDropzone'] > [data-testid='baseButton-secondary'] {
-        margin-top: 0;
-        margin-bottom: -1px;
-        text-indent: -9999px;
-        line-height: 0;
-        width: 80%;
-        border: none;
-        background: transparent;
-        color:#18A0FB;
-        font-family: "Inter", sans-serif;
-        &::after {
-            line-height: initial;
-            content: "Upload Test Dataset";
-            text-indent: 0;
-            font-weight: bold;
-
-      }
-    }
-/*Sample Output Dataset Uploader*/
-div[data-testid='stFileUploader'] > section[aria-label="Upload Sample Output Dataset (Optional)"] > input + div {
-    display: none;
-}
-
-div[data-testid='stFileUploader'] > section[aria-label="Upload Sample Output Dataset (Optional)"]{
-    width:100%;
-    padding: 0;
-    height: 50%;
-    background-color: transparent;
-}
-section[aria-label="Upload Sample Output Dataset (Optional)"][data-testid='stFileUploaderDropzone'] > [data-testid='baseButton-secondary'] {
-        margin-top: 0;
-        margin-bottom: -1px;
-        text-indent: -9999px;
-        line-height: 0;
-        width: 80%;
-        border: none;
-        background: transparent;
-        color:#18A0FB;
-        text-align: left;
-        font-family: "Inter", sans-serif;
-        &::after {
-            line-height: initial;
-            content: "Upload Sample Output Dataset";
-            text-indent: 0;
-            font-weight: bold;
-
-      }
-    }
-
 
 /*Task Description File Uploader*/
 section[aria-label="Upload task description file"][data-testid='stFileUploaderDropzone'] > [data-testid='baseButton-secondary'] {
@@ -172,9 +90,6 @@ div.row-widget.stDownloadButton > button[data-testid='baseButton-secondary'] > d
         font-weight: bold;
 }
 
-.stFileUploaderFile {
-    display: none
-}
 
 /* preview.py */
 .file-view-bar {

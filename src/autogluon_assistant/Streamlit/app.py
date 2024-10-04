@@ -1,5 +1,6 @@
 import streamlit as st
 import extra_streamlit_components as stx
+import streamlit.components.v1 as components
 st.set_page_config(page_title="AutoGluon Assistant",page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png", layout="wide",initial_sidebar_state="collapsed")
 from pages.nav_bar import nav_bar
 from pages.tutorial import main as tutorial
@@ -8,8 +9,7 @@ from pages.demo import main as demo
 from pages.preview import main as preview
 from pages.task import main as run
 
-
-
+# fontawesome
 st.markdown(
     """
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -26,6 +26,28 @@ st.markdown(
 )
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+
+reload_warning = """
+<script>
+  window.onbeforeunload = function () {
+
+    return  "Are you sure want to LOGOUT the session ?";
+}; 
+</script>
+"""
+
+components.html(reload_warning,height=0)
+
+st.markdown(
+    f"""
+               <style>
+               .element-container:has(iframe[height="0"]) {{
+                 display: None;
+               }}
+               </style>
+           """, unsafe_allow_html=True
+)
 
 def initial_session_state():
     if 'config_overrides' not in st.session_state:
@@ -58,48 +80,8 @@ def initial_session_state():
         st.session_state.return_code = None
     if "task_canceled" not in st.session_state:
         st.session_state.task_canceled = False
-    if "train_file_name" not in st.session_state:
-        st.session_state.train_file_name = None
-    if "train_file_df" not in st.session_state:
-        st.session_state.train_file_df = None
-    if "test_file_name" not in st.session_state:
-        st.session_state.test_file_name = None
-    if "test_file_df" not in st.session_state:
-        st.session_state.test_file_df = None
-    if "sample_output_file_name" not in st.session_state:
-        st.session_state.sample_output_file_name = None
-    if "sample_output_file_df" not in st.session_state:
-        st.session_state.sample_output_file_df = None
-
-def get_manager():
-    return stx.CookieManager()
-
-cookie_manager = get_manager()
-
-
-# st.subheader("All Cookies:")
-# cookies = cookie_manager.get_all()
-# st.write(cookies)
-# c1, c2, c3 = st.columns(3)
-#
-# with c1:
-#     st.subheader("Get Cookie:")
-#     cookie = st.text_input("Cookie", key="0")
-#     clicked = st.button("Get")
-#     if clicked:
-#         value = cookie_manager.get(cookie=cookie)
-#         st.write(value)
-# with c2:
-#     st.subheader("Set Cookie:")
-#     cookie = st.text_input("Cookie", key="1")
-#     val = st.text_input("Value")
-#     if st.button("Add"):
-#         cookie_manager.set(cookie, val) # Expires in a day by default
-# with c3:
-#     st.subheader("Delete Cookie:")
-#     cookie = st.text_input("Cookie", key="2")
-#     if st.button("Delete"):
-#         cookie_manager.delete(cookie)
+    if 'uploaded_files' not in st.session_state:
+        st.session_state.uploaded_files = {}
 
 
 
@@ -111,7 +93,6 @@ def main():
     feature()
     run()
     preview()
-    # st.write(st.session_state)
 
     st.markdown("""
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

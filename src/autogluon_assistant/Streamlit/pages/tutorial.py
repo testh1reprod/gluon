@@ -113,7 +113,6 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-    # Main container
     st.markdown(f"""
     <div class="main-container" id="get-started">
         <div class="left-section">
