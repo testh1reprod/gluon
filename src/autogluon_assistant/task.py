@@ -229,7 +229,6 @@ class TabularPredictionTask:
     def train_id_column(self, train_id_column: str) -> None:
         self.metadata["train_id_column"] = train_id_column
 
-
     @property
     def output_id_column(self) -> Optional[str]:
         return self.metadata.get(

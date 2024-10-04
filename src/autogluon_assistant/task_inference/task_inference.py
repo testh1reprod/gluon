@@ -116,6 +116,7 @@ class ProblemTypeInference(TaskInference):
         self.fallback_value = infer_problem_type(task.train_data[task.label_column], silent=True)
         self.prompt_generator = ProblemTypePromptGenerator(data_description=task.metadata["description"])
 
+
 class BaseIDColumnInference(TaskInference):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -131,9 +132,7 @@ class BaseIDColumnInference(TaskInference):
         self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
         if not description:
             description = task.metadata["description"]
-        self.prompt_generator = self.get_prompt_generator()(
-            data_description=description, column_names=column_names
-        )
+        self.prompt_generator = self.get_prompt_generator()(data_description=description, column_names=column_names)
 
     def get_data(self, task):
         pass
@@ -148,15 +147,14 @@ class BaseIDColumnInference(TaskInference):
         self.initialize_task(task)
         parser_output = self._chat_and_parse_prompt_output()
         id_column_name = self.get_id_column_name()
-        
+
         if parser_output[id_column_name] == NO_ID_COLUMN_IDENTIFIED:
             logger.warning(
-                f"Failed to infer ID column with data descriptions. "
-                "Retry the inference without data descriptions."
+                f"Failed to infer ID column with data descriptions. " "Retry the inference without data descriptions."
             )
-            self.initialize_task(task, 
-                                 description="Missing data description. Please infer the ID column based on given column names."
-                                )
+            self.initialize_task(
+                task, description="Missing data description. Please infer the ID column based on given column names."
+            )
             parser_output = self._chat_and_parse_prompt_output()
 
         id_column = parser_output[id_column_name]
@@ -166,6 +164,7 @@ class BaseIDColumnInference(TaskInference):
 
     def process_id_column(self, task, id_column):
         pass
+
 
 class TestIDColumnInference(BaseIDColumnInference):
     def get_data(self, task):
@@ -189,13 +188,14 @@ class TestIDColumnInference(BaseIDColumnInference):
                 new_test_data[id_column] = task.output_data[task.output_id_column]
                 task.test_data = new_test_data
             # if output data has id column that is different from test id column name
-            #elif id_column != task.output_id_column:
+            # elif id_column != task.output_id_column:
             #    new_test_data = task.test_data.copy()
             #    new_test_data = new_test_data.rename(columns={id_column: task.output_id_column})
             #    task.test_data = new_test_data
             #    id_column = task.output_id_column
 
         return id_column
+
 
 class TrainIDColumnInference(BaseIDColumnInference):
     def get_data(self, task):
@@ -217,6 +217,7 @@ class TrainIDColumnInference(BaseIDColumnInference):
 
         return id_column
 
+
 class OutputIDColumnInference(BaseIDColumnInference):
     def get_data(self, task):
         return task.output_data
@@ -229,6 +230,7 @@ class OutputIDColumnInference(BaseIDColumnInference):
 
     def process_id_column(self, task, id_column):
         return id_column
+
 
 class EvalMetricInference(TaskInference):
     def initialize_task(self, task):

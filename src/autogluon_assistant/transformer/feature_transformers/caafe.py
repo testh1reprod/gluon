@@ -27,7 +27,7 @@ class CAAFETransformer(BaseFeatureTransformer):
 
         openai.api_key = kwargs.get("openai_api_key", os.environ.get("OPENAI_API_KEY"))
 
-        pd.set_option('future.no_silent_downcasting', True)
+        pd.set_option("future.no_silent_downcasting", True)
 
         self.llm_model = llm_model
         self.iterations = num_iterations
