@@ -90,8 +90,8 @@ class TaskInference:
 
 
 class DescriptionFileNameInference(TaskInference):
-    """Uses an LLM to locate the filenames of the train, test, and output data,
-    and assigns them to the respective properties of the task.
+    """Uses an LLM to locate the filenames of description files.
+    TODO: merge the logics with DataFileNameInference and add support for multiple files per field.
     """
 
     def initialize_task(self, task):
