@@ -65,10 +65,13 @@ class TabularPredictionAssistant:
             DataFileNameInference,
             LabelColumnInference,
             ProblemTypeInference,
-            OutputIDColumnInference,
-            TrainIDColumnInference,
-            TestIDColumnInference,
         ]
+        if self.config.detect_and_drop_id_column:
+            task_inference_preprocessors += [
+                OutputIDColumnInference,
+                TrainIDColumnInference,
+                TestIDColumnInference,
+            ]
         if self.config.infer_eval_metric:
             task_inference_preprocessors += [EvalMetricInference]
         for preprocessor_class in task_inference_preprocessors:

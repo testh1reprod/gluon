@@ -178,7 +178,13 @@ class TabularPredictionTask:
     @property
     def output_columns(self) -> List[str]:
         """Return the output dataset columns for the task."""
-        return self.output_data.columns.to_list()
+        if self.output_data is None:
+            if self.label_column:
+                return [self.label_column]
+            else:
+                return None
+        else:
+            return self.output_data.columns.to_list()
 
     @property
     def label_column(self) -> Optional[str]:
@@ -233,6 +239,9 @@ class TabularPredictionTask:
         self.metadata["output_id_column"] = output_id_column
 
     def _infer_label_column_from_output_data(self) -> Optional[str]:
+        if self.output_columns is None:
+            return None
+
         # Assume the first output column is the ID column and ignore it
         relevant_output_cols = self.output_columns[1:]
 
