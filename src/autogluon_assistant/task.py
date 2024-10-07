@@ -65,13 +65,13 @@ class TabularPredictionTask:
             return ""
 
     @staticmethod
-    def save_artifacts(full_save_path, predictor, train_data, test_data, output_data):
+    def save_artifacts(full_save_path, predictor, train_data, test_data, sample_submission_data):
         # Prepare the dictionary with all artifacts
         artifacts = {
             "trained_model": predictor,  # AutoGluon TabularPredictor
             "train_data": train_data,  # Pandas DataFrame
             "test_data": test_data,  # Pandas DataFrame
-            "out_data": output_data,  # Pandas DataFrame
+            "out_data": sample_submission_data,  # Pandas DataFrame
         }
 
         # Get the directory where the AG models are saved
@@ -117,14 +117,17 @@ class TabularPredictionTask:
 
     def describe(self) -> Dict[str, Any]:
         """Return a description of the task."""
-        return {
+        describe_task = {
             "name": self.metadata["name"],
             "description": self.metadata["description"],
             "metadata": self.metadata,
             "train_data": self.train_data.describe().to_dict(),
             "test_data": self.test_data.describe().to_dict(),
-            "output_data": self.output_data.describe().to_dict(),
         }
+        if self.sample_submission_data is not None:
+            describe_task["sample_submission_data"] = self.sample_submission_data.describe().to_dict()
+
+        return describe_task
 
     def get_filenames(self) -> List[str]:
         """Return all filenames for the task."""
@@ -133,7 +136,9 @@ class TabularPredictionTask:
     def _set_task_files(self, dataset_name_mapping: Dict[str, Union[str, Path, pd.DataFrame, TabularDataset]]) -> None:
         """Set the task files for the task."""
         for k, v in dataset_name_mapping.items():
-            if isinstance(v, (pd.DataFrame, TabularDataset)):
+            if v is None:
+                self.dataset_mapping[k] = None
+            elif isinstance(v, (pd.DataFrame, TabularDataset)):
                 self.dataset_mapping[k] = v
             elif isinstance(v, Path):
                 self.dataset_mapping[k] = TabularDataset(str(v)) if self.cache_data else v
@@ -142,7 +147,7 @@ class TabularPredictionTask:
                     iter([path for path in self.filepaths if path.name == v]), self.filepaths[0].parent / v
                 )
                 if not filepath.is_file():
-                    raise ValueError(f"File {v} not found in task {self.name}")
+                    raise ValueError(f"File {v} not found in task {self.metadata['name']}")
                 self.dataset_mapping[k] = TabularDataset(str(filepath)) if self.cache_data else filepath
             else:
                 raise TypeError(f"Unsupported type for dataset_mapping: {type(v)}")
@@ -165,26 +170,26 @@ class TabularPredictionTask:
         self._set_task_files({TEST: data})
 
     @property
-    def output_data(self) -> TabularDataset:
+    def sample_submission_data(self) -> TabularDataset:
         """Return the output dataset for the task."""
         return self.load_task_data(OUTPUT)
 
-    @output_data.setter
-    def output_data(self, data: Union[str, Path, pd.DataFrame, TabularDataset]) -> None:
-        if self.output_data is not None:
+    @sample_submission_data.setter
+    def sample_submission_data(self, data: Union[str, Path, pd.DataFrame, TabularDataset]) -> None:
+        if self.sample_submission_data is not None:
             raise ValueError("Output data already set for task")
         self._set_task_files({OUTPUT: data})
 
     @property
     def output_columns(self) -> List[str]:
         """Return the output dataset columns for the task."""
-        if self.output_data is None:
+        if self.sample_submission_data is None:
             if self.label_column:
                 return [self.label_column]
             else:
                 return None
         else:
-            return self.output_data.columns.to_list()
+            return self.sample_submission_data.columns.to_list()
 
     @property
     def label_column(self) -> Optional[str]:
@@ -193,8 +198,8 @@ class TabularPredictionTask:
             return self.metadata["label_column"]
         else:
             # should ideally never be called after LabelColumnInferenceTransformer has run
-            # `_infer_label_column_from_output_data` is the fallback when label_column is not found
-            return self._infer_label_column_from_output_data()
+            # `_infer_label_column_from_sample_submission_data` is the fallback when label_column is not found
+            return self._infer_label_column_from_sample_submission_data()
 
     @label_column.setter
     def label_column(self, label_column: str) -> None:
@@ -231,14 +236,14 @@ class TabularPredictionTask:
     @property
     def output_id_column(self) -> Optional[str]:
         return self.metadata.get(
-            "output_id_column", self.output_data.columns[0] if self.output_data is not None else None
+            "output_id_column", self.sample_submission_data.columns[0] if self.sample_submission_data is not None else None
         )
 
     @output_id_column.setter
     def output_id_column(self, output_id_column: str) -> None:
         self.metadata["output_id_column"] = output_id_column
 
-    def _infer_label_column_from_output_data(self) -> Optional[str]:
+    def _infer_label_column_from_sample_submission_data(self) -> Optional[str]:
         if self.output_columns is None:
             return None
 

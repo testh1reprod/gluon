@@ -29,6 +29,8 @@ MEAN_ABSOLUTE_ERROR = "mean_absolute_error"
 R2 = "r2"
 ROOT_MEAN_SQUARED_LOGARITHMIC_ERROR = "root_mean_squared_logarithmic_error"
 
+CLASSIFICATION_PROBA_EVAL_METRIC = [ROC_AUC, LOG_LOSS, F1]
+
 METRICS_DESCRIPTION = {
     ROC_AUC: "Area under the receiver operating characteristics (ROC) curve",
     LOG_LOSS: "Log loss, also known as logarithmic loss",

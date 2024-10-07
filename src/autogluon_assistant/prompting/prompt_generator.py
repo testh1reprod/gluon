@@ -66,17 +66,17 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
             return None
     
     def generate_prompt(self) -> str:
-        file_content_prompts = "# Available Files And First Line in The File\n"
+        file_content_prompts = "# Available Files And Content in The File\n\n"
         for filename in map(Path, self.filenames):
             if is_text_file(filename):
                 content = self.read_file_safely(filename)
                 if content is not None:
-                    first_line = content.split('\n')[0].strip()
-                    if len(first_line) > 100:
-                        first_line = first_line[:100] + "..."
-                    file_content_prompts += f"File:\n{filename}\nFirst Line:\n{first_line}\n"
+                    truncated_contents = content[:100].strip()
+                    if len(content) > 100:
+                        truncated_contents += "..."
+                    file_content_prompts += f"File:\n\n{filename}\n\nTruncated Content:\n{truncated_contents}\n\n"
         
-        file_content_prompts += f"Please find the files to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file."
+        file_content_prompts += f"Please find the File to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such File."
         
         return "\n\n".join([
             self.basic_intro_prompt,
@@ -86,7 +86,7 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
 
 
 class DataFileNamePromptGenerator(PromptGenerator):
-    fields = ["train_data", "test_data", "output_data"]
+    fields = ["train_data", "test_data", "sample_submission_data"]
 
     def __init__(self, data_description: str, filenames: list):
         super().__init__(data_description)
@@ -99,6 +99,7 @@ class DataFileNamePromptGenerator(PromptGenerator):
                 self.data_description_prompt,
                 f"# Available Files\n{', '.join(self.filenames)}",
                 "If there are zip (e.g. .zip or .gz) versions of files and non-zipped versions of the files, choose the non-zip version.",
+                f"Please find the data files, and response with the value {NO_FILE_IDENTIFIED} if there's no such File.",
                 self.get_field_parsing_prompt(),
             ]
         )

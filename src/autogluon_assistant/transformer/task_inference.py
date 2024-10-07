@@ -128,7 +128,7 @@ class FilenameInferenceTransformer(LLMParserTransformer):
 
         task.train_data = parser_output["train"]
         task.test_data = parser_output["test"]
-        task.output_data = parser_output["output"]
+        task.sample_submission_data = parser_output["output"]
 
         return task
 
@@ -151,7 +151,7 @@ class LabelColumnInferenceTransformer(LLMParserTransformer):
             task.metadata["label_column"] = parser_output["label_column"]
         except OutputParserException as e:
             # Use the fallback method to infer the label column
-            task.metadata["label_column"] = task._infer_label_column_from_output_data()
+            task.metadata["label_column"] = task._infer_label_column_from_sample_submission_data()
             if not task.metadata["label_column"]:
                 # raise the error if the fallback logic returns an Empty/None value
                 raise e
@@ -205,8 +205,8 @@ class TestIdColumnTransformer(AbstractIdColumnInferenceTransformer):
             parsed_id_column = self._parse_id_column_in_data(task.test_data, output_id_column)
             if parsed_id_column == "NO_ID_COLUMN_IDENTIFIED" or parsed_id_column not in task.test_data.columns:
                 # if no valid column could be identified by the LLM, we also transform the test data and add a new ID column
-                start_val, end_val = task.output_data[output_id_column].iloc[[0, -1]]
-                if all(task.output_data[output_id_column] == np.arange(start_val, end_val + 1)):
+                start_val, end_val = task.sample_submission_data[output_id_column].iloc[[0, -1]]
+                if all(task.sample_submission_data[output_id_column] == np.arange(start_val, end_val + 1)):
                     new_test_data = task.test_data.copy()
                     new_test_data[output_id_column] = np.arange(start_val, start_val + len(task.test_data))
                     task.test_data = new_test_data

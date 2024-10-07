@@ -41,7 +41,7 @@ class AssistantChatOpenAI(ChatOpenAI):
 
 class LLMFactory:
     valid_models = {
-        "openai": ["gpt-3.5-turbo", "gpt-4-1106-preview", "gpt-4o-mini-2024-07-18"],
+        "openai": ["gpt-3.5-turbo", "gpt-4-1106-preview", "gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06"],
         "bedrock": ["anthropic.claude-3-sonnet-20240229-v1:0", "anthropic.claude-3-haiku-20240307-v1:0"],
     }
 

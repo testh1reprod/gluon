@@ -37,6 +37,7 @@ class TaskInference:
         super().__init__(*args, **kwargs)
         self.llm = llm
         self.fallback_value = None
+        self.ignored_value = []
 
     def initialize_task(self, task):
         self.prompt_generator = None
@@ -46,8 +47,10 @@ class TaskInference:
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
         self.initialize_task(task)
         parser_output = self._chat_and_parse_prompt_output()
-        for key in parser_output:
-            setattr(task, key, parser_output[key])
+        for k,v in parser_output.items():
+            if v in self.ignored_value:
+                v = None
+            setattr(task, k, v)
         return task
 
     def parse_output(self, output):
@@ -60,9 +63,9 @@ class TaskInference:
         """Chat with the LLM and parse the output"""
         try:
             chat_prompt = self.prompt_generator.generate_chat_prompt()
-            logger.debug(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
+            logger.info(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
             output = self.llm(chat_prompt.format_messages())
-            logger.debug(f"LLM output:\n{output}")
+            logger.info(f"LLM output:\n{output}")
 
             parsed_output = self.parse_output(output)
         except OutputParserException as e:
@@ -97,6 +100,7 @@ class DescriptionFileNameInference(TaskInference):
     def initialize_task(self, task):
         filenames = [str(path) for path in task.filepaths]
         self.valid_values = filenames + [NO_FILE_IDENTIFIED]
+        self.fallback_value = NO_FILE_IDENTIFIED
         self.prompt_generator = DescriptionFileNamePromptGenerator(filenames=filenames)
 
     def _read_descriptions(self, parser_output: dict) -> str:
@@ -136,7 +140,9 @@ class DataFileNameInference(TaskInference):
 
     def initialize_task(self, task):
         filenames = [str(path) for path in task.filepaths]
-        self.valid_values = filenames
+        self.valid_values = filenames + [NO_FILE_IDENTIFIED]
+        self.fallback_value = NO_FILE_IDENTIFIED
+        self.ignored_value = [NO_FILE_IDENTIFIED]
         self.prompt_generator = DataFileNamePromptGenerator(
             data_description=task.metadata["description"], filenames=filenames
         )
@@ -226,7 +232,7 @@ class TestIDColumnInference(BaseIDColumnInference):
                 else:
                     id_column = "id_column"
                 new_test_data = task.test_data.copy()
-                new_test_data[id_column] = task.output_data[task.output_id_column]
+                new_test_data[id_column] = task.sample_submission_data[task.output_id_column]
                 task.test_data = new_test_data
             # if output data has id column that is different from test id column name
             # elif id_column != task.output_id_column:
@@ -261,7 +267,7 @@ class TrainIDColumnInference(BaseIDColumnInference):
 
 class OutputIDColumnInference(BaseIDColumnInference):
     def get_data(self, task):
-        return task.output_data
+        return task.sample_submission_data
 
     def get_prompt_generator(self):
         return OutputIDColumnPromptGenerator
