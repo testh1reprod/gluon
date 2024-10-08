@@ -1,5 +1,5 @@
 from .base import BaseTransformer, TransformTimeoutError
-from .feature_transformers import BaseFeatureTransformer, CAAFETransformer, OpenFETransformer, GloveTextEmbeddingTransformer
+from .feature_transformers import BaseFeatureTransformer, CAAFETransformer, OpenFETransformer, PretrainedEmbeddingTransformer
 from .task_inference import (
     EvalMetricInferenceTransformer,
     FilenameInferenceTransformer,
@@ -13,7 +13,7 @@ __all__ = [
     "BaseTransformer",
     "BaseFeatureTransformer",
     "CAAFETransformer",
-    "GloveTextEmbeddingTransformer",
+    "PretrainedEmbeddingTransformer",
     "EvalMetricInferenceTransformer",
     "FilenameInferenceTransformer",
     "LabelColumnInferenceTransformer",
