@@ -9,6 +9,7 @@ import torch
 import torch.multiprocessing as mp
 logger = logging.getLogger(__name__)
 logger.setLevel('DEBUG')
+import re
 
 from collections import namedtuple
 import os
@@ -25,8 +26,8 @@ def get_device_info():
     return DeviceInfo(cpu_count, gpu_devices)
 
 def _run_one_proc(model, data):
-
-    if any(isinstance(x, str) for x in data):
+    if all(isinstance(x, str) for x in data) and any(len(x.split(" "))>3 for x in data):
+        data = np.where(pd.isna(data), '', data)
         return model.encode(data).astype('float32')
     else:
         return np.zeros(len(data))
@@ -34,7 +35,10 @@ def _run_one_proc(model, data):
 class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
     def __init__(self, model_name, **kwargs) -> None:
         self.model_name = model_name 
-        self.model = SentenceTransformer(self.model_name)
+        try:
+            self.model = SentenceTransformer(self.model_name)
+        except:
+            logger.warning(f"No model {self.model_name.__name__} is found.")
 
 
     def _fit_dataframes(self, train_X: pd.DataFrame, train_y: pd.Series, **kwargs) -> None:
@@ -48,7 +52,7 @@ class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
             transformed_train_column = _run_one_proc(self.model, np.transpose(train_X[series_name].to_numpy()).T)
             transformed_test_column = _run_one_proc(self.model, np.transpose(test_X[series_name].to_numpy()).T)
             
-            if transformed_train_column.any() or transformed_test_column.any():
+            if transformed_train_column.any() and transformed_test_column.any():
                 transformed_train_column = pd.DataFrame(transformed_train_column)
                 transformed_test_column = pd.DataFrame(transformed_test_column)
                 transformed_train_column.columns = transformed_test_column.columns = [series_name + ' ' + str(i) for i in range(len(transformed_train_column.columns))]

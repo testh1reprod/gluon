@@ -7,6 +7,8 @@ save_artifacts:
   # path: "s3://autogluon-assistant-agts/outputs/<run_id>/aga-artifacts/"
 feature_transformers:
   - _target_: autogluon_assistant.transformer.PretrainedEmbeddingTransformer
+      model_name: 'all-mpnet-base-v2'
+  - _target_: autogluon_assistant.transformer.PretrainedEmbeddingTransformer
     model_name: "sentence-transformers/average_word_embeddings_glove.6B.300d"
   - _target_: autogluon_assistant.transformer.CAAFETransformer
     eval_model: lightgbm
