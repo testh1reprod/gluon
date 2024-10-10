@@ -160,8 +160,15 @@ class LabelColumnInference(TaskInference):
 class ProblemTypeInference(TaskInference):
     def initialize_task(self, task):
         self.valid_values = PROBLEM_TYPES
-        self.fallback_value = infer_problem_type(task.train_data[task.label_column], silent=True)
         self.prompt_generator = ProblemTypePromptGenerator(data_description=task.metadata["description"])
+
+    def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
+        try:
+            task.problem_type = infer_problem_type(task.train_data[task.label_column], silent=True)
+        except Exception as e:
+            logger.warning(f"Failed to inference problem type with Autogluon Tabular: {e}. Switched to use LLM to inference problem type.")
+            return super().transform(task)
+        return task
 
 
 class BaseIDColumnInference(TaskInference):
@@ -234,12 +241,6 @@ class TestIDColumnInference(BaseIDColumnInference):
                 new_test_data = task.test_data.copy()
                 new_test_data[id_column] = task.sample_submission_data[task.output_id_column]
                 task.test_data = new_test_data
-            # if output data has id column that is different from test id column name
-            # elif id_column != task.output_id_column:
-            #    new_test_data = task.test_data.copy()
-            #    new_test_data = new_test_data.rename(columns={id_column: task.output_id_column})
-            #    task.test_data = new_test_data
-            #    id_column = task.output_id_column
 
         return id_column
 
