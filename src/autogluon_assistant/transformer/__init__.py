@@ -5,6 +5,7 @@ __all__ = [
     "BaseTransformer",
     "BaseFeatureTransformer",
     "CAAFETransformer",
+    "PretrainedEmbeddingTransformer",
     "OpenFETransformer",
     "TransformTimeoutError",
 ]
