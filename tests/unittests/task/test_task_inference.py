@@ -89,7 +89,7 @@ def test_label_column_inference(toy_multiclass_data):
     assert task.metadata["label_column"] == "OutcomeType", "The label column should be 'OutcomeType'."
 
     # guaranteed test fallback logic explicitly
-    task.metadata["label_column"] = task._infer_label_column_from_output_data()
+    task.metadata["label_column"] = task._infer_label_column_from_sample_submission_data()
     assert task.metadata["label_column"] == "OutcomeType", "The label column should be 'OutcomeType'."
 
 
