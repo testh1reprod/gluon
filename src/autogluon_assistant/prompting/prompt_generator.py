@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, Any, List
 
+from autogluon.tabular import TabularDataset
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
@@ -76,7 +77,7 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
                         truncated_contents += "..."
                     file_content_prompts += f"File:\n\n{filename}\n\nTruncated Content:\n{truncated_contents}\n\n"
         
-        file_content_prompts += f"Please find the File to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such File."
+        file_content_prompts += f"Please return the full path of the file to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file."
         
         return "\n\n".join([
             self.basic_intro_prompt,
@@ -92,17 +93,44 @@ class DataFileNamePromptGenerator(PromptGenerator):
         super().__init__(data_description)
         self.filenames = filenames
 
+    def read_file_safely(self, filename: Path) -> str | None:
+        try:
+            return filename.read_text()
+        except UnicodeDecodeError:
+            return None
+
     def generate_prompt(self) -> str:
-        return "\n\n".join(
-            [
-                self.basic_intro_prompt,
-                self.data_description_prompt,
-                f"# Available Files\n{', '.join(self.filenames)}",
-                "If there are zip (e.g. .zip or .gz) versions of files and non-zipped versions of the files, choose the non-zip version.",
-                f"Please find the data files, and response with the value {NO_FILE_IDENTIFIED} if there's no such File.",
-                self.get_field_parsing_prompt(),
-            ]
-        )
+        file_content_prompts = "# Available Data Files And Columns in The File\n\n"
+        for filename in self.filenames:
+            try:
+                content = TabularDataset(filename)
+                truncated_columns = content.columns[:10].tolist()
+                if len(content.columns) > 10:
+                    truncated_columns.append("...")
+                truncated_columns_str = ", ".join(truncated_columns)
+                file_content_prompts += f"File:\n\n{filename}\n\nTruncated Columns:\n{truncated_columns_str}\n\n"
+            except Exception as e:
+                print(e)
+                continue
+    
+        file_content_prompts += f"Please return the full path of the data files as provided, and response with the value {NO_FILE_IDENTIFIED} if there's no such File."
+        
+        return "\n\n".join([
+            self.basic_intro_prompt,
+            file_content_prompts,
+            self.get_field_parsing_prompt(),
+        ])
+
+    #def generate_prompt(self) -> str:
+    #    return "\n\n".join(
+    #        [
+    #            self.basic_intro_prompt,
+    #            self.data_description_prompt,
+    #            f"# Available Files\n{', '.join(self.filenames)}",
+    #            f"Please return the full path of the data files as provided, and response with the value {NO_FILE_IDENTIFIED} if there's no such File.",
+    #            self.get_field_parsing_prompt(),
+    #        ]
+    #    )
 
 
 class LabelColumnPromptGenerator(PromptGenerator):

@@ -171,6 +171,9 @@ class BaseIDColumnInference(TaskInference):
         self.prompt_generator = None
 
     def initialize_task(self, task, description=None):
+        if self.get_data(task) is None:
+            return
+        
         column_names = list(self.get_data(task).columns)
         # Assume ID column can only appear in first 3 columns
         if len(column_names) >= 3:
@@ -190,6 +193,10 @@ class BaseIDColumnInference(TaskInference):
         pass
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
+        if self.get_data(task) is None:
+            setattr(task, self.get_id_column_name(), None)
+            return task
+        
         self.initialize_task(task)
         parser_output = self._chat_and_parse_prompt_output()
         id_column_name = self.get_id_column_name()

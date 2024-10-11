@@ -11,7 +11,7 @@ from autogluon.tabular import TabularDataset, TabularPredictor
 from sklearn.metrics import mean_squared_log_error
 
 from .task import TabularPredictionTask
-from .constants import CLASSIFICATION_PROBA_EVAL_METRIC
+from .constants import BINARY, CLASSIFICATION_PROBA_EVAL_METRIC, MULTICLASS
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +111,7 @@ class AutogluonTabularPredictor(Predictor):
         Exception
             `TabularPredictor.predict` fails
         """
-        if self.predictor.problem_type in ["binary", "multiclass"] and task.eval_metric in CLASSIFICATION_PROBA_EVAL_METRIC:
-            return self.predictor.predict_proba(task.test_data)
+        if task.eval_metric in CLASSIFICATION_PROBA_EVAL_METRIC and self.predictor.problem_type in [BINARY, MULTICLASS]:
+            return self.predictor.predict_proba(task.test_data, as_multiclass=(self.predictor.problem_type == MULTICLASS))
         else:
             return self.predictor.predict(task.test_data)

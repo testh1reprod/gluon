@@ -47,9 +47,16 @@ def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFra
             axis="columns",
         )
     else:
-        outputs = predictions
+        if isinstance(predictions, pd.Series):
+            outputs = predictions.to_frame()
+        else:
+            outputs = predictions
 
-    outputs.columns = task.output_columns
+    if len(outputs.columns) == len(task.output_columns):
+        outputs.columns = task.output_columns  # TODO: should better remove this
+    else:
+        outputs = outputs[task.output_columns]
+
     return outputs
 
 
