@@ -21,7 +21,7 @@ dependencies = [
     "rich",
     "s3fs",
     "joblib",
-    "sentence-transformers",
+    "sentence-transformers >= 3.1.0",
 ]
 
 [project.optional-dependencies]
