@@ -93,12 +93,6 @@ class DataFileNamePromptGenerator(PromptGenerator):
         super().__init__(data_description)
         self.filenames = filenames
 
-    def read_file_safely(self, filename: Path) -> str | None:
-        try:
-            return filename.read_text()
-        except UnicodeDecodeError:
-            return None
-
     def generate_prompt(self) -> str:
         file_content_prompts = "# Available Data Files And Columns in The File\n\n"
         for filename in self.filenames:
@@ -120,17 +114,6 @@ class DataFileNamePromptGenerator(PromptGenerator):
             file_content_prompts,
             self.get_field_parsing_prompt(),
         ])
-
-    #def generate_prompt(self) -> str:
-    #    return "\n\n".join(
-    #        [
-    #            self.basic_intro_prompt,
-    #            self.data_description_prompt,
-    #            f"# Available Files\n{', '.join(self.filenames)}",
-    #            f"Please return the full path of the data files as provided, and response with the value {NO_FILE_IDENTIFIED} if there's no such File.",
-    #            self.get_field_parsing_prompt(),
-    #        ]
-    #    )
 
 
 class LabelColumnPromptGenerator(PromptGenerator):
