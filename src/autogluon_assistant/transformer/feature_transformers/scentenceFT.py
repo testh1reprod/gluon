@@ -27,7 +27,7 @@ def get_device_info():
 
 
 def _run_one_proc(model, data):
-    if all(isinstance(x, str) for x in data) and any(len(x.split(" ")) > 3 for x in data):
+    if all(isinstance(x, str) for x in data) and any(len(x.split(" ")) > 10 for x in data):
         data = np.where(pd.isna(data), "", data)
         return model.encode(data).astype("float32")
     else:
