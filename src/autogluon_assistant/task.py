@@ -11,11 +11,7 @@ import pandas as pd
 import s3fs
 from autogluon.tabular import TabularDataset
 
-
-class DatasetType(Enum):
-    TRAIN = "train"
-    TEST = "test"
-    OUTPUT = "output"
+from .constants import TEST, TRAIN, OUTPUT
 
 
 class TabularPredictionTask:
@@ -23,42 +19,36 @@ class TabularPredictionTask:
     problem type, test_id_column, etc.
     """
 
-    preferred_eval_metrics = {
-        "binary": "log_loss",
-        "multiclass": "log_loss",
-        "regression": "root_mean_squared_error",
-    }
-
     def __init__(
         self,
-        name: str,
-        description: str,
         filepaths: List[Path],
         metadata: Dict[str, Any],
+        name: Optional[str] = "",
+        description: Optional[str] = "",
         cache_data: bool = True,
     ):
-        self.name = name
-        self.description: str = description if description else ""
         self.metadata: Dict[str, Any] = {
+            "name": name,
+            "description": description,
             "label_column": None,
-            "data_description": "",
-            "evaluation_description": "",
             "problem_type": None,
             "eval_metric": None,  # string, keying Autogluon Tabular metrics
             "test_id_column": None,
-            **metadata,
         }
+        self.metadata.update(metadata)
+
         self.filepaths = filepaths
         self.cache_data = cache_data
 
-        self.dataset_mapping: Dict[Union[str, DatasetType], Union[Path, pd.DataFrame, TabularDataset]] = {
-            DatasetType.TRAIN: None,
-            DatasetType.TEST: None,
-            DatasetType.OUTPUT: None,
+        # TODO: each data split can have multiple files
+        self.dataset_mapping: Dict[str, Union[Path, pd.DataFrame, TabularDataset]] = {
+            TRAIN: None,
+            TEST: None,
+            OUTPUT: None,
         }
 
     def __repr__(self) -> str:
-        return f"TabularPredictionTask(name={self.name}, description={self.description[:100]}, {len(self.dataset_mapping)} datasets)"
+        return f"TabularPredictionTask(name={self.metadata['name']}, description={self.metadata['description'][:100]}, {len(self.dataset_mapping)} datasets)"
 
     @staticmethod
     def read_task_file(task_path: Path, filename_pattern: str, default_filename: str = "description.txt") -> str:
@@ -109,34 +99,27 @@ class TabularPredictionTask:
             shutil.copytree(ag_model_dir, local_model_dir, dirs_exist_ok=True)
 
     @classmethod
-    def from_path(cls, task_path: Path, name: Optional[str] = None) -> "TabularPredictionTask":
-        task_data_filenames: List[str] = cls.read_task_file(
-            task_path,
-            "**/*files.txt",
-            default_filename="task_files.txt",
-        ).split("\n")
-
-        data_description = cls.read_task_file(task_path, "**/data.txt")
-        evaluation_description = cls.read_task_file(task_path, "**/evaluation.txt")
-        full_description = cls.read_task_file(task_path, "description.txt") or "\n\n".join(
-            [data_description, evaluation_description]
-        )
+    def from_path(cls, task_root_dir: Path, name: Optional[str] = None) -> "TabularPredictionTask":
+        # Get all filenames under task_root_dir
+        task_data_filenames = []
+        for root, _, files in os.walk(task_root_dir):
+            for file in files:
+                # Get the relative path
+                relative_path = os.path.relpath(os.path.join(root, file), task_root_dir)
+                task_data_filenames.append(relative_path)
 
         return cls(
-            name=name or task_path.name,
-            description=full_description,
-            filepaths=[task_path / fn for fn in task_data_filenames],
+            filepaths=[task_root_dir / fn for fn in task_data_filenames],
             metadata=dict(
-                data_description=data_description,
-                evaluation_description=evaluation_description,
+                name=task_root_dir.name,
             ),
         )
 
     def describe(self) -> Dict[str, Any]:
         """Return a description of the task."""
         return {
-            "name": self.name,
-            "description": self.description,
+            "name": self.metadata["name"],
+            "description": self.metadata["description"],
             "metadata": self.metadata,
             "train_data": self.train_data.describe().to_dict(),
             "test_data": self.test_data.describe().to_dict(),
@@ -147,9 +130,7 @@ class TabularPredictionTask:
         """Return all filenames for the task."""
         return [f.name for f in self.filepaths]
 
-    def _set_task_files(
-        self, dataset_name_mapping: Dict[DatasetType, Union[str, Path, pd.DataFrame, TabularDataset]]
-    ) -> None:
+    def _set_task_files(self, dataset_name_mapping: Dict[str, Union[str, Path, pd.DataFrame, TabularDataset]]) -> None:
         """Set the task files for the task."""
         for k, v in dataset_name_mapping.items():
             if isinstance(v, (pd.DataFrame, TabularDataset)):
@@ -174,31 +155,31 @@ class TabularPredictionTask:
 
     @property
     def train_data(self) -> TabularDataset:
-        return self.load_task_data(DatasetType.TRAIN)
+        return self.load_task_data(TRAIN)
 
     @train_data.setter
     def train_data(self, data: Union[str, Path, pd.DataFrame, TabularDataset]) -> None:
-        self._set_task_files({DatasetType.TRAIN: data})
+        self._set_task_files({TRAIN: data})
 
     @property
     def test_data(self) -> TabularDataset:
         """Return the test dataset for the task."""
-        return self.load_task_data(DatasetType.TEST)
+        return self.load_task_data(TEST)
 
     @test_data.setter
     def test_data(self, data: Union[str, Path, pd.DataFrame, TabularDataset]) -> None:
-        self._set_task_files({DatasetType.TEST: data})
+        self._set_task_files({TEST: data})
 
     @property
     def output_data(self) -> TabularDataset:
         """Return the output dataset for the task."""
-        return self.load_task_data(DatasetType.OUTPUT)
+        return self.load_task_data(OUTPUT)
 
     @output_data.setter
     def output_data(self, data: Union[str, Path, pd.DataFrame, TabularDataset]) -> None:
         if self.output_data is not None:
             raise ValueError("Output data already set for task")
-        self._set_task_files({DatasetType.OUTPUT: data})
+        self._set_task_files({OUTPUT: data})
 
     @property
     def output_columns(self) -> List[str]:
@@ -208,12 +189,16 @@ class TabularPredictionTask:
     @property
     def label_column(self) -> Optional[str]:
         """Return the label column for the task."""
-        if "label_column" in self.metadata:
+        if "label_column" in self.metadata and self.metadata["label_column"]:
             return self.metadata["label_column"]
         else:
             # should ideally never be called after LabelColumnInferenceTransformer has run
             # `_infer_label_column_from_output_data` is the fallback when label_column is not found
             return self._infer_label_column_from_output_data()
+
+    @label_column.setter
+    def label_column(self, label_column: str) -> None:
+        self.metadata["label_column"] = label_column
 
     @property
     def columns_in_train_but_not_test(self) -> List[str]:
@@ -229,13 +214,29 @@ class TabularPredictionTask:
 
     @property
     def test_id_column(self) -> Optional[str]:
-        return self.metadata.get("test_id_column", self.test_data.columns[0])
+        return self.metadata.get("test_id_column", None)
+
+    @test_id_column.setter
+    def test_id_column(self, test_id_column: str) -> None:
+        self.metadata["test_id_column"] = test_id_column
+
+    @property
+    def train_id_column(self) -> Optional[str]:
+        return self.metadata.get("train_id_column", None)
+
+    @train_id_column.setter
+    def train_id_column(self, train_id_column: str) -> None:
+        self.metadata["train_id_column"] = train_id_column
 
     @property
     def output_id_column(self) -> Optional[str]:
         return self.metadata.get(
             "output_id_column", self.output_data.columns[0] if self.output_data is not None else None
         )
+
+    @output_id_column.setter
+    def output_id_column(self, output_id_column: str) -> None:
+        self.metadata["output_id_column"] = output_id_column
 
     def _infer_label_column_from_output_data(self) -> Optional[str]:
         # Assume the first output column is the ID column and ignore it
@@ -272,13 +273,21 @@ class TabularPredictionTask:
     def problem_type(self) -> Optional[str]:
         return self.metadata["problem_type"] or self._find_problem_type_in_description()
 
+    @problem_type.setter
+    def problem_type(self, problem_type: str) -> None:
+        self.metadata["problem_type"] = problem_type
+
     @property
     def eval_metric(self) -> Optional[str]:
         return self.metadata["eval_metric"] or (
             self.preferred_eval_metrics[self.problem_type] if self.problem_type else None
         )
 
-    def load_task_data(self, dataset_key: Union[str, DatasetType]) -> TabularDataset:
+    @eval_metric.setter
+    def eval_metric(self, eval_metric: str) -> None:
+        self.metadata["eval_metric"] = eval_metric
+
+    def load_task_data(self, dataset_key: Union[str, str]) -> TabularDataset:
         """Load the competition file for the task."""
         if dataset_key not in self.dataset_mapping:
             raise ValueError(f"Dataset type {dataset_key} not found for task {self.name}")

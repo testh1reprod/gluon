@@ -120,7 +120,7 @@ class AutogluonTabularPredictor(Predictor):
             `TabularPredictor.predict` fails
         """
         if self.predictor.problem_type == "binary" and any(
-            indicator in task.evaluation_description for indicator in BINARY_PROBA_INDICATORS
+            indicator in task.metadata["description"] for indicator in BINARY_PROBA_INDICATORS
         ):
             # TODO: Turn BINARY_PROBA_INDICATORS into an llm call in the future (add test cases)
             return self.predictor.predict_proba(task.test_data)[1]
