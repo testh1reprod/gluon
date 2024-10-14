@@ -136,14 +136,20 @@ class TabularPredictionTask:
             if isinstance(v, (pd.DataFrame, TabularDataset)):
                 self.dataset_mapping[k] = v
             elif isinstance(v, Path):
-                self.dataset_mapping[k] = TabularDataset(str(v)) if self.cache_data else v
+                if v.suffix in [".xlsx", ".xls"]:  # Check if the file is an Excel file
+                    self.dataset_mapping[k] = pd.read_excel(v, engine='calamine') if self.cache_data else v
+                else:
+                    self.dataset_mapping[k] = TabularDataset(str(v)) if self.cache_data else v
             elif isinstance(v, str):
                 filepath = next(
                     iter([path for path in self.filepaths if path.name == v]), self.filepaths[0].parent / v
                 )
                 if not filepath.is_file():
                     raise ValueError(f"File {v} not found in task {self.name}")
-                self.dataset_mapping[k] = TabularDataset(str(filepath)) if self.cache_data else filepath
+                if filepath.suffix in [".xlsx", ".xls"]:  # Check if the file is an Excel file
+                    self.dataset_mapping[k] = pd.read_excel(filepath, engine='calamine') if self.cache_data else filepath
+                else:
+                    self.dataset_mapping[k] = TabularDataset(str(filepath)) if self.cache_data else filepath
             else:
                 raise TypeError(f"Unsupported type for dataset_mapping: {type(v)}")
 
