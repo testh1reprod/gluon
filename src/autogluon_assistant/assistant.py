@@ -9,14 +9,16 @@ from autogluon_assistant.llm import AssistantChatOpenAI, LLMFactory
 
 from .predictor import AutogluonTabularPredictor
 from .task import TabularPredictionTask
-from .transformer import (
-    EvalMetricInferenceTransformer,
-    FilenameInferenceTransformer,
-    LabelColumnInferenceTransformer,
-    ProblemTypeInferenceTransformer,
-    TestIdColumnTransformer,
-    TrainIdColumnDropTransformer,
-    TransformTimeoutError,
+from .transformer import TransformTimeoutError
+from .task_inference import (
+    EvalMetricInference,
+    DataFileNameInference,
+    DescriptionFileNameInference,
+    LabelColumnInference,
+    OutputIDColumnInference,
+    ProblemTypeInference,
+    TestIDColumnInference,
+    TrainIDColumnInference,
 )
 
 logger = logging.getLogger(__name__)
@@ -57,33 +59,48 @@ class TabularPredictionAssistant:
     def handle_exception(self, stage: str, exception: Exception):
         raise Exception(str(exception), stage)
 
-    def preprocess_task(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        # instantiate and run task preprocessors, which infer the problem type, important filenames
-        # and columns as well as the feature extractors
-        task_preprocessors = (
-            [
-                FilenameInferenceTransformer(llm=self.llm),
-                LabelColumnInferenceTransformer(llm=self.llm),
-                TestIdColumnTransformer(llm=self.llm),
-                TrainIdColumnDropTransformer(llm=self.llm),
-                ProblemTypeInferenceTransformer(),
-            ]
-            + ([EvalMetricInferenceTransformer(llm=self.llm)] if self.config.infer_eval_metric else [])
-            + (
-                [instantiate(ft_config) for ft_config in self.feature_transformers_config]
-                if self.feature_transformers_config
-                else []
-            )
-        )
-        for transformer in task_preprocessors:
+    def inference_task(self, task: TabularPredictionTask) -> TabularPredictionTask:
+        task_inference_preprocessors = [
+            DescriptionFileNameInference,
+            DataFileNameInference,
+            LabelColumnInference,
+            ProblemTypeInference,
+            OutputIDColumnInference,
+            TrainIDColumnInference,
+            TestIDColumnInference,
+        ]
+        if self.config.infer_eval_metric:
+            task_inference_preprocessors += [EvalMetricInference]
+        for preprocessor_class in task_inference_preprocessors:
+            preprocessor = preprocessor_class(llm=self.llm)
             try:
                 with timeout(
                     seconds=self.config.task_preprocessors_timeout,
-                    error_message=f"Task preprocessing timed out: {transformer.name}",
+                    error_message=f"Task inference preprocessing timed out: {preprocessor_class}",
                 ):
-                    task = transformer.fit_transform(task)
+                    task = preprocessor.transform(task)
             except Exception as e:
-                self.handle_exception(f"Task preprocessing: {transformer.name}", e)
+                self.handle_exception(f"Task inference preprocessing: {preprocessor_class}", e)
+
+        logger.info(f"###LLM Inference Results:###\n{task.metadata}")
+
+        return task
+
+    def preprocess_task(self, task: TabularPredictionTask) -> TabularPredictionTask:
+        # instantiate and run task preprocessors, which infer the problem type, important filenames
+        # and columns as well as the feature extractors
+        task = self.inference_task(task)
+        if self.feature_transformers_config:
+            fe_transformers = [instantiate(ft_config) for ft_config in self.feature_transformers_config]
+            for fe_transformer in fe_transformers:
+                try:
+                    with timeout(
+                        seconds=self.config.task_preprocessors_timeout,
+                        error_message=f"Task preprocessing timed out: {fe_transformer.name}",
+                    ):
+                        task = fe_transformer.fit_transform(task)
+                except Exception as e:
+                    self.handle_exception(f"Task preprocessing: {fe_transformer.name}", e)
 
         return task
 

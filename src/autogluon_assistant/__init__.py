@@ -12,6 +12,7 @@ from rich import print as rprint
 from typing_extensions import Annotated
 
 from .assistant import TabularPredictionAssistant
+from .constants import NO_ID_COLUMN_IDENTIFIED
 from .task import TabularPredictionTask
 
 logging.basicConfig(level=logging.INFO)
@@ -31,19 +32,22 @@ def get_task(path: Path) -> TabularPredictionTask:
 
 
 def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFrame) -> pd.DataFrame:
-    test_ids = task.test_data[task.test_id_column]
-    output_ids = task.output_data[task.output_id_column]
+    if task.test_id_column is not None and task.test_id_column != NO_ID_COLUMN_IDENTIFIED:
+        test_ids = task.test_data[task.test_id_column]
+        output_ids = task.output_data[task.output_id_column]
 
-    if not test_ids.equals(output_ids):
-        rprint("[orange]Warning: Test IDs and output IDs do not match![/orange]")
+        if not test_ids.equals(output_ids):
+            rprint(f"[orange]Warning: Test IDs and output IDs do not match![/orange]")
 
-    outputs = pd.concat(
-        [
-            task.test_data[task.test_id_column],
-            predictions,
-        ],
-        axis="columns",
-    )
+        outputs = pd.concat(
+            [
+                task.test_data[task.test_id_column],
+                predictions,
+            ],
+            axis="columns",
+        )
+    else:
+        outputs = predictions
 
     outputs.columns = task.output_columns
     return outputs
@@ -105,10 +109,10 @@ def run_assistant(
 
     if config.save_artifacts.enabled:
         # Determine the artifacts_dir with or without timestamp
-        artifacts_dir_name = f"{task.name}_artifacts"
+        artifacts_dir_name = f"{task.metadata['name']}_artifacts"
         if config.save_artifacts.append_timestamp:
             current_timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            artifacts_dir_name = f"{task.name}_artifacts_{current_timestamp}"
+            artifacts_dir_name = f"{task.metadata['name']}_artifacts_{current_timestamp}"
 
         full_save_path = f"{config.save_artifacts.path.rstrip('/')}/{artifacts_dir_name}"
 

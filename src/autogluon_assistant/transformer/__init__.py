@@ -1,24 +1,11 @@
 from .base import BaseTransformer, TransformTimeoutError
-from .feature_transformers import BaseFeatureTransformer, CAAFETransformer, OpenFETransformer
-from .task_inference import (
-    EvalMetricInferenceTransformer,
-    FilenameInferenceTransformer,
-    LabelColumnInferenceTransformer,
-    ProblemTypeInferenceTransformer,
-    TestIdColumnTransformer,
-    TrainIdColumnDropTransformer,
-)
+from .feature_transformers import BaseFeatureTransformer, CAAFETransformer, OpenFETransformer, PretrainedEmbeddingTransformer
 
 __all__ = [
     "BaseTransformer",
     "BaseFeatureTransformer",
     "CAAFETransformer",
-    "EvalMetricInferenceTransformer",
-    "FilenameInferenceTransformer",
-    "LabelColumnInferenceTransformer",
-    "ProblemTypeInferenceTransformer",
+    "PretrainedEmbeddingTransformer",
     "OpenFETransformer",
-    "TestIdColumnTransformer",
-    "TrainIdColumnDropTransformer",
     "TransformTimeoutError",
 ]
