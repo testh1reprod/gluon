@@ -9,17 +9,17 @@ from autogluon_assistant.llm import AssistantChatBedrock, AssistantChatOpenAI, L
 
 from .predictor import AutogluonTabularPredictor
 from .task import TabularPredictionTask
-from .transformer import TransformTimeoutError
 from .task_inference import (
-    EvalMetricInference,
     DataFileNameInference,
     DescriptionFileNameInference,
+    EvalMetricInference,
     LabelColumnInference,
     OutputIDColumnInference,
     ProblemTypeInference,
     TestIDColumnInference,
     TrainIDColumnInference,
 )
+from .transformer import TransformTimeoutError
 
 logger = logging.getLogger(__name__)
 
