@@ -16,6 +16,9 @@ feature_transformers:
     num_features_to_keep: 10
   #- _target_: autogluon_assistant.transformer.PretrainedEmbeddingTransformer
   #    model_name: 'all-mpnet-base-v2'
+  - _target_: autogluon_assistant.transformer.SimpleGenTransformer
+    n_jobs: 1
+    llm_model: bedrock-claude-3.5-sonnet
 autogluon:
   predictor_init_kwargs: {}
   predictor_fit_kwargs:
