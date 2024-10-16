@@ -26,12 +26,12 @@ autogluon:
     num_stack_levels: 0
 llm:
   # Note: bedrock is only supported in limited AWS regions
-  # provider: bedrock
-  # api_key_location: BEDROCK_API_KEY
-  # model: "anthropic.claude-3-sonnet-20240229-v1:0"
-  provider: openai
-  api_key_location: OPENAI_API_KEY
-  model: gpt-4o-mini-2024-07-18
+  provider: bedrock
+  api_key_location: BEDROCK_API_KEY
+  model: "anthropic.claude-3-sonnet-20240229-v1:0"
+  # provider: openai
+  # api_key_location: OPENAI_API_KEY
+  # model: gpt-4o-mini-2024-07-18
   # model: gpt-3.5-turbo
   max_tokens: 512
   proxy_url: null
