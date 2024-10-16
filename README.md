@@ -17,20 +17,32 @@ cd autogluon-assistant && pip install -e ".[dev]" && cd ..
 
 ### API Keys
 
-#### LLMs 
-You will need an OpenAI API key and have it set to the `OPENAI_API_KEY` environment variable.
-- Create OpenAI Account: https://platform.openai.com/
-- Manage OpenAI API Keys: https://platform.openai.com/account/api-keys
+#### Configuring LLMs
+AG-A supports using both AWS Bedrock and OpenAI as LLM model providers. You will need to set up API keys for the respective provider you choose. By default, AG-A uses AWS Bedrock for its language models.
 
-Note: If you have a free OpenAI account, then you will be blocked by capped rate limits.
-	  The project requires paid OpenAI API keys access.
+#### AWS Bedrock Setup
+AG-A integrates with AWS Bedrock by default. To use AWS Bedrock, you will need to configure your AWS credentials and region settings, along with the Bedrock-specific API key:
 
+```bash
+export BEDROCK_API_KEY="4509..."
+export AWS_DEFAULT_REGION="<your-region>"
+export AWS_ACCESS_KEY_ID="<your-access-key>"
+export AWS_SECRET_ACCESS_KEY="<your-secret-key>"
 ```
+
+Ensure you have an active AWS account and appropriate permissions set up for Bedrock. You can manage your AWS credentials through the AWS Management Console.
+
+
+#### OpenAI Setup
+To use OpenAI, you'll need to set your OpenAI API key as an environment variable:
+
+```bash
 export OPENAI_API_KEY="sk-..."
 ```
 
-You can also run AutoGluon-Assistant with Bedrock through the access gateway set up in the config, however `BEDROCK_API_KEY` will have to be present in the environment.
-`autogluon-assistant-tools` provides more functionality and utilities for benchmarking, wrapped around autogluon-assistant. Please check out the [repo](https://github.com/autogluon/autogluon-assistant-tools/) for more details.
+You can sign up for an OpenAI account [here](https://platform.openai.com/) and manage your API keys [here](https://platform.openai.com/account/api-keys).
+
+Important: Free-tier OpenAI accounts may be subject to rate limits, which could affect AG-A's performance. We recommend using a paid OpenAI API key for seamless functionality.
 
 
 ## Usage
@@ -69,3 +81,5 @@ Here’s an example command with some configuration overrides:
 ```
 autogluon-assistant ./config ./data --output-filename my_output.csv --config-overrides "autogluon.predictor_fit_kwargs.time_limit=120 autogluon.predictor_fit_kwargs.verbosity=3 autogluon.predictor_fit_kwargs.presets=medium_quality llm.temperature=0.7 llm.max_tokens=256"
 ```
+
+`autogluon-assistant-tools` provides more functionality and utilities for benchmarking, wrapped around autogluon-assistant. Please check out the [repo](https://github.com/autogluon/autogluon-assistant-tools/) for more details.
