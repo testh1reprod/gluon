@@ -71,7 +71,11 @@ class TaskInference:
         if self.valid_values is not None:
             for key, parsed_value in parsed_output.items():
                 if parsed_value not in self.valid_values:
-                    close_matches = difflib.get_close_matches(parsed_value, self.valid_values)
+                    # Check if parsed_value is a string
+                    if isinstance(parsed_value, str):
+                        close_matches = difflib.get_close_matches(parsed_value, self.valid_values)
+                    else:
+                        close_matches = []
                     if len(close_matches) == 0:
                         if self.fallback_value:
                             logger.warning(
