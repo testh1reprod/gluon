@@ -21,7 +21,7 @@ class AssistantChatOpenAI(ChatOpenAI, BaseModel):
     def describe(self) -> Dict[str, Any]:
         return {
             "model": self.model_name,
-            "proxy": self.openai_api_base,
+            "proxy": self.openai_proxy,
             "history": self.history_,
             "prompt_tokens": self.input_,
             "completion_tokens": self.output_,
@@ -45,33 +45,6 @@ class AssistantChatOpenAI(ChatOpenAI, BaseModel):
             }
         )
         return response
-
-    def stream(self, *args, **kwargs):
-        input_: List[BaseMessage] = args[0]
-        stream = super().stream(*args, **kwargs)
-
-        aggregate = None
-        for chunk in stream:
-            if aggregate is None:
-                aggregate = chunk
-            else:
-                aggregate = aggregate + chunk
-
-            yield chunk
-
-        # Update token usage after streaming is complete
-        if isinstance(aggregate, AIMessage) and aggregate.usage_metadata:
-            self.input_ += aggregate.usage_metadata.get("input_tokens", 0)
-            self.output_ += aggregate.usage_metadata.get("output_tokens", 0)
-
-        self.history_.append(
-            {
-                "input": [{"type": msg.type, "content": msg.content} for msg in input_],
-                "output": pprint.pformat(dict(aggregate)),
-                "prompt_tokens": self.input_,
-                "completion_tokens": self.output_,
-            }
-        )
 
 
 class AssistantChatBedrock(ChatBedrock, BaseModel):
@@ -109,33 +82,6 @@ class AssistantChatBedrock(ChatBedrock, BaseModel):
             }
         )
         return response
-
-    def stream(self, *args, **kwargs):
-        input_: List[BaseMessage] = args[0]
-        stream = super().stream(*args, **kwargs)
-
-        aggregate = None
-        for chunk in stream:
-            if aggregate is None:
-                aggregate = chunk
-            else:
-                aggregate = aggregate + chunk
-
-            yield chunk
-
-        # Update token usage after streaming is complete
-        if isinstance(aggregate, AIMessage) and aggregate.usage_metadata:
-            self.input_ += aggregate.usage_metadata.get("input_tokens", 0)
-            self.output_ += aggregate.usage_metadata.get("output_tokens", 0)
-
-        self.history_.append(
-            {
-                "input": [{"type": msg.type, "content": msg.content} for msg in input_],
-                "output": pprint.pformat(dict(aggregate)),
-                "prompt_tokens": self.input_,
-                "completion_tokens": self.output_,
-            }
-        )
 
 
 class LLMFactory:
