@@ -83,6 +83,8 @@ class TabularPredictionAssistant:
                 self.handle_exception(f"Task inference preprocessing: {preprocessor_class}", e)
 
         logger.info(f"###LLM Inference Results:###\n{task.metadata}")
+        logger.info(f"###Total number of prompt tokens:###\n{self.llm.input_}")
+        logger.info(f"###Total number of completion tokens:###\n{self.llm.output_}")
 
         return task
 

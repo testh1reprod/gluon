@@ -14,27 +14,36 @@ class AssistantChatOpenAI(ChatOpenAI):
     AssistantChatOpenAI is a subclass of ChatOpenAI that traces the input and output of the model.
     """
 
-    history_: List[Dict[str, Any]] = Field(default_factory=list)
+    history_: List[Dict[str, Any]] = Field(default_factory=list) 
+    input_: int = Field(default_factory=int)
+    output_: int = Field(default_factory=int)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.history_ = []
+        self.input_ = 0     
+        self.output_ = 0 
 
     def describe(self) -> Dict[str, Any]:
         return {
             "model": self.model_name,
             "proxy": self.openai_proxy,
             "history": self.history_,
+            "prompt_tokens": self.input_,
+            "completion_tokens": self.output_,
         }
 
     def __call__(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
-        response = super().__call__(*args, **kwargs)
-
+        response = super().invoke(*args, **kwargs)
+        self.input_ += int(response.response_metadata["token_usage"]['prompt_tokens'])
+        self.output_ += response.response_metadata["token_usage"]['completion_tokens'] 
         self.history_.append(
             {
                 "input": [{"type": msg.type, "content": msg.content} for msg in input_],
                 "output": pprint.pformat(dict(response)),
+                "prompt_tokens": self.input_,
+                "completion_tokens": self.output_,
             }
         )
         return response
@@ -46,20 +55,28 @@ class AssistantChatBedrock(BedrockChat):
     """
 
     history_: List[Dict[str, Any]] = Field(default_factory=list)
+    input_: int = Field(default_factory=int)
+    output_: int = Field(default_factory=int)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.history_ = []
+        self.input_ = 0
+        self.output_ = 0
 
     def describe(self) -> Dict[str, Any]:
         return {
             "model": self.model_id,
             "history": self.history_,
+            "prompt_tokens": self.input_,
+            "completion_tokens": self.output_,
         }
 
     def __call__(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
-        response = super().__call__(*args, **kwargs)
+        response = super().invoke(*args, **kwargs)
+        self.input_ += response.response_metadata["usage"]['prompt_tokens']
+        self.output_ += response.response_metadata["usage"]['completion_tokens'] 
         self.history_.append(
             {
                 "input": [{"type": msg.type, "content": msg.content} for msg in input_],
