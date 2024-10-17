@@ -47,9 +47,6 @@ where = ["src"]
 [tool.setuptools.package-data]
 "autogluon_assistant_tools.config" = ["**/*.yaml"]
 
-[tool.setuptools.build_meta]
-post-install-script = "python -m pip install --no-deps git+https://github.com/gidler/CAAFE.git@main"
-
 [tool.pytest.ini_options]
 testpaths = "tests"
 addopts = "--strict-markers"
