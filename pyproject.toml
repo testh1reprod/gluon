@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "autogluon-assistant"
-version = "0.0.3"
+version = "0.0.2"
 description = "An LLM-backed AI agent for competitive tabular machine learning"
 readme = "README.md"
 requires-python = ">=3.8"
