@@ -111,7 +111,12 @@ class AutogluonTabularPredictor(Predictor):
         Exception
             `TabularPredictor.predict` fails
         """
-        if task.eval_metric in CLASSIFICATION_PROBA_EVAL_METRIC and self.predictor.problem_type in [BINARY, MULTICLASS]:
-            return self.predictor.predict_proba(task.test_data, as_multiclass=(self.predictor.problem_type == MULTICLASS))
+        if task.eval_metric in CLASSIFICATION_PROBA_EVAL_METRIC and self.predictor.problem_type in [
+            BINARY,
+            MULTICLASS,
+        ]:
+            return self.predictor.predict_proba(
+                task.test_data, as_multiclass=(self.predictor.problem_type == MULTICLASS)
+            )
         else:
             return self.predictor.predict(task.test_data)

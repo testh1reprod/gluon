@@ -8,6 +8,7 @@ from langchain.schema import BaseMessage, AIMessage
 from omegaconf import DictConfig
 from pydantic import Field, BaseModel
 
+
 class AssistantChatOpenAI(ChatOpenAI, BaseModel):
     """
     AssistantChatOpenAI is a subclass of ChatOpenAI that traces the input and output of the model.
@@ -29,12 +30,12 @@ class AssistantChatOpenAI(ChatOpenAI, BaseModel):
     def invoke(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
         response = super().invoke(*args, **kwargs)
-        
+
         # Update token usage
         if isinstance(response, AIMessage) and response.usage_metadata:
-            self.input_ += response.usage_metadata.get('input_tokens', 0)
-            self.output_ += response.usage_metadata.get('output_tokens', 0)
-        
+            self.input_ += response.usage_metadata.get("input_tokens", 0)
+            self.output_ += response.usage_metadata.get("output_tokens", 0)
+
         self.history_.append(
             {
                 "input": [{"type": msg.type, "content": msg.content} for msg in input_],
@@ -48,21 +49,21 @@ class AssistantChatOpenAI(ChatOpenAI, BaseModel):
     def stream(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
         stream = super().stream(*args, **kwargs)
-        
+
         aggregate = None
         for chunk in stream:
             if aggregate is None:
                 aggregate = chunk
             else:
                 aggregate = aggregate + chunk
-            
+
             yield chunk
-        
+
         # Update token usage after streaming is complete
         if isinstance(aggregate, AIMessage) and aggregate.usage_metadata:
-            self.input_ += aggregate.usage_metadata.get('input_tokens', 0)
-            self.output_ += aggregate.usage_metadata.get('output_tokens', 0)
-        
+            self.input_ += aggregate.usage_metadata.get("input_tokens", 0)
+            self.output_ += aggregate.usage_metadata.get("output_tokens", 0)
+
         self.history_.append(
             {
                 "input": [{"type": msg.type, "content": msg.content} for msg in input_],
@@ -71,6 +72,7 @@ class AssistantChatOpenAI(ChatOpenAI, BaseModel):
                 "completion_tokens": self.output_,
             }
         )
+
 
 class AssistantChatBedrock(ChatBedrock, BaseModel):
     """
@@ -92,12 +94,12 @@ class AssistantChatBedrock(ChatBedrock, BaseModel):
     def invoke(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
         response = super().invoke(*args, **kwargs)
-        
+
         # Update token usage
         if isinstance(response, AIMessage) and response.usage_metadata:
-            self.input_ += response.usage_metadata.get('input_tokens', 0)
-            self.output_ += response.usage_metadata.get('output_tokens', 0)
-        
+            self.input_ += response.usage_metadata.get("input_tokens", 0)
+            self.output_ += response.usage_metadata.get("output_tokens", 0)
+
         self.history_.append(
             {
                 "input": [{"type": msg.type, "content": msg.content} for msg in input_],
@@ -111,21 +113,21 @@ class AssistantChatBedrock(ChatBedrock, BaseModel):
     def stream(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
         stream = super().stream(*args, **kwargs)
-        
+
         aggregate = None
         for chunk in stream:
             if aggregate is None:
                 aggregate = chunk
             else:
                 aggregate = aggregate + chunk
-            
+
             yield chunk
-        
+
         # Update token usage after streaming is complete
         if isinstance(aggregate, AIMessage) and aggregate.usage_metadata:
-            self.input_ += aggregate.usage_metadata.get('input_tokens', 0)
-            self.output_ += aggregate.usage_metadata.get('output_tokens', 0)
-        
+            self.input_ += aggregate.usage_metadata.get("input_tokens", 0)
+            self.output_ += aggregate.usage_metadata.get("output_tokens", 0)
+
         self.history_.append(
             {
                 "input": [{"type": msg.type, "content": msg.content} for msg in input_],
@@ -139,7 +141,11 @@ class AssistantChatBedrock(ChatBedrock, BaseModel):
 class LLMFactory:
     valid_models = {
         "openai": ["gpt-3.5-turbo", "gpt-4-1106-preview"],
-        "bedrock": ["anthropic.claude-3-sonnet-20240229-v1:0", "anthropic.claude-3-haiku-20240307-v1:0", "anthropic.claude-3-5-sonnet-20240620-v1:0"],
+        "bedrock": [
+            "anthropic.claude-3-sonnet-20240229-v1:0",
+            "anthropic.claude-3-haiku-20240307-v1:0",
+            "anthropic.claude-3-5-sonnet-20240620-v1:0",
+        ],
     }
 
     @staticmethod

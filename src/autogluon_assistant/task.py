@@ -244,7 +244,8 @@ class TabularPredictionTask:
     @property
     def output_id_column(self) -> Optional[str]:
         return self.metadata.get(
-            "output_id_column", self.sample_submission_data.columns[0] if self.sample_submission_data is not None else None
+            "output_id_column",
+            self.sample_submission_data.columns[0] if self.sample_submission_data is not None else None,
         )
 
     @output_id_column.setter

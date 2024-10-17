@@ -88,14 +88,16 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
                     if len(content) > 100:
                         truncated_contents += "..."
                     file_content_prompts += f"File:\n\n{filename}\n\nTruncated Content:\n{truncated_contents}\n\n"
-        
+
         file_content_prompts += f"Please return the full path of the file to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file."
-        
-        return "\n\n".join([
-            self.basic_intro_prompt,
-            file_content_prompts,
-            self.get_field_parsing_prompt(),
-        ])
+
+        return "\n\n".join(
+            [
+                self.basic_intro_prompt,
+                file_content_prompts,
+                self.get_field_parsing_prompt(),
+            ]
+        )
 
 
 class DataFileNamePromptGenerator(PromptGenerator):
@@ -118,14 +120,16 @@ class DataFileNamePromptGenerator(PromptGenerator):
             except Exception as e:
                 print(e)
                 continue
-    
+
         file_content_prompts += f"Based on the data description, what are the training, test, and output data? The output file may contain keywords such as benchmark, submission, or output. Please return the full path of the data files as provided, and response with the value {NO_FILE_IDENTIFIED} if there's no such File."
-        
-        return "\n\n".join([
-            self.basic_intro_prompt,
-            file_content_prompts,
-            self.get_field_parsing_prompt(),
-        ])
+
+        return "\n\n".join(
+            [
+                self.basic_intro_prompt,
+                file_content_prompts,
+                self.get_field_parsing_prompt(),
+            ]
+        )
 
 
 class LabelColumnPromptGenerator(PromptGenerator):
