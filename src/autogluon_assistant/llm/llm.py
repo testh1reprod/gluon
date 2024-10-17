@@ -21,7 +21,7 @@ class AssistantChatOpenAI(ChatOpenAI):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.history_ = []
-        self.input_ = 0     
+        self.input_ = 0
         self.output_ = 0 
 
     def describe(self) -> Dict[str, Any]:

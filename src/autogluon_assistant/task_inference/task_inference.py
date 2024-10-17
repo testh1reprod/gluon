@@ -61,9 +61,9 @@ class TaskInference:
         """Chat with the LLM and parse the output"""
         try:
             chat_prompt = self.prompt_generator.generate_chat_prompt()
-            logger.info(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
+            logger.debug(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
             output = self.llm(chat_prompt.format_messages())
-            logger.info(f"LLM output:\n{output}")
+            logger.debug(f"LLM output:\n{output}")
 
             parsed_output = self.parse_output(output)
         except OutputParserException as e:
@@ -74,10 +74,17 @@ class TaskInference:
         if self.valid_values is not None:
             for key, parsed_value in parsed_output.items():
                 if parsed_value not in self.valid_values:
-                    # Check if parsed_value is a string
+                    # Currently only support single parsed value
                     if isinstance(parsed_value, str):
                         close_matches = difflib.get_close_matches(parsed_value, self.valid_values)
+                    elif isinstance(parsed_value, list) and len(parsed_value) == 1:
+                        parsed_value = parsed_value[0]
+                        close_matches = difflib.get_close_matches(parsed_value, self.valid_values)
                     else:
+                        logger.warning(
+                            f"Unrecognized parsed value: {parsed_value} for key {key} parsed by the LLM."
+                            f"It has type: {type(parsed_value)}."
+                        )
                         close_matches = []
                     if len(close_matches) == 0:
                         if self.fallback_value:
