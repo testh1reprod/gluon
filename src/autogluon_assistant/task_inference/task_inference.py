@@ -119,7 +119,6 @@ class DescriptionFileNameInference(TaskInference):
                         continue
                     except IOError:
                         continue
-
         return "\n\n".join(description_parts)
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:

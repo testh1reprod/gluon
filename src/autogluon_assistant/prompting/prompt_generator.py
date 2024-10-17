@@ -112,7 +112,7 @@ class DataFileNamePromptGenerator(PromptGenerator):
                 self.basic_intro_prompt,
                 self.data_description_prompt,
                 f"# Available Files\n{', '.join(self.filenames)}",
-                "If there are zip (e.g. .zip or .gz) versions of files and non-zipped versions of the files, choose the non-zip version.",
+                "Based on the data description, what are the training, test, and output data? The output file may contain keywords such as benchmark, submission, or output. If there are zip (e.g. .zip or .gz) versions of files and non-zipped versions of the files, choose the non-zip version.",
                 self.get_field_parsing_prompt(),
             ]
         )
