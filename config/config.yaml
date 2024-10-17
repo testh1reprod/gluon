@@ -7,11 +7,11 @@ save_artifacts:
   path: "./aga-artifacts"
   # path: "s3://autogluon-assistant-agts/outputs/<run_id>/aga-artifacts/"
 feature_transformers:
-  - _target_: autogluon_assistant.transformer.CAAFETransformer
-    eval_model: lightgbm
-    llm_model: gpt-3.5-turbo
-    num_iterations: 2
-    optimization_metric: roc
+  #- _target_: autogluon_assistant.transformer.CAAFETransformer
+  #  eval_model: lightgbm
+  #  llm_model: gpt-3.5-turbo
+  #  num_iterations: 2
+  #  optimization_metric: roc
   - _target_: autogluon_assistant.transformer.OpenFETransformer
     n_jobs: 1
     num_features_to_keep: 10
