@@ -1,12 +1,17 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
+from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 
-from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_FILE_IDENTIFIED, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES, TEXT_EXTENSIONS
+from ..constants import (
+    METRICS_DESCRIPTION,
+    NO_FILE_IDENTIFIED,
+    NO_ID_COLUMN_IDENTIFIED,
+    PROBLEM_TYPES,
+)
 from ..utils import is_text_file
 
 
@@ -34,7 +39,14 @@ class PromptGenerator(ABC):
         pass
 
     def get_field_parsing_prompt(self) -> str:
-        return f"Based on the above information, what are the correct values for the following fields in JSON format: {', '.join(self.fields)}"
+        return (
+            f"Based on the above information, provide the correct values for the following fields strictly "
+            f"in valid JSON format: {', '.join(self.fields)}.\n\n"
+            "Important:\n"
+            "1. Return only valid JSON. No extra explanations, text, or comments.\n"
+            "2. Ensure that the output can be parsed by a JSON parser directly.\n"
+            "3. Do not include any non-JSON text or formatting outside the JSON object."
+        )
 
     def generate_chat_prompt(self):
         chat_prompt = ChatPromptTemplate.from_messages(
@@ -64,25 +76,27 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
             return filename.read_text()
         except UnicodeDecodeError:
             return None
-    
+
     def generate_prompt(self) -> str:
         file_content_prompts = "# Available Files And First Line in The File\n"
         for filename in map(Path, self.filenames):
             if is_text_file(filename):
                 content = self.read_file_safely(filename)
                 if content is not None:
-                    first_line = content.split('\n')[0].strip()
+                    first_line = content.split("\n")[0].strip()
                     if len(first_line) > 100:
                         first_line = first_line[:100] + "..."
                     file_content_prompts += f"File:\n{filename}\nFirst Line:\n{first_line}\n"
-        
+
         file_content_prompts += f"Please find the files to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file."
-        
-        return "\n\n".join([
-            self.basic_intro_prompt,
-            file_content_prompts,
-            self.get_field_parsing_prompt(),
-        ])
+
+        return "\n\n".join(
+            [
+                self.basic_intro_prompt,
+                file_content_prompts,
+                self.get_field_parsing_prompt(),
+            ]
+        )
 
 
 class DataFileNamePromptGenerator(PromptGenerator):

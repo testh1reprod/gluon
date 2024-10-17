@@ -1,5 +1,10 @@
 from .base import BaseTransformer, TransformTimeoutError
-from .feature_transformers import BaseFeatureTransformer, CAAFETransformer, OpenFETransformer, PretrainedEmbeddingTransformer
+from .feature_transformers import (
+    BaseFeatureTransformer,
+    CAAFETransformer,
+    OpenFETransformer,
+    PretrainedEmbeddingTransformer,
+)
 
 __all__ = [
     "BaseTransformer",

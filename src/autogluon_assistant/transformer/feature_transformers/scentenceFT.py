@@ -1,18 +1,17 @@
-from typing import Tuple, Dict, Optional, List
-import pydantic
-import numpy as np
 import logging
-from .base import BaseFeatureTransformer
+import os
+from collections import namedtuple
+from typing import Tuple
+
+import numpy as np
 import pandas as pd
 import torch
+from sentence_transformers import SentenceTransformer
+
+from .base import BaseFeatureTransformer
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
-import re
-
-from collections import namedtuple
-import os
-from sentence_transformers import SentenceTransformer
 
 DeviceInfo = namedtuple("DeviceInfo", ["cpu_count", "gpu_devices"])
 
