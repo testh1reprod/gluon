@@ -6,6 +6,8 @@ import os
 import traceback
 
 import pandas as pd
+import numpy as np
+import sklearn
 import dspy
 from sklearn.model_selection import train_test_split
 from caafe.preprocessing import make_datasets_numeric
@@ -16,10 +18,15 @@ pd.set_option("future.no_silent_downcasting", True)
 
 
 def get_llm(model_str, kwargs) -> dspy.lm:
-    if model_str == "bedrock-claude-3.5-sonnet":
-        # todo: pass crediential to here or set it in the environment variable is enough
+    if model_str == "bedrock-claude-3.5-sonnet":  # load credential from envrionment variables
         return dspy.AWSAnthropic(
-            aws_provider=dspy.Bedrock(region_name="us-west-2"), model="anthropic.claude-3-5-sonnet-20240620-v1:0"
+            aws_provider=dspy.Bedrock(region_name=os.environ.get("AWS_DEFAULT_REGION")),
+            model="anthropic.claude-3-5-sonnet-20240620-v1:0",
+        )
+    elif model_str == "bedrock-claude-3-sonnet":  # load credential from envrionment variables
+        return dspy.AWSAnthropic(
+            aws_provider=dspy.Bedrock(region_name=os.environ.get("AWS_DEFAULT_REGION")),
+            model="anthropic.claude-3-sonnet-20240229-v1:0",
         )
     elif model_str == "gpt-4-turbo":
         return dspy.OpenAI(model="gpt-4-turbo", api_key=kwargs.get("openai_api_key", os.environ.get("OPENAI_API_KEY")))
@@ -46,6 +53,7 @@ def construct_context(context: list) -> str:
 
 
 def exec_python_code(code: str, df: pd.DataFrame):
+    access_scope = {"df": df, "pd": pd, "np": np, "sklearn": sklearn}
     try:
         ast.parse(code)
     except Exception as e:
@@ -53,7 +61,7 @@ def exec_python_code(code: str, df: pd.DataFrame):
 
     locals_dict = {"df": df}
     try:
-        exec(code, globals(), locals_dict)
+        exec(code, globals(), locals_dict, access_scope=access_scope)
         assert "df" in locals_dict
         return locals_dict["df"]
     except Exception as e:
@@ -179,7 +187,6 @@ class SimpleGenTransformer(BaseFeatureTransformer):
         self,
         train_X: pd.DataFrame,
         train_y: pd.Series,
-        *,
         target_column_name: str,
         problem_type: str,
         dataset_description: str,
@@ -237,7 +244,7 @@ class SimpleGenTransformer(BaseFeatureTransformer):
             logger.info("SimpleGen doesn't generate any good features")
             logger.info(self.code)
         else:
-            logger.info("SimpleGen generated features:")
+            logger.info("SimpleGen generated features:\n")
             logger.info(self.code)
 
     def _transform_dataframes(self, train_X: pd.DataFrame, test_X: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
