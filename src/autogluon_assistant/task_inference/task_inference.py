@@ -6,9 +6,9 @@ from autogluon.core.utils.utils import infer_problem_type
 from langchain_core.exceptions import OutputParserException
 
 from autogluon_assistant.prompting import (
-    EvalMetricPromptGenerator,
     DataFileNamePromptGenerator,
     DescriptionFileNamePromptGenerator,
+    EvalMetricPromptGenerator,
     LabelColumnPromptGenerator,
     OutputIDColumnPromptGenerator,
     ProblemTypePromptGenerator,
@@ -17,7 +17,13 @@ from autogluon_assistant.prompting import (
 )
 from autogluon_assistant.task import TabularPredictionTask
 
-from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_FILE_IDENTIFIED, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES
+from ..constants import (
+    METRICS_BY_PROBLEM_TYPE,
+    METRICS_DESCRIPTION,
+    NO_FILE_IDENTIFIED,
+    NO_ID_COLUMN_IDENTIFIED,
+    PROBLEM_TYPES,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +74,11 @@ class TaskInference:
         if self.valid_values is not None:
             for key, parsed_value in parsed_output.items():
                 if parsed_value not in self.valid_values:
-                    close_matches = difflib.get_close_matches(parsed_value, self.valid_values)
+                    # Check if parsed_value is a string
+                    if isinstance(parsed_value, str):
+                        close_matches = difflib.get_close_matches(parsed_value, self.valid_values)
+                    else:
+                        close_matches = []
                     if len(close_matches) == 0:
                         if self.fallback_value:
                             logger.warning(
@@ -100,20 +110,19 @@ class DescriptionFileNameInference(TaskInference):
         for key, file_paths in parser_output.items():
             if isinstance(file_paths, str):
                 file_paths = [file_paths]  # Convert single string to list
-            
+
             for file_path in file_paths:
                 if file_path == NO_FILE_IDENTIFIED:
                     continue
                 else:
                     try:
-                        with open(file_path, 'r') as file:
+                        with open(file_path, "r") as file:
                             content = file.read()
                             description_parts.append(f"{key}: {content}")
                     except FileNotFoundError:
                         continue
                     except IOError:
                         continue
-        
         return "\n\n".join(description_parts)
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
@@ -203,7 +212,7 @@ class BaseIDColumnInference(TaskInference):
 
         if parser_output[id_column_name] == NO_ID_COLUMN_IDENTIFIED:
             logger.warning(
-                f"Failed to infer ID column with data descriptions. " "Retry the inference without data descriptions."
+                "Failed to infer ID column with data descriptions. " "Retry the inference without data descriptions."
             )
             self.initialize_task(
                 task, description="Missing data description. Please infer the ID column based on given column names."

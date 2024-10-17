@@ -1,17 +1,16 @@
 """A task encapsulates the data for a data science task or project. It contains descriptions, data, metadata."""
 
 import os
-from enum import Enum
+import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import joblib
-import shutil
 import pandas as pd
 import s3fs
 from autogluon.tabular import TabularDataset
 
-from .constants import TEST, TRAIN, OUTPUT
+from .constants import OUTPUT, TEST, TRAIN
 
 
 class TabularPredictionTask:
@@ -141,14 +140,23 @@ class TabularPredictionTask:
             elif isinstance(v, (pd.DataFrame, TabularDataset)):
                 self.dataset_mapping[k] = v
             elif isinstance(v, Path):
-                self.dataset_mapping[k] = TabularDataset(str(v)) if self.cache_data else v
+                if v.suffix in [".xlsx", ".xls"]:  # Check if the file is an Excel file
+                    self.dataset_mapping[k] = pd.read_excel(v, engine="calamine") if self.cache_data else v
+                else:
+                    self.dataset_mapping[k] = TabularDataset(str(v)) if self.cache_data else v
             elif isinstance(v, str):
                 filepath = next(
                     iter([path for path in self.filepaths if path.name == v]), self.filepaths[0].parent / v
                 )
                 if not filepath.is_file():
                     raise ValueError(f"File {v} not found in task {self.metadata['name']}")
-                self.dataset_mapping[k] = TabularDataset(str(filepath)) if self.cache_data else filepath
+                # TODO: integrate read_excel in AG Tabular
+                if filepath.suffix in [".xlsx", ".xls"]:  # Check if the file is an Excel file
+                    self.dataset_mapping[k] = (
+                        pd.read_excel(filepath, engine="calamine") if self.cache_data else filepath
+                    )
+                else:
+                    self.dataset_mapping[k] = TabularDataset(str(filepath)) if self.cache_data else filepath
             else:
                 raise TypeError(f"Unsupported type for dataset_mapping: {type(v)}")
 

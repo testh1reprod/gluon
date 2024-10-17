@@ -1,13 +1,18 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from autogluon.tabular import TabularDataset
+from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 
-from ..constants import METRICS_BY_PROBLEM_TYPE, METRICS_DESCRIPTION, NO_FILE_IDENTIFIED, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES, TEXT_EXTENSIONS
+from ..constants import (
+    METRICS_DESCRIPTION,
+    NO_FILE_IDENTIFIED,
+    NO_ID_COLUMN_IDENTIFIED,
+    PROBLEM_TYPES,
+)
 from ..utils import is_text_file
 
 
@@ -35,7 +40,14 @@ class PromptGenerator(ABC):
         pass
 
     def get_field_parsing_prompt(self) -> str:
-        return f"Based on the above information, what are the correct values for the following fields in JSON format: {', '.join(self.fields)}"
+        return (
+            f"Based on the above information, provide the correct values for the following fields strictly "
+            f"in valid JSON format: {', '.join(self.fields)}.\n\n"
+            "Important:\n"
+            "1. Return only valid JSON. No extra explanations, text, or comments.\n"
+            "2. Ensure that the output can be parsed by a JSON parser directly.\n"
+            "3. Do not include any non-JSON text or formatting outside the JSON object."
+        )
 
     def generate_chat_prompt(self):
         chat_prompt = ChatPromptTemplate.from_messages(
@@ -65,7 +77,7 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
             return filename.read_text()
         except UnicodeDecodeError:
             return None
-    
+
     def generate_prompt(self) -> str:
         file_content_prompts = "# Available Files And Content in The File\n\n"
         for filename in map(Path, self.filenames):
@@ -107,7 +119,7 @@ class DataFileNamePromptGenerator(PromptGenerator):
                 print(e)
                 continue
     
-        file_content_prompts += f"Please return the full path of the data files as provided, and response with the value {NO_FILE_IDENTIFIED} if there's no such File."
+        file_content_prompts += f"Based on the data description, what are the training, test, and output data? The output file may contain keywords such as benchmark, submission, or output. Please return the full path of the data files as provided, and response with the value {NO_FILE_IDENTIFIED} if there's no such File."
         
         return "\n\n".join([
             self.basic_intro_prompt,
