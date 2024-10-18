@@ -7,6 +7,7 @@ from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
+from .utils import get_outer_columns
 from ..constants import (
     METRICS_DESCRIPTION,
     NO_FILE_IDENTIFIED,
@@ -137,7 +138,7 @@ class LabelColumnPromptGenerator(PromptGenerator):
 
     def __init__(self, data_description: str, column_names: list):
         super().__init__(data_description)
-        self.column_names = column_names
+        self.column_names = get_outer_columns(column_names)
 
     def generate_prompt(self) -> str:
         return "\n\n".join(
@@ -169,7 +170,7 @@ class IDColumnPromptGenerator(PromptGenerator):
 
     def __init__(self, data_description: str, column_names: list):
         super().__init__(data_description)
-        self.column_names = column_names
+        self.column_names = get_outer_columns(column_names)
 
     def generate_prompt(self) -> str:
         return "\n\n".join(
