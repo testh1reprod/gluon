@@ -146,8 +146,8 @@ class LLMFactory:
     def get_chat_model(cls, config: DictConfig) -> AssistantChatOpenAI | AssistantChatBedrock:
         valid_models = cls.get_valid_models()
 
-        assert config.provider in valid_models
-        assert config.model in valid_models[config.provider]
+        assert config.provider in valid_models, f"{config.provider} is not a valid provider in: {valid_models.keys()}"
+        assert config.model in valid_models[config.provider], f"{config.model} is not a valid model in: {valid_models[config.provider]} for provider {config.provider}"
 
         if config.provider == "openai":
             return LLMFactory._get_openai_chat_model(config)
