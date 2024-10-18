@@ -2,10 +2,12 @@ import os
 import pprint
 from typing import Any, Dict, List, Union
 
+import boto3
 from langchain_openai import ChatOpenAI
 from langchain_aws import ChatBedrock
 from langchain.schema import BaseMessage, AIMessage
 from omegaconf import DictConfig
+from openai import OpenAI
 from pydantic import Field, BaseModel
 
 
@@ -85,14 +87,32 @@ class AssistantChatBedrock(ChatBedrock, BaseModel):
 
 
 class LLMFactory:
-    valid_models = {
-        "openai": ["gpt-3.5-turbo", "gpt-4-1106-preview"],
-        "bedrock": [
-            "anthropic.claude-3-sonnet-20240229-v1:0",
-            "anthropic.claude-3-haiku-20240307-v1:0",
-            "anthropic.claude-3-5-sonnet-20240620-v1:0",
-        ],
-    }
+    @staticmethod
+    def get_openai_models() -> List[str]:
+        try:
+            client = OpenAI()
+            models = client.models.list()
+            return [model.id for model in models if model.id.startswith(("gpt-3.5", "gpt-4"))]
+        except Exception as e:
+            print(f"Error fetching OpenAI models: {e}")
+            return []
+
+    @staticmethod
+    def get_bedrock_models() -> List[str]:
+        try:
+            bedrock = boto3.client('bedrock')
+            response = bedrock.list_foundation_models()
+            return [model['modelId'] for model in response['modelSummaries'] if model['modelId'].startswith("anthropic.claude")]
+        except Exception as e:
+            print(f"Error fetching Bedrock models: {e}")
+            return []
+
+    @classmethod
+    def get_valid_models(cls):
+        return {
+            "openai": cls.get_openai_models(),
+            "bedrock": cls.get_bedrock_models(),
+        }
 
     @staticmethod
     def _get_openai_chat_model(config: DictConfig) -> AssistantChatOpenAI:
@@ -122,10 +142,12 @@ class LLMFactory:
             verbose=config.verbose,
         )
 
-    @staticmethod
-    def get_chat_model(config: DictConfig) -> AssistantChatOpenAI | AssistantChatBedrock:
-        assert config.provider in LLMFactory.valid_models
-        assert config.model in LLMFactory.valid_models[config.provider]
+    @classmethod
+    def get_chat_model(cls, config: DictConfig) -> AssistantChatOpenAI | AssistantChatBedrock:
+        valid_models = cls.get_valid_models()
+
+        assert config.provider in valid_models
+        assert config.model in valid_models[config.provider]
 
         if config.provider == "openai":
             return LLMFactory._get_openai_chat_model(config)
