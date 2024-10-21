@@ -46,10 +46,10 @@ class TaskInference:
         for k, v in parser_output.items():
             if v in self.ignored_value:
                 v = None
-            setattr(task, k, self.post_process(v))
+            setattr(task, k, self.post_process(task=task, value=v))
         return task
     
-    def post_process(self, value):
+    def post_process(self, task, value):
         return value
 
     def parse_output(self, output):
@@ -176,6 +176,7 @@ class ProblemTypeInference(TaskInference):
             if problem_type_infered_by_autogluon in CLASSIFICATION_PROBLEM_TYPES:
                 value = problem_type_infered_by_autogluon
         return value
+
 
 class BaseIDColumnInference(TaskInference):
     def __init__(self, *args, **kwargs):
