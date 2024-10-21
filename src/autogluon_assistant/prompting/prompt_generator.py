@@ -13,7 +13,6 @@ from ..constants import (
     NO_FILE_IDENTIFIED,
     NO_ID_COLUMN_IDENTIFIED,
     PROBLEM_TYPES,
-    TEXT_EXTENSIONS,
 )
 from ..utils import is_text_file
 
@@ -90,7 +89,7 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
                     if len(content) > 100:
                         truncated_contents += "..."
                     file_content_prompts += f"File:\n\n{filename} Truncated Content:\n{truncated_contents}\n\n"
-        file_content_prompts += f"Please return the full path of the file to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file. the file to describe the problem settings can't be a csv file"
+        file_content_prompts += f"Please return the full path of the file to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file."
 
         return "\n\n".join(
             [
