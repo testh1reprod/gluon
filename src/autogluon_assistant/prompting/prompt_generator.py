@@ -7,11 +7,13 @@ from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
+from .utils import get_outer_columns
 from ..constants import (
     METRICS_DESCRIPTION,
     NO_FILE_IDENTIFIED,
     NO_ID_COLUMN_IDENTIFIED,
     PROBLEM_TYPES,
+    TEXT_EXTENSIONS,
 )
 from ..utils import is_text_file
 
@@ -87,9 +89,8 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
                     truncated_contents = content[:100].strip()
                     if len(content) > 100:
                         truncated_contents += "..."
-                    file_content_prompts += f"File:\n\n{filename}\n\nTruncated Content:\n{truncated_contents}\n\n"
-
-        file_content_prompts += f"Please return the full path of the file to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file."
+                    file_content_prompts += f"File:\n\n{filename} Truncated Content:\n{truncated_contents}\n\n"
+        file_content_prompts += f"Please return the full path of the file to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file. the file to describe the problem settings can't be a csv file"
 
         return "\n\n".join(
             [
@@ -116,7 +117,7 @@ class DataFileNamePromptGenerator(PromptGenerator):
                 if len(content.columns) > 10:
                     truncated_columns.append("...")
                 truncated_columns_str = ", ".join(truncated_columns)
-                file_content_prompts += f"File:\n\n{filename}\n\nTruncated Columns:\n{truncated_columns_str}\n\n"
+                file_content_prompts += f"File:\n\n{filename}"#\n\nTruncated Columns:\n{truncated_columns_str}\n\n"
             except Exception as e:
                 print(e)
                 continue
@@ -137,7 +138,7 @@ class LabelColumnPromptGenerator(PromptGenerator):
 
     def __init__(self, data_description: str, column_names: list):
         super().__init__(data_description)
-        self.column_names = column_names
+        self.column_names = get_outer_columns(column_names)
 
     def generate_prompt(self) -> str:
         return "\n\n".join(
@@ -169,7 +170,7 @@ class IDColumnPromptGenerator(PromptGenerator):
 
     def __init__(self, data_description: str, column_names: list):
         super().__init__(data_description)
-        self.column_names = column_names
+        self.column_names = get_outer_columns(column_names)
 
     def generate_prompt(self) -> str:
         return "\n\n".join(

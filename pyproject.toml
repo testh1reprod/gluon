@@ -24,6 +24,7 @@ dependencies = [
     "joblib>=1.4.2",
     "python-calamine",
     "sentence-transformers>=3.1.0",
+    "tenacity>=8.2.2,<10.0",
 ]
 
 [project.optional-dependencies]
