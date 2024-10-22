@@ -66,7 +66,7 @@ class TabularPredictionAssistant:
             LabelColumnInference,
             ProblemTypeInference,
         ]
-        
+
         if self.config.detect_and_drop_id_column:
             task_inference_preprocessors += [
                 OutputIDColumnInference,

@@ -46,22 +46,21 @@ def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFra
     if task.test_id_column is not None and task.test_id_column != NO_ID_COLUMN_IDENTIFIED:
         test_ids = task.test_data[task.test_id_column]
         output_ids = task.sample_submission_data[task.output_id_column]
-        
+
         if not test_ids.equals(output_ids):
             print(f"Warning: Test IDs and output IDs do not match!")
-            
+
         # Ensure test ID column is included
         if task.test_id_column not in outputs.columns:
-            outputs = pd.concat([
-                task.test_data[task.test_id_column],
-                outputs
-            ], axis="columns")
+            outputs = pd.concat([task.test_data[task.test_id_column], outputs], axis="columns")
 
     # Handle undetected ID columns
     missing_columns = [col for col in task.output_columns if col not in outputs.columns]
     if missing_columns:
-        print(f"Warning: The following columns are not in predictions and will be treated as ID columns: {missing_columns}")
-        
+        print(
+            f"Warning: The following columns are not in predictions and will be treated as ID columns: {missing_columns}"
+        )
+
         for col in missing_columns:
             if col in task.test_data.columns:
                 # Copy from test data if available
@@ -74,7 +73,7 @@ def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFra
 
     # Ensure columns are in the correct order
     outputs = outputs[task.output_columns]
-    
+
     return outputs
 
 

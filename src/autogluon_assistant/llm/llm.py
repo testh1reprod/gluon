@@ -12,6 +12,7 @@ from pydantic import Field, BaseModel
 from tenacity import retry, stop_after_attempt, wait_exponential
 import botocore
 
+
 class AssistantChatOpenAI(ChatOpenAI, BaseModel):
     """
     AssistantChatOpenAI is a subclass of ChatOpenAI that traces the input and output of the model.
@@ -74,7 +75,7 @@ class AssistantChatBedrock(ChatBedrock, BaseModel):
         try:
             response = super().invoke(*args, **kwargs)
         except botocore.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == 'ThrottlingException':
+            if e.response["Error"]["Code"] == "ThrottlingException":
                 raise e
             else:
                 raise e
@@ -109,9 +110,13 @@ class LLMFactory:
     @staticmethod
     def get_bedrock_models() -> List[str]:
         try:
-            bedrock = boto3.client('bedrock')
+            bedrock = boto3.client("bedrock")
             response = bedrock.list_foundation_models()
-            return [model['modelId'] for model in response['modelSummaries'] if model['modelId'].startswith("anthropic.claude")]
+            return [
+                model["modelId"]
+                for model in response["modelSummaries"]
+                if model["modelId"].startswith("anthropic.claude")
+            ]
         except Exception as e:
             print(f"Error fetching Bedrock models: {e}")
             return []
@@ -156,7 +161,9 @@ class LLMFactory:
         valid_models = cls.get_valid_models()
 
         assert config.provider in valid_models, f"{config.provider} is not a valid provider in: {valid_models.keys()}"
-        assert config.model in valid_models[config.provider], f"{config.model} is not a valid model in: {valid_models[config.provider]} for provider {config.provider}"
+        assert (
+            config.model in valid_models[config.provider]
+        ), f"{config.model} is not a valid model in: {valid_models[config.provider]} for provider {config.provider}"
 
         if config.provider == "openai":
             return LLMFactory._get_openai_chat_model(config)

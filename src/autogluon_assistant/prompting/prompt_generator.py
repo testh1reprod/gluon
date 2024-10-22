@@ -116,7 +116,7 @@ class DataFileNamePromptGenerator(PromptGenerator):
                 if len(content.columns) > 10:
                     truncated_columns.append("...")
                 truncated_columns_str = ", ".join(truncated_columns)
-                file_content_prompts += f"File:\n\n{filename}"#\n\nTruncated Columns:\n{truncated_columns_str}\n\n"
+                file_content_prompts += f"File:\n\n{filename}"  # \n\nTruncated Columns:\n{truncated_columns_str}\n\n"
             except Exception as e:
                 print(e)
                 continue

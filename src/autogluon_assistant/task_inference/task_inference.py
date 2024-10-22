@@ -48,7 +48,7 @@ class TaskInference:
                 v = None
             setattr(task, k, self.post_process(task=task, value=v))
         return task
-    
+
     def post_process(self, task, value):
         return value
 
@@ -196,7 +196,9 @@ class BaseIDColumnInference(TaskInference):
         self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
         if not description:
             description = task.metadata["description"]
-        self.prompt_generator = self.get_prompt_generator()(data_description=description, column_names=column_names, label_column = task.metadata["label_column"])
+        self.prompt_generator = self.get_prompt_generator()(
+            data_description=description, column_names=column_names, label_column=task.metadata["label_column"]
+        )
 
     def get_data(self, task):
         pass
