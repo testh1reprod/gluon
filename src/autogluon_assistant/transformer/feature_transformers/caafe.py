@@ -52,7 +52,7 @@ class CAAFETransformer(BaseFeatureTransformer):
             optimization_metric=self.optimization_metric,
             llm_model=self.llm_model,
             iterations=self.iterations,
-            # display_method="print",
+            display_method="print",
         )
 
         self.metadata = {"transformer": "CAAFE"}
