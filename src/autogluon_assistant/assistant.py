@@ -66,6 +66,7 @@ class TabularPredictionAssistant:
             LabelColumnInference,
             ProblemTypeInference,
         ]
+        
         if self.config.detect_and_drop_id_column:
             task_inference_preprocessors += [
                 OutputIDColumnInference,
@@ -88,7 +89,6 @@ class TabularPredictionAssistant:
         logger.info(f"###LLM Inference Results:###\n{task.metadata}")
         logger.info(f"###Total number of prompt tokens:###\n{self.llm.input_}")
         logger.info(f"###Total number of completion tokens:###\n{self.llm.output_}")
-
         return task
 
     def preprocess_task(self, task: TabularPredictionTask) -> TabularPredictionTask:

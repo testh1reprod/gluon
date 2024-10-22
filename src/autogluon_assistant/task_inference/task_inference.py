@@ -16,6 +16,7 @@ from autogluon_assistant.prompting import (
 )
 from autogluon_assistant.task import TabularPredictionTask
 from ..constants import (
+    CLASSIFICATION_PROBLEM_TYPES,
     METRICS_BY_PROBLEM_TYPE,
     METRICS_DESCRIPTION,
     NO_FILE_IDENTIFIED,
@@ -45,8 +46,11 @@ class TaskInference:
         for k, v in parser_output.items():
             if v in self.ignored_value:
                 v = None
-            setattr(task, k, v)
+            setattr(task, k, self.post_process(task=task, value=v))
         return task
+    
+    def post_process(self, task, value):
+        return value
 
     def parse_output(self, output):
         assert self.prompt_generator is not None, "prompt_generator is not initialized"
@@ -56,9 +60,9 @@ class TaskInference:
         """Chat with the LLM and parse the output"""
         try:
             chat_prompt = self.prompt_generator.generate_chat_prompt()
-            logger.debug(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
+            logger.info(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
             output = self.llm.invoke(chat_prompt.format_messages())
-            logger.debug(f"LLM output:\n{output}")
+            logger.info(f"LLM output:\n{output}")
             parsed_output = self.parse_output(output)
         except OutputParserException as e:
             logger.error(f"Failed to parse output: {e}")
@@ -165,15 +169,13 @@ class ProblemTypeInference(TaskInference):
         self.valid_values = PROBLEM_TYPES
         self.prompt_generator = ProblemTypePromptGenerator(data_description=task.metadata["description"])
 
-    def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
-        try:
-            task.problem_type = infer_problem_type(task.train_data[task.label_column], silent=True)
-        except Exception as e:
-            logger.warning(
-                f"Failed to inference problem type with Autogluon Tabular: {e}. Switched to use LLM to inference problem type."
-            )
-            return super().transform(task)
-        return task
+    def post_process(self, task, value):
+        # LLM may get confused between BINARY and MULTICLASS as it cannot see the whole label column
+        if value in CLASSIFICATION_PROBLEM_TYPES:
+            problem_type_infered_by_autogluon = infer_problem_type(task.train_data[task.label_column], silent=True)
+            if problem_type_infered_by_autogluon in CLASSIFICATION_PROBLEM_TYPES:
+                value = problem_type_infered_by_autogluon
+        return value
 
 
 class BaseIDColumnInference(TaskInference):
@@ -194,7 +196,7 @@ class BaseIDColumnInference(TaskInference):
         self.valid_values = column_names + [NO_ID_COLUMN_IDENTIFIED]
         if not description:
             description = task.metadata["description"]
-        self.prompt_generator = self.get_prompt_generator()(data_description=description, column_names=column_names)
+        self.prompt_generator = self.get_prompt_generator()(data_description=description, column_names=column_names, label_column = task.metadata["label_column"])
 
     def get_data(self, task):
         pass
