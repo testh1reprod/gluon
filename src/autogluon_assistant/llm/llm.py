@@ -9,7 +9,8 @@ from langchain.schema import BaseMessage, AIMessage
 from omegaconf import DictConfig
 from openai import OpenAI
 from pydantic import Field, BaseModel
-
+from tenacity import retry, stop_after_attempt, wait_exponential
+import botocore
 
 class AssistantChatOpenAI(ChatOpenAI, BaseModel):
     """
@@ -29,6 +30,7 @@ class AssistantChatOpenAI(ChatOpenAI, BaseModel):
             "completion_tokens": self.output_,
         }
 
+    @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=10))
     def invoke(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
         response = super().invoke(*args, **kwargs)
@@ -66,9 +68,16 @@ class AssistantChatBedrock(ChatBedrock, BaseModel):
             "completion_tokens": self.output_,
         }
 
+    @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=10))
     def invoke(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
-        response = super().invoke(*args, **kwargs)
+        try:
+            response = super().invoke(*args, **kwargs)
+        except botocore.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == 'ThrottlingException':
+                raise e
+            else:
+                raise e
 
         # Update token usage
         if isinstance(response, AIMessage) and response.usage_metadata:
