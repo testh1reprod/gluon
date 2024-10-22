@@ -152,7 +152,7 @@ class LLMFactory:
                 "temperature": config.temperature,
                 "max_tokens": config.max_tokens,
             },
-            region_name=os.getenv("AWS_REGION"),
+            region_name="us-west-2",
             verbose=config.verbose,
         )
 
