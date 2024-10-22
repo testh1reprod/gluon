@@ -15,7 +15,6 @@ dependencies = [
     "langchain~=0.1.15",
     "openfe",
     "pydantic==1.10.13",
-    "caafe@git+https://github.com/gidler/CAAFE.git@main",
     "matplotlib>=3.9.2",
     "typer",
     "rich",
@@ -23,7 +22,7 @@ dependencies = [
     "joblib",
     "python-calamine",
     "sentence-transformers >= 3.1.0",
-    "dspy-ai"
+    "dspy-ai==2.5.0"
 ]
 
 [project.optional-dependencies]
@@ -60,7 +59,6 @@ target-version = ['py38', 'py39', 'py310']
 known_first_party = "autogluon_assistant"
 known_third_party = [
     "autogluon",
-    "caafe",
     "joblib",
     "langchain",
     "numpy",

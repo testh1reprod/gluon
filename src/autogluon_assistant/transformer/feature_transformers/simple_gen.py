@@ -1,4 +1,4 @@
-from typing import Mapping, Tuple, Optional
+from typing import Mapping, Tuple, Optional, Dict
 import logging
 import ast
 import re
@@ -9,12 +9,69 @@ import pandas as pd
 import numpy as np
 import sklearn
 import dspy
+import copy
 from sklearn.model_selection import train_test_split
-from caafe.preprocessing import make_datasets_numeric
 from .base import BaseFeatureTransformer
 
 logger = logging.getLogger(__name__)
-pd.set_option("future.no_silent_downcasting", True)
+# pd.set_option("future.no_silent_downcasting", True)
+
+
+def create_mappings(df_train: pd.DataFrame) -> Dict[str, Dict[int, str]]:
+    """
+    Creates a dictionary of mappings for categorical columns in the given dataframe.
+
+    Parameters:
+    df_train (pandas.DataFrame): The dataframe to create mappings for.
+
+    Returns:
+    Dict[str, Dict[int, str]]: A dictionary of mappings for categorical columns in the dataframe.
+    """
+    mappings = {}
+    for col in df_train.columns:
+        if df_train[col].dtype.name == "category" or df_train[col].dtype.name == "object":
+            mappings[col] = dict(enumerate(df_train[col].astype("category").cat.categories))
+    return mappings
+
+
+def make_datasets_numeric(
+    df_train: pd.DataFrame,
+    df_test: Optional[pd.DataFrame],
+    target_column: str,
+    return_mappings: Optional[bool] = False,
+) -> Tuple[pd.DataFrame, Optional[pd.DataFrame], Optional[Dict[str, Dict[int, str]]]]:
+    """
+    Converts the categorical columns in the given training and test dataframes to integer values using mappings created from the training dataframe.
+
+    Parameters:
+    df_train (pandas.DataFrame): The training dataframe to convert.
+    df_test (pandas.DataFrame, optional): The test dataframe to convert. Defaults to None.
+    target_column (str): The name of the target column.
+    return_mappings (bool, optional): Whether to return the mappings used for the conversion. Defaults to False.
+
+    Returns:
+    Tuple[pandas.DataFrame, Optional[pandas.DataFrame], Optional[Dict[str, Dict[int, str]]]]: The converted training dataframe, the converted test dataframe (if it exists), and the mappings used for the conversion (if `return_mappings` is True).
+    """
+    df_train = copy.deepcopy(df_train)
+    df_train = df_train.infer_objects()
+    if df_test is not None:
+        df_test = copy.deepcopy(df_test)
+        df_test = df_test.infer_objects()
+
+    # Create the mappings using the train and test datasets
+    mappings = create_mappings(df_train)
+
+    # Apply the mappings to the train and test datasets
+    non_target = [c for c in df_train.columns if c != target_column]
+    df_train[non_target] = make_dataset_numeric(df_train[non_target], mappings)
+
+    if df_test is not None:
+        df_test[non_target] = make_dataset_numeric(df_test[non_target], mappings)
+
+    if return_mappings:
+        return df_train, df_test, mappings
+
+    return df_train, df_test
 
 
 def get_llm(model_str, kwargs) -> dspy.lm:
