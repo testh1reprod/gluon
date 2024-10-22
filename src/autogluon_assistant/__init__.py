@@ -34,7 +34,7 @@ def get_task(path: Path) -> TabularPredictionTask:
 def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFrame) -> pd.DataFrame:
     if task.test_id_column is not None and task.test_id_column != NO_ID_COLUMN_IDENTIFIED:
         test_ids = task.test_data[task.test_id_column]
-        output_ids = task.output_data[task.output_id_column]
+        output_ids = task.sample_submission_data[task.output_id_column]
 
         if not test_ids.equals(output_ids):
             rprint(f"[orange]Warning: Test IDs and output IDs do not match![/orange]")
@@ -47,9 +47,16 @@ def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFra
             axis="columns",
         )
     else:
-        outputs = predictions
+        if isinstance(predictions, pd.Series):
+            outputs = predictions.to_frame()
+        else:
+            outputs = predictions
 
-    outputs.columns = task.output_columns
+    if len(outputs.columns) == len(task.output_columns):
+        outputs.columns = task.output_columns  # TODO: should better remove this
+    else:
+        outputs = outputs[task.output_columns]
+
     return outputs
 
 
@@ -86,7 +93,7 @@ def run_assistant(
     rprint("[green]Task preprocessing complete![/green]")
     task_description = task.describe()
 
-    for data_key in ["train_data", "test_data", "output_data"]:
+    for data_key in ["train_data", "test_data", "sample_submission_data"]:
         if data_key in task_description:
             rprint(f"{data_key}:")
             rprint(pd.DataFrame(task_description.pop(data_key, {})).T)
@@ -116,7 +123,9 @@ def run_assistant(
 
         full_save_path = f"{config.save_artifacts.path.rstrip('/')}/{artifacts_dir_name}"
 
-        task.save_artifacts(full_save_path, assistant.predictor, task.train_data, task.test_data, task.output_data)
+        task.save_artifacts(
+            full_save_path, assistant.predictor, task.train_data, task.test_data, task.sample_submission_data
+        )
 
         rprint(f"[green]Artifacts including transformed datasets and trained model saved at {full_save_path}[/green]")
 

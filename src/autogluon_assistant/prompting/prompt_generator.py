@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List
 
+from autogluon.tabular import TabularDataset
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
+from .utils import get_outer_columns
 from ..constants import (
     METRICS_DESCRIPTION,
     NO_FILE_IDENTIFIED,
@@ -78,17 +80,16 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
             return None
 
     def generate_prompt(self) -> str:
-        file_content_prompts = "# Available Files And First Line in The File\n"
+        file_content_prompts = "# Available Files And Content in The File\n\n"
         for filename in map(Path, self.filenames):
             if is_text_file(filename):
                 content = self.read_file_safely(filename)
                 if content is not None:
-                    first_line = content.split("\n")[0].strip()
-                    if len(first_line) > 100:
-                        first_line = first_line[:100] + "..."
-                    file_content_prompts += f"File:\n{filename}\nFirst Line:\n{first_line}\n"
-
-        file_content_prompts += f"Please find the files to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file."
+                    truncated_contents = content[:100].strip()
+                    if len(content) > 100:
+                        truncated_contents += "..."
+                    file_content_prompts += f"File:\n\n{filename} Truncated Content:\n{truncated_contents}\n\n"
+        file_content_prompts += f"Please return the full path of the file to describe the problem settings, and response with the value {NO_FILE_IDENTIFIED} if there's no such file."
 
         return "\n\n".join(
             [
@@ -100,19 +101,32 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
 
 
 class DataFileNamePromptGenerator(PromptGenerator):
-    fields = ["train_data", "test_data", "output_data"]
+    fields = ["train_data", "test_data", "sample_submission_data"]
 
     def __init__(self, data_description: str, filenames: list):
         super().__init__(data_description)
         self.filenames = filenames
 
     def generate_prompt(self) -> str:
+        file_content_prompts = "# Available Data Files And Columns in The File\n\n"
+        for filename in self.filenames:
+            try:
+                content = TabularDataset(filename)
+                truncated_columns = content.columns[:10].tolist()
+                if len(content.columns) > 10:
+                    truncated_columns.append("...")
+                truncated_columns_str = ", ".join(truncated_columns)
+                file_content_prompts += f"File:\n\n{filename}"#\n\nTruncated Columns:\n{truncated_columns_str}\n\n"
+            except Exception as e:
+                print(e)
+                continue
+
+        file_content_prompts += f"Based on the data description, what are the training, test, and output data? The output file may contain keywords such as benchmark, submission, or output. Please return the full path of the data files as provided, and response with the value {NO_FILE_IDENTIFIED} if there's no such File."
+
         return "\n\n".join(
             [
                 self.basic_intro_prompt,
-                self.data_description_prompt,
-                f"# Available Files\n{', '.join(self.filenames)}",
-                "If there are zip (e.g. .zip or .gz) versions of files and non-zipped versions of the files, choose the non-zip version.",
+                file_content_prompts,
                 self.get_field_parsing_prompt(),
             ]
         )
@@ -123,7 +137,7 @@ class LabelColumnPromptGenerator(PromptGenerator):
 
     def __init__(self, data_description: str, column_names: list):
         super().__init__(data_description)
-        self.column_names = column_names
+        self.column_names = get_outer_columns(column_names)
 
     def generate_prompt(self) -> str:
         return "\n\n".join(
@@ -155,7 +169,7 @@ class IDColumnPromptGenerator(PromptGenerator):
 
     def __init__(self, data_description: str, column_names: list):
         super().__init__(data_description)
-        self.column_names = column_names
+        self.column_names = get_outer_columns(column_names)
 
     def generate_prompt(self) -> str:
         return "\n\n".join(
