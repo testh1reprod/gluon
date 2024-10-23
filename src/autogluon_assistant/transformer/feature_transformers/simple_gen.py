@@ -11,78 +11,37 @@ import sklearn
 import dspy
 import copy
 from sklearn.model_selection import train_test_split
+from botocore.exceptions import ClientError
+from tenacity import retry, stop_after_attempt, wait_exponential
 from .base import BaseFeatureTransformer
+from caafe.preprocessing import make_datasets_numeric
+
 
 logger = logging.getLogger(__name__)
 # pd.set_option("future.no_silent_downcasting", True)
 
 
-def create_mappings(df_train: pd.DataFrame) -> Dict[str, Dict[int, str]]:
-    """
-    Creates a dictionary of mappings for categorical columns in the given dataframe.
+class AWSAnthropicRetry(dspy.AWSAnthropic):
 
-    Parameters:
-    df_train (pandas.DataFrame): The dataframe to create mappings for.
-
-    Returns:
-    Dict[str, Dict[int, str]]: A dictionary of mappings for categorical columns in the dataframe.
-    """
-    mappings = {}
-    for col in df_train.columns:
-        if df_train[col].dtype.name == "category" or df_train[col].dtype.name == "object":
-            mappings[col] = dict(enumerate(df_train[col].astype("category").cat.categories))
-    return mappings
-
-
-def make_datasets_numeric(
-    df_train: pd.DataFrame,
-    df_test: Optional[pd.DataFrame],
-    target_column: str,
-    return_mappings: Optional[bool] = False,
-) -> Tuple[pd.DataFrame, Optional[pd.DataFrame], Optional[Dict[str, Dict[int, str]]]]:
-    """
-    Converts the categorical columns in the given training and test dataframes to integer values using mappings created from the training dataframe.
-
-    Parameters:
-    df_train (pandas.DataFrame): The training dataframe to convert.
-    df_test (pandas.DataFrame, optional): The test dataframe to convert. Defaults to None.
-    target_column (str): The name of the target column.
-    return_mappings (bool, optional): Whether to return the mappings used for the conversion. Defaults to False.
-
-    Returns:
-    Tuple[pandas.DataFrame, Optional[pandas.DataFrame], Optional[Dict[str, Dict[int, str]]]]: The converted training dataframe, the converted test dataframe (if it exists), and the mappings used for the conversion (if `return_mappings` is True).
-    """
-    df_train = copy.deepcopy(df_train)
-    df_train = df_train.infer_objects()
-    if df_test is not None:
-        df_test = copy.deepcopy(df_test)
-        df_test = df_test.infer_objects()
-
-    # Create the mappings using the train and test datasets
-    mappings = create_mappings(df_train)
-
-    # Apply the mappings to the train and test datasets
-    non_target = [c for c in df_train.columns if c != target_column]
-    df_train[non_target] = make_dataset_numeric(df_train[non_target], mappings)
-
-    if df_test is not None:
-        df_test[non_target] = make_dataset_numeric(df_test[non_target], mappings)
-
-    if return_mappings:
-        return df_train, df_test, mappings
-
-    return df_train, df_test
+    @retry(
+        stop=stop_after_attempt(5),
+        wait=wait_exponential(multiplier=1, min=4, max=10),
+        retry=lambda exception: isinstance(exception, ClientError)
+        and exception.response["Error"]["Code"] == "ThrottlingException",
+    )
+    def _call_model(self, body: str) -> str:
+        return super()._call_model(body)
 
 
 def get_llm(model_str, kwargs) -> dspy.lm:
     if model_str == "bedrock-claude-3.5-sonnet":  # load credential from envrionment variables
-        return dspy.AWSAnthropic(
-            aws_provider=dspy.Bedrock(region_name=os.environ.get("AWS_DEFAULT_REGION")),
+        return AWSAnthropicRetry(
+            aws_provider=dspy.Bedrock(region_name="us-west-2"),
             model="anthropic.claude-3-5-sonnet-20240620-v1:0",
         )
     elif model_str == "bedrock-claude-3-sonnet":  # load credential from envrionment variables
-        return dspy.AWSAnthropic(
-            aws_provider=dspy.Bedrock(region_name=os.environ.get("AWS_DEFAULT_REGION")),
+        return AWSAnthropicRetry(
+            aws_provider=dspy.Bedrock(region_name="us-west-2"),
             model="anthropic.claude-3-sonnet-20240229-v1:0",
         )
     elif model_str == "gpt-4-turbo":
@@ -201,6 +160,7 @@ class MultiStepGen(dspy.Module):
                 code = extract_python_code(code)
             except Exception as e:
                 context.append((code, "error extracting python code {e}"))
+                logger.info(f"SimpleGen extract python code error\n\n {code} \n\n {e}")
                 continue
 
             is_valid, message = validate_python_code(code)
@@ -213,9 +173,11 @@ class MultiStepGen(dspy.Module):
                 except Exception as e:
                     tb = traceback.format_exc()
                     context.append((code, f"Runtime Error: {e}. Trace: {tb}"))
+                    logger.info(f"SimpleGen code has Runtime Error\n\n {code} \n\n {e} {tb}")
                     continue
             else:
                 context.append((code, message))
+                logger.info(f"SimpleGen code has Syntax Error\n\n {code} \n\n {message}")
                 continue
 
 
@@ -297,7 +259,7 @@ class SimpleGenTransformer(BaseFeatureTransformer):
 
         self.code = best_code
 
-        if self.code is None:
+        if self.code == "":
             logger.info("SimpleGen doesn't generate any good features")
             logger.info(self.code)
         else:
