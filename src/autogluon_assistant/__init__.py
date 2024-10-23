@@ -97,6 +97,7 @@ def run_assistant(
     rprint(OmegaConf.to_container(config))
 
     task_path = Path(task_path).resolve()
+    assert task_path.is_dir(), "Task path does not exist, please provide a valid directory."
     rprint(f"Task path: {task_path}")
 
     task = TabularPredictionTask.from_path(task_path)
