@@ -60,9 +60,9 @@ class TaskInference:
         """Chat with the LLM and parse the output"""
         try:
             chat_prompt = self.prompt_generator.generate_chat_prompt()
-            logger.info(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
+            logger.debug(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
             output = self.llm.invoke(chat_prompt.format_messages())
-            logger.info(f"LLM output:\n{output}")
+            logger.debug(f"LLM output:\n{output}")
             parsed_output = self.parse_output(output)
         except OutputParserException as e:
             logger.error(f"Failed to parse output: {e}")
