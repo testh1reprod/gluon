@@ -24,6 +24,10 @@ class CAAFETransformer(BaseFeatureTransformer):
         **kwargs,
     ) -> None:
         import openai
+        
+        if not("OPENAI_API_KEY" in os.environ):
+            logger.info("No OpenAI API keys found, therefore, skip CAAFE")
+            pass
 
         openai.api_key = kwargs.get("openai_api_key", os.environ.get("OPENAI_API_KEY"))
 
@@ -52,7 +56,7 @@ class CAAFETransformer(BaseFeatureTransformer):
             optimization_metric=self.optimization_metric,
             llm_model=self.llm_model,
             iterations=self.iterations,
-            # display_method="print",
+            display_method="print",
         )
 
         self.metadata = {"transformer": "CAAFE"}
