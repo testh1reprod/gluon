@@ -40,12 +40,19 @@ class TaskInference:
         self.prompt_generator = None
         self.valid_values = None
 
+    def log_value(self, k, v):
+        if v is not None and v:
+            logger.info(f"AGA has identified the {k} of the task: {v}")
+        else:
+            logger.info(f"AGA failed to identified the {k} of the task, it is set to None.")
+
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
         self.initialize_task(task)
         parser_output = self._chat_and_parse_prompt_output()
         for k, v in parser_output.items():
             if v in self.ignored_value:
                 v = None
+            self.log_value(k, v)
             setattr(task, k, self.post_process(task=task, value=v))
         return task
 
@@ -60,9 +67,9 @@ class TaskInference:
         """Chat with the LLM and parse the output"""
         try:
             chat_prompt = self.prompt_generator.generate_chat_prompt()
-            logger.info(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
+            logger.debug(f"LLM chat_prompt:\n{chat_prompt.format_messages()}")
             output = self.llm.invoke(chat_prompt.format_messages())
-            logger.info(f"LLM output:\n{output}")
+            logger.debug(f"LLM output:\n{output}")
             parsed_output = self.parse_output(output)
         except OutputParserException as e:
             logger.error(f"Failed to parse output: {e}")
@@ -137,6 +144,7 @@ class DescriptionFileNameInference(TaskInference):
         descriptions_read = self._read_descriptions(parser_output)
         if descriptions_read:
             task.metadata["description"] = descriptions_read
+        self.log_value("description", descriptions_read)
         return task
 
 
@@ -229,6 +237,7 @@ class BaseIDColumnInference(TaskInference):
 
         id_column = parser_output[id_column_name]
         id_column = self.process_id_column(task, id_column)
+        self.log_value(id_column_name, id_column)
         setattr(task, id_column_name, id_column)
         return task
 

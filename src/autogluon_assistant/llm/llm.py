@@ -1,3 +1,4 @@
+import logging
 import os
 import pprint
 from typing import Any, Dict, List, Union
@@ -11,6 +12,8 @@ from openai import OpenAI
 from pydantic import Field, BaseModel
 from tenacity import retry, stop_after_attempt, wait_exponential
 import botocore
+
+logger = logging.getLogger(__name__)
 
 
 class AssistantChatOpenAI(ChatOpenAI, BaseModel):
@@ -122,11 +125,17 @@ class LLMFactory:
             return []
 
     @classmethod
-    def get_valid_models(cls):
-        return {
-            "openai": cls.get_openai_models(),
-            "bedrock": cls.get_bedrock_models(),
-        }
+    def get_valid_models(cls, provider):
+        if provider == "openai":
+            return cls.get_openai_models()
+        elif provider == "bedrock":
+            return cls.get_bedrock_models()
+        else:
+            raise ValueError(f"Invalid LLM provider: {provider}")
+    
+    @classmethod
+    def get_valid_providers(cls):
+        return ["openai", "bedrock"]
 
     @staticmethod
     def _get_openai_chat_model(config: DictConfig) -> AssistantChatOpenAI:
@@ -134,6 +143,8 @@ class LLMFactory:
             api_key = os.environ[config.api_key_location]
         else:
             raise Exception("OpenAI API env variable not set")
+        
+        logger.info(f"AGA is using model {config.model} from OpenAI to assist you with the task.")
 
         return AssistantChatOpenAI(
             model_name=config.model,
@@ -146,6 +157,8 @@ class LLMFactory:
 
     @staticmethod
     def _get_bedrock_chat_model(config: DictConfig) -> AssistantChatBedrock:
+        logger.info(f"AGA is using model {config.model} from Bedrock to assist you with the task.")
+
         return AssistantChatBedrock(
             model_id=config.model,
             model_kwargs={
@@ -158,16 +171,17 @@ class LLMFactory:
 
     @classmethod
     def get_chat_model(cls, config: DictConfig) -> AssistantChatOpenAI | AssistantChatBedrock:
-        valid_models = cls.get_valid_models()
+        valid_providers = cls.get_valid_providers()
+        assert config.provider in valid_providers, f"{config.provider} is not a valid provider in: {valid_providers}"
 
-        assert config.provider in valid_models, f"{config.provider} is not a valid provider in: {valid_models.keys()}"
+        valid_models = cls.get_valid_models(config.provider)
         assert (
-            config.model in valid_models[config.provider]
-        ), f"{config.model} is not a valid model in: {valid_models[config.provider]} for provider {config.provider}"
+            config.model in valid_models
+        ), f"{config.model} is not a valid model in: {valid_models} for provider {config.provider}"
 
         if config.provider == "openai":
             return LLMFactory._get_openai_chat_model(config)
         elif config.provider == "bedrock":
             return LLMFactory._get_bedrock_chat_model(config)
         else:
-            raise ValueError(f"Unsupported provider: {config.provider}")
+            raise ValueError(f"Invalid LLM provider: {config.provider}")
