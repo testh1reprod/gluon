@@ -157,7 +157,7 @@ class LLMFactory:
         )
 
     @classmethod
-    def get_chat_model(cls, config: DictConfig) -> AssistantChatOpenAI | AssistantChatBedrock:
+    def get_chat_model(cls, config: DictConfig) -> Union[AssistantChatOpenAI, AssistantChatBedrock]:
         valid_models = cls.get_valid_models()
         assert len(valid_models[config.provider]), f"Check you bedrock keys"
 
