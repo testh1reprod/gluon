@@ -15,8 +15,8 @@ feature_transformers:
   - _target_: autogluon_assistant.transformer.OpenFETransformer
     n_jobs: 1
     num_features_to_keep: 10
-  #- _target_: autogluon_assistant.transformer.PretrainedEmbeddingTransformer
-  #    model_name: 'all-mpnet-base-v2'
+  - _target_: autogluon_assistant.transformer.PretrainedEmbeddingTransformer
+    model_name: 'all-mpnet-base-v2'
 autogluon:
   predictor_init_kwargs: {}
   predictor_fit_kwargs:
