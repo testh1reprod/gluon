@@ -31,7 +31,7 @@ class AssistantChatOpenAI(ChatOpenAI, BaseModel):
             "completion_tokens": self.output_,
         }
 
-    @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=10))
+    @retry(stop=stop_after_attempt(500), wait=wait_exponential(multiplier=1, min=4, max=10))
     def invoke(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
         response = super().invoke(*args, **kwargs)
@@ -69,7 +69,7 @@ class AssistantChatBedrock(ChatBedrock, BaseModel):
             "completion_tokens": self.output_,
         }
 
-    @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=10))
+    @retry(stop=stop_after_attempt(500), wait=wait_exponential(multiplier=1, min=4, max=10))
     def invoke(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
         try:
@@ -159,6 +159,7 @@ class LLMFactory:
     @classmethod
     def get_chat_model(cls, config: DictConfig) -> AssistantChatOpenAI | AssistantChatBedrock:
         valid_models = cls.get_valid_models()
+        assert len(valid_models[config.provider]), f"Check you bedrock keys"
 
         assert config.provider in valid_models, f"{config.provider} is not a valid provider in: {valid_models.keys()}"
         assert (
