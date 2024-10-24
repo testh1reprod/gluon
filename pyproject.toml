@@ -27,6 +27,7 @@ dependencies = [
     "python-calamine",
     "sentence-transformers>=3.1.0",
     "tenacity>=8.2.2,<10.0",
+    "gensim>=4.3", 
 ]
 
 [project.optional-dependencies]
