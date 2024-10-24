@@ -46,7 +46,7 @@ class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
 
     def _transform_dataframes(self, train_X: pd.DataFrame, test_X: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         if not torch.cuda.is_available():
-            pass 
+            pass
         assert (
             train_X.columns.values.tolist() == test_X.columns.values.tolist()
         ), "The columns of the training set does not matach the columns of the test set"

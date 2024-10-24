@@ -1,10 +1,10 @@
 import logging
+import os
 import signal
 from typing import Any, Dict, Union
 
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
-from os import environ
 
 from autogluon_assistant.llm import AssistantChatBedrock, AssistantChatOpenAI, LLMFactory
 
@@ -97,8 +97,13 @@ class TabularPredictionAssistant:
         # and columns as well as the feature extractors
         task = self.inference_task(task)
         if self.feature_transformers_config:
-            if not("OPENAI_API_KEY" in environ):
-                fe_transformers = [instantiate(ft_config) for ft_config in self.feature_transformers_config if ft_config["_target_"] != "autogluon_assistant.transformer.CAAFETransformer"]
+            if not ("OPENAI_API_KEY" in os.environ):
+                logger.info("No OpenAI API keys found, therefore, skip CAAFE")
+                fe_transformers = [
+                    instantiate(ft_config)
+                    for ft_config in self.feature_transformers_config
+                    if ft_config["_target_"] != "autogluon_assistant.transformer.CAAFETransformer"
+                ]
             else:
                 fe_transformers = [instantiate(ft_config) for ft_config in self.feature_transformers_config]
             for fe_transformer in fe_transformers:
