@@ -4,14 +4,14 @@ import pprint
 from typing import Any, Dict, List, Union
 
 import boto3
-from langchain_openai import ChatOpenAI
+import botocore
+from langchain.schema import AIMessage, BaseMessage
 from langchain_aws import ChatBedrock
-from langchain.schema import BaseMessage, AIMessage
+from langchain_openai import ChatOpenAI
 from omegaconf import DictConfig
 from openai import OpenAI
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 from tenacity import retry, stop_after_attempt, wait_exponential
-import botocore
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,7 @@ class AssistantChatBedrock(ChatBedrock, BaseModel):
             "completion_tokens": self.output_,
         }
 
-    @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=10))
+    @retry(stop=stop_after_attempt(50), wait=wait_exponential(multiplier=1, min=4, max=10))
     def invoke(self, *args, **kwargs):
         input_: List[BaseMessage] = args[0]
         try:
@@ -129,7 +129,9 @@ class LLMFactory:
         if provider == "openai":
             return cls.get_openai_models()
         elif provider == "bedrock":
-            return cls.get_bedrock_models()
+            model_names = cls.get_bedrock_models()
+            assert len(model_names), "Check your bedrock keys"
+            return model_names
         else:
             raise ValueError(f"Invalid LLM provider: {provider}")
     
@@ -165,7 +167,7 @@ class LLMFactory:
                 "temperature": config.temperature,
                 "max_tokens": config.max_tokens,
             },
-            region_name=os.getenv("AWS_REGION"),
+            region_name="us-west-2",
             verbose=config.verbose,
         )
 

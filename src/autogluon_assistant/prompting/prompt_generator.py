@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from autogluon.tabular import TabularDataset
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
@@ -73,7 +73,7 @@ class DescriptionFileNamePromptGenerator(PromptGenerator):
         super().__init__()
         self.filenames = filenames
 
-    def read_file_safely(self, filename: Path) -> str | None:
+    def read_file_safely(self, filename: Path) -> Union[str, None]:
         try:
             return filename.read_text()
         except UnicodeDecodeError:
