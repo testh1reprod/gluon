@@ -50,7 +50,7 @@ def glove_run_one_proc(model, data):
 class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
     def __init__(self, model_name, **kwargs) -> None:
         self.model_name = model_name
-        if 0: #torch.cuda.is_available():
+        if torch.cuda.is_available():
             try:
                 self.model = SentenceTransformer(self.model_name)
             except:
@@ -76,7 +76,7 @@ class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
             ), "The columns of the training set does not matach the columns of the test set"
         
         for series_name in train_X.columns.values.tolist():
-            if 0: #torch.cuda.is_available():
+            if torch.cuda.is_available():
                 transformed_train_column = huggingface_run(self.model, np.transpose(train_X[series_name].to_numpy()).T)
                 transformed_test_column = huggingface_run(self.model, np.transpose(test_X[series_name].to_numpy()).T)
             else:
