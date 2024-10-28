@@ -58,8 +58,8 @@ class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
             
         else:
             logger.warning(f"Cuda is not found. For an optimized user experience, we switched to the glove embeddings")
-            self.model_name = "glove-twitter"
-            self.dim = 100
+            self.model_name = "glove-wiki-gigaword"
+            self.dim = 300
             self.max_num_procs = 16
             try:
                 self.model = api.load(f"{self.model_name}-{self.dim}")
@@ -91,5 +91,5 @@ class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
                 ]
                 train_X = pd.concat([train_X.drop([series_name], axis=1), transformed_train_column], axis=1)
                 test_X = pd.concat([test_X.drop([series_name], axis=1), transformed_test_column], axis=1)
-                
+
         return train_X, test_X
