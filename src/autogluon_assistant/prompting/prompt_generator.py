@@ -14,7 +14,7 @@ from ..constants import (
     NO_ID_COLUMN_IDENTIFIED,
     PROBLEM_TYPES,
 )
-from ..utils import is_text_file
+from ..utils import is_text_file, load_pd_quietly
 
 
 class PromptGenerator(ABC):
@@ -112,14 +112,14 @@ class DataFileNamePromptGenerator(PromptGenerator):
         file_content_prompts = "# Available Data Files And Columns in The File\n\n"
         for filename in self.filenames:
             try:
-                content = TabularDataset(filename)
+                content = load_pd_quietly(filename)
                 truncated_columns = content.columns[:10].tolist()
                 if len(content.columns) > 10:
                     truncated_columns.append("...")
                 truncated_columns_str = ", ".join(truncated_columns)
                 file_content_prompts += f"File:\n\n{filename}"  # \n\nTruncated Columns:\n{truncated_columns_str}\n\n"
             except Exception as e:
-                print(e)
+                print(f"Failed to load data as a pandas Dataframe in {filename} with following error (please ignore this if it is not supposed to be a data file): {e}")
                 continue
 
         file_content_prompts += f"Based on the data description, what are the training, test, and output data? The output file may contain keywords such as benchmark, submission, or output. Please return the full path of the data files as provided, and response with the value {NO_FILE_IDENTIFIED} if there's no such File."

@@ -41,33 +41,19 @@ class TaskInference:
         self.prompt_generator = None
         self.valid_values = None
 
-    def log_value(self, key: str, value: Any, max_width: int = 80, indent: int = 4) -> None:
-        """
-        Log a key-value pair with formatted output for better readability.
-        
-        Args:
-            key: The key/field name to log
-            value: The value to log (can be None or any type)
-            max_width: Maximum width for wrapped text (default: 80 characters)
-            indent: Number of spaces to indent wrapped lines (default: 4)
-        """
-        if value is not None and value:
-            # Convert value to string and wrap long text
-            value_str = str(value)
-            if len(value_str) > max_width:
-                # Wrap the text, maintaining indentation
-                wrapped_value = textwrap.fill(
-                    value_str,
-                    width=max_width,
-                    initial_indent=" " * indent,
-                    subsequent_indent=" " * indent
-                )
-                logger.info(f"AGA has identified the {key} of the task:\n{wrapped_value}")
-            else:
-                # For short values, log on a single line
-                logger.info(f"AGA has identified the {key} of the task: {value_str}")
-        else:
+    def log_value(self, key: str, value: Any, max_width: int = 160) -> None:
+        """Logs a key-value pair with formatted output."""
+        if not value:
             logger.info(f"AGA failed to identify the {key} of the task, it is set to None.")
+            return
+
+        prefix = f"AGA has identified the {key} of the task: "
+        value_str = str(value).replace('\n', '\\n')
+        
+        if len(prefix) + len(value_str) > max_width:
+            value_str = value_str[:max_width - len(prefix) - 3] + "..."
+        
+        logger.info(f"{prefix}{value_str}")
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
         self.initialize_task(task)

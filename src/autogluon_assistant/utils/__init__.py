@@ -1,1 +1,1 @@
-from .files import is_text_file
+from .files import is_text_file, load_pd_quietly
