@@ -1,10 +1,11 @@
 import difflib
 import logging
 import textwrap
-from typing import Dict, List, Any  # Added Union for type hinting
+from typing import Any, Dict, List  # Added Union for type hinting
 
 from autogluon.core.utils.utils import infer_problem_type
 from langchain_core.exceptions import OutputParserException  # Updated import
+
 from autogluon_assistant.prompting import (
     DataFileNamePromptGenerator,
     DescriptionFileNamePromptGenerator,
@@ -16,6 +17,7 @@ from autogluon_assistant.prompting import (
     TrainIDColumnPromptGenerator,
 )
 from autogluon_assistant.task import TabularPredictionTask
+
 from ..constants import (
     CLASSIFICATION_PROBLEM_TYPES,
     METRICS_BY_PROBLEM_TYPE,
@@ -48,11 +50,11 @@ class TaskInference:
             return
 
         prefix = f"AGA has identified the {key} of the task: "
-        value_str = str(value).replace('\n', '\\n')
-        
+        value_str = str(value).replace("\n", "\\n")
+
         if len(prefix) + len(value_str) > max_width:
-            value_str = value_str[:max_width - len(prefix) - 3] + "..."
-        
+            value_str = value_str[: max_width - len(prefix) - 3] + "..."
+
         logger.info(f"{prefix}{value_str}")
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:

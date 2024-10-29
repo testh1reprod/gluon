@@ -10,8 +10,8 @@ from autogluon.core.metrics import make_scorer
 from autogluon.tabular import TabularDataset, TabularPredictor
 from sklearn.metrics import mean_squared_log_error
 
-from .task import TabularPredictionTask
 from .constants import BINARY, CLASSIFICATION_PROBA_EVAL_METRIC, MULTICLASS
+from .task import TabularPredictionTask
 
 logger = logging.getLogger(__name__)
 

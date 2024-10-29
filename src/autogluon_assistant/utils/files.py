@@ -19,10 +19,10 @@ def suppress_tabular_logs():
     # Save the current logging level
     logger = logging.getLogger()
     old_level = logger.getEffectiveLevel()
-    
+
     # Temporarily increase logging level to suppress INFO logs
     logger.setLevel(logging.WARNING)
-    
+
     # Redirect stdout to capture any print statements
     temp_stdout = io.StringIO()
     with contextlib.redirect_stdout(temp_stdout):

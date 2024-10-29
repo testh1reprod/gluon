@@ -7,7 +7,6 @@ from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from .utils import get_outer_columns
 from ..constants import (
     METRICS_DESCRIPTION,
     NO_FILE_IDENTIFIED,
@@ -15,6 +14,7 @@ from ..constants import (
     PROBLEM_TYPES,
 )
 from ..utils import is_text_file, load_pd_quietly
+from .utils import get_outer_columns
 
 
 class PromptGenerator(ABC):
@@ -48,7 +48,7 @@ class PromptGenerator(ABC):
             "1. Return only valid JSON. No extra explanations, text, or comments.\n"
             "2. Ensure that the output can be parsed by a JSON parser directly.\n"
             "3. Do not include any non-JSON text or formatting outside the JSON object."
-            "4. An example is \{\"<provided_field>\": \"<correct_value_for_the_field>\"\}"
+            '4. An example is \{"<provided_field>": "<correct_value_for_the_field>"\}'
         )
 
     def generate_chat_prompt(self):
@@ -119,7 +119,9 @@ class DataFileNamePromptGenerator(PromptGenerator):
                 truncated_columns_str = ", ".join(truncated_columns)
                 file_content_prompts += f"File:\n\n{filename}"  # \n\nTruncated Columns:\n{truncated_columns_str}\n\n"
             except Exception as e:
-                print(f"Failed to load data as a pandas Dataframe in {filename} with following error (please ignore this if it is not supposed to be a data file): {e}")
+                print(
+                    f"Failed to load data as a pandas Dataframe in {filename} with following error (please ignore this if it is not supposed to be a data file): {e}"
+                )
                 continue
 
         file_content_prompts += f"Based on the data description, what are the training, test, and output data? The output file may contain keywords such as benchmark, submission, or output. Please return the full path of the data files as provided, and response with the value {NO_FILE_IDENTIFIED} if there's no such File."

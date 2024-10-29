@@ -134,7 +134,7 @@ class LLMFactory:
             return model_names
         else:
             raise ValueError(f"Invalid LLM provider: {provider}")
-    
+
     @classmethod
     def get_valid_providers(cls):
         return ["openai", "bedrock"]
@@ -145,7 +145,7 @@ class LLMFactory:
             api_key = os.environ[config.api_key_location]
         else:
             raise Exception("OpenAI API env variable not set")
-        
+
         logger.info(f"AGA is using model {config.model} from OpenAI to assist you with the task.")
 
         return AssistantChatOpenAI(

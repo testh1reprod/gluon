@@ -3,12 +3,12 @@ import os
 from collections import namedtuple
 from typing import Tuple
 
+import gensim.downloader as api
 import numpy as np
 import pandas as pd
 import torch
-from sentence_transformers import SentenceTransformer
-import gensim.downloader as api
 from gensim.utils import tokenize
+from sentence_transformers import SentenceTransformer
 
 from .base import BaseFeatureTransformer
 
@@ -44,7 +44,7 @@ def glove_run_one_proc(model, data):
             embeddings.append(embed)
     else:
         return np.zeros(len(data))
-    return np.stack(embeddings).astype('float32') 
+    return np.stack(embeddings).astype("float32")
 
 
 class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
@@ -55,7 +55,7 @@ class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
                 self.model = SentenceTransformer(self.model_name)
             except:
                 logger.warning(f"No model {self.model_name} is found.")
-            
+
         else:
             logger.warning(f"Cuda is not found. For an optimized user experience, we switched to the glove embeddings")
             self.model_name = "glove-wiki-gigaword"
@@ -72,16 +72,20 @@ class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
 
     def _transform_dataframes(self, train_X: pd.DataFrame, test_X: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         assert (
-                train_X.columns.values.tolist() == test_X.columns.values.tolist()
-            ), "The columns of the training set does not matach the columns of the test set"
-        
+            train_X.columns.values.tolist() == test_X.columns.values.tolist()
+        ), "The columns of the training set does not matach the columns of the test set"
+
         for series_name in train_X.columns.values.tolist():
             if torch.cuda.is_available():
                 transformed_train_column = huggingface_run(self.model, np.transpose(train_X[series_name].to_numpy()).T)
                 transformed_test_column = huggingface_run(self.model, np.transpose(test_X[series_name].to_numpy()).T)
             else:
-                transformed_train_column = glove_run_one_proc(self.model, np.transpose(train_X[series_name].to_numpy()).T)
-                transformed_test_column = glove_run_one_proc(self.model, np.transpose(test_X[series_name].to_numpy()).T)
+                transformed_train_column = glove_run_one_proc(
+                    self.model, np.transpose(train_X[series_name].to_numpy()).T
+                )
+                transformed_test_column = glove_run_one_proc(
+                    self.model, np.transpose(test_X[series_name].to_numpy()).T
+                )
 
             if transformed_train_column.any() and transformed_test_column.any():
                 transformed_train_column = pd.DataFrame(transformed_train_column)
