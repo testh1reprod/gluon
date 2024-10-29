@@ -6,11 +6,7 @@ from typing import Any, Dict, Union
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 
-from autogluon_assistant.llm import (
-    AssistantChatBedrock,
-    AssistantChatOpenAI,
-    LLMFactory,
-)
+from autogluon_assistant.llm import AssistantChatBedrock, AssistantChatOpenAI, LLMFactory
 
 from .predictor import AutogluonTabularPredictor
 from .task import TabularPredictionTask
@@ -65,6 +61,7 @@ class TabularPredictionAssistant:
         raise Exception(str(exception), stage)
 
     def inference_task(self, task: TabularPredictionTask) -> TabularPredictionTask:
+        logger.info("Task understanding starts!")
         task_inference_preprocessors = [
             DescriptionFileNameInference,
             DataFileNameInference,
@@ -91,14 +88,17 @@ class TabularPredictionAssistant:
             except Exception as e:
                 self.handle_exception(f"Task inference preprocessing: {preprocessor_class}", e)
 
+        logger.info(f"###LLM Inference Results:###\n{task.metadata}")
         logger.info(f"###Total number of prompt tokens:###\n{self.llm.input_}")
         logger.info(f"###Total number of completion tokens:###\n{self.llm.output_}")
+        logger.info("Task understanding completes!")
         return task
 
     def preprocess_task(self, task: TabularPredictionTask) -> TabularPredictionTask:
         # instantiate and run task preprocessors, which infer the problem type, important filenames
         # and columns as well as the feature extractors
         task = self.inference_task(task)
+        logger.info("Automatic feature engineering starts!")
         if self.feature_transformers_config:
             if not ("OPENAI_API_KEY" in os.environ):
                 logger.info("No OpenAI API keys found, therefore, skip CAAFE")
@@ -118,7 +118,7 @@ class TabularPredictionAssistant:
                         task = fe_transformer.fit_transform(task)
                 except Exception as e:
                     self.handle_exception(f"Task preprocessing: {fe_transformer.name}", e)
-
+        logger.info("Automatic feature engineering completes!")
         return task
 
     def fit_predictor(self, task: TabularPredictionTask):

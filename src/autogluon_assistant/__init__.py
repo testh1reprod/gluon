@@ -119,9 +119,13 @@ def run_assistant(
     rprint("[green]Task description:[/green]")
     rprint(task_description)
 
+    rprint("Predictor fit starts!")
+
     assistant.fit_predictor(task)
 
     rprint("[green]Predictor fit complete![/green]")
+
+    rprint("Prediction starts!")
 
     predictions = assistant.predict(task)
 
