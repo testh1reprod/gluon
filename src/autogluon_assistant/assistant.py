@@ -6,7 +6,11 @@ from typing import Any, Dict, Union
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 
-from autogluon_assistant.llm import AssistantChatBedrock, AssistantChatOpenAI, LLMFactory
+from autogluon_assistant.llm import (
+    AssistantChatBedrock,
+    AssistantChatOpenAI,
+    LLMFactory,
+)
 
 from .predictor import AutogluonTabularPredictor
 from .task import TabularPredictionTask
@@ -88,7 +92,6 @@ class TabularPredictionAssistant:
             except Exception as e:
                 self.handle_exception(f"Task inference preprocessing: {preprocessor_class}", e)
 
-        logger.info(f"###LLM Inference Results:###\n{task.metadata}")
         logger.info(f"###Total number of prompt tokens:###\n{self.llm.input_}")
         logger.info(f"###Total number of completion tokens:###\n{self.llm.output_}")
         logger.info("Task understanding completes!")
