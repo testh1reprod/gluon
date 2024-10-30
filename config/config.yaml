@@ -10,7 +10,7 @@ feature_transformers:
   - _target_: autogluon_assistant.transformer.CAAFETransformer
     eval_model: lightgbm
     llm_model: gpt-4o-2024-08-06
-    num_iterations: 2
+    num_iterations: 5
     optimization_metric: roc
   - _target_: autogluon_assistant.transformer.OpenFETransformer
     n_jobs: 1
