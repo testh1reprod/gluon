@@ -22,14 +22,14 @@ autogluon:
   predictor_fit_kwargs:
     verbosity: 2
     presets: best_quality
-    time_limit: 14400
+    time_limit: 60
     dynamic_stacking: True
     num_stack_levels: 2
 llm:
   # Note: bedrock is only supported in limited AWS regions
   provider: bedrock
   api_key_location: BEDROCK_API_KEY
-  model: "anthropic.claude-3-5-sonnet-20240620-v1:0"
+  model: "anthropic.claude-3-5-sonnet-20241022-v2:0" #"anthropic.claude-3-5-sonnet-20240620-v1:0"
   # provider: openai
   # api_key_location: OPENAI_API_KEY
   # model: gpt-4o-2024-08-06
