@@ -9,8 +9,8 @@ save_artifacts:
 feature_transformers:
   - _target_: autogluon_assistant.transformer.CAAFETransformer
     eval_model: lightgbm
-    llm_model: gpt-3.5-turbo
-    num_iterations: 2
+    llm_model: gpt-4o-2024-08-06
+    num_iterations: 5
     optimization_metric: roc
   - _target_: autogluon_assistant.transformer.OpenFETransformer
     n_jobs: 1
@@ -23,8 +23,9 @@ autogluon:
     verbosity: 2
     presets: best_quality
     time_limit: 14400
-    dynamic_stacking: False
-    num_stack_levels: 0
+    dynamic_stacking: True
+    num_bag_folds: 5
+    num_stack_levels: 2
 llm:
   # Note: bedrock is only supported in limited AWS regions
   provider: bedrock
