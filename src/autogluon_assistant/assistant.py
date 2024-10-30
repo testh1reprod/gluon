@@ -101,7 +101,7 @@ class TabularPredictionAssistant:
         # instantiate and run task preprocessors, which infer the problem type, important filenames
         # and columns as well as the feature extractors
         task = self.inference_task(task)
-        logger.info("Automatic feature engineering starts!")
+        logger.info("Automatic feature generation starts!")
         if self.feature_transformers_config:
             if not ("OPENAI_API_KEY" in os.environ):
                 logger.info("No OpenAI API keys found, therefore, skip CAAFE")
@@ -121,7 +121,7 @@ class TabularPredictionAssistant:
                         task = fe_transformer.fit_transform(task)
                 except Exception as e:
                     self.handle_exception(f"Task preprocessing: {fe_transformer.name}", e)
-        logger.info("Automatic feature engineering completes!")
+        logger.info("Automatic feature generation completes!")
         return task
 
     def fit_predictor(self, task: TabularPredictionTask):
