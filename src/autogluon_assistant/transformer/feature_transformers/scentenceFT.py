@@ -57,7 +57,7 @@ class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
                 logger.warning(f"No model {self.model_name} is found.")
 
         else:
-            logger.warning(f"Cuda is not found. For an optimized user experience, we switched to the glove embeddings")
+            logger.warning("CUDA is not found. For an optimized user experience, we switched to the glove embeddings")
             self.model_name = "glove-wiki-gigaword"
             self.dim = 300
             self.max_num_procs = 16

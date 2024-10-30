@@ -1,18 +1,12 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Union
 
-from autogluon.tabular import TabularDataset
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from ..constants import (
-    METRICS_DESCRIPTION,
-    NO_FILE_IDENTIFIED,
-    NO_ID_COLUMN_IDENTIFIED,
-    PROBLEM_TYPES,
-)
+from ..constants import METRICS_DESCRIPTION, NO_FILE_IDENTIFIED, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES
 from ..utils import is_text_file, load_pd_quietly
 from .utils import get_outer_columns
 
@@ -116,7 +110,7 @@ class DataFileNamePromptGenerator(PromptGenerator):
                 truncated_columns = content.columns[:10].tolist()
                 if len(content.columns) > 10:
                     truncated_columns.append("...")
-                truncated_columns_str = ", ".join(truncated_columns)
+                # truncated_columns_str = ", ".join(truncated_columns)
                 file_content_prompts += f"File:\n\n{filename}"  # \n\nTruncated Columns:\n{truncated_columns_str}\n\n"
             except Exception as e:
                 print(
