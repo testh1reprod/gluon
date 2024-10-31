@@ -28,6 +28,7 @@ class CAAFETransformer(BaseFeatureTransformer):
         # Set up credentials if using OpenAI
         if llm_provider == "openai":
             import openai
+
             openai.api_key = kwargs.get("openai_api_key", os.environ.get("OPENAI_API_KEY"))
 
         pd.set_option("future.no_silent_downcasting", True)
@@ -42,9 +43,11 @@ class CAAFETransformer(BaseFeatureTransformer):
         # Initialize the base classifier
         if self.eval_model == "tab_pfn":
             from tabpfn import TabPFNClassifier
+
             clf_no_feat_eng = TabPFNClassifier(device="cpu", N_ensemble_configurations=16)
         elif self.eval_model == "lightgbm":
             from lightgbm import LGBMClassifier
+
             clf_no_feat_eng = LGBMClassifier()
         else:
             raise ValueError(f"Unsupported CAAFE eval model: {self.eval_model}")
@@ -57,14 +60,10 @@ class CAAFETransformer(BaseFeatureTransformer):
             iterations=self.iterations,
             region_name=self.region_name,
             display_method="print",
-            **kwargs  # Pass through any additional provider-specific kwargs
+            **kwargs,  # Pass through any additional provider-specific kwargs
         )
 
-        self.metadata = {
-            "transformer": "CAAFE",
-            "llm_provider": llm_provider,
-            "llm_model": llm_model
-        }
+        self.metadata = {"transformer": "CAAFE", "llm_provider": llm_provider, "llm_model": llm_model}
 
     def _fit_dataframes(
         self,
