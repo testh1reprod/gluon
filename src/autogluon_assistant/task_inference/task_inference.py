@@ -46,16 +46,19 @@ class TaskInference:
     def log_value(self, key: str, value: Any, max_width: int = 1600) -> None:
         """Logs a key-value pair with formatted output."""
         if not value:
-            logger.info(f"AG-A failed to identify the {key} of the task, it is set to None.")
+            logger.info(f"Failed to identify the {key} of the task, it is set to None.")
             return
 
-        prefix = f"AG-A has identified the {key} of the task: "
+        prefix = key # f"Identified the {key} of the task: "
         value_str = str(value).replace("\n", "\\n")
 
         if len(prefix) + len(value_str) > max_width:
             value_str = value_str[: max_width - len(prefix) - 3] + "..."
+        
+        bold_start = "\033[1m"
+        bold_end = "\033[0m"
 
-        logger.info(f"{prefix}{value_str}")
+        logger.info(f"{bold_start}{prefix}{bold_end}: {value_str}")
 
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
         self.initialize_task(task)
