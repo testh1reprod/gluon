@@ -46,23 +46,25 @@ Important: Free-tier OpenAI accounts may be subject to rate limits, which could 
 
 
 ## Usage
-
-Before launching AutoGluon Assistant (AG-A), ensure that the data files (dataset csv files, the dataset descriptions and task descriptions) are placed in the correct structure within the data directory. This setup is necessary for AG-A to run successfully. Below is a demo using a toy dataset from the Titanic Kaggle Competition.
-
+Before launching AutoGluon Assistant (AG-A), prepare your data files in the following structure. Here's an example using a dataset from the Titanic Kaggle Competition:
 ```
 .
-├── config                            # Configuration files directory
-│   └── [CONFIG_FILE].yaml            # Your configuration file
+├── config # Configuration files directory
+│ └── [CONFIG_FILE].yaml # Your configuration file
 │
-└── data                              # Data files directory
-    ├── competition_files.txt         # Contains the names of all the files, for this case e.g. train.csv test.csv sample_submission.csv
-    ├── data.txt                      # Contains the main data description
-    ├── evaluation.txt                # Describes the evaluation metric to be used
-    ├── sample_submission.csv         # Sample output template
-    ├── test.csv                      # Test dataset
-    └── train.csv                     # Training dataset
-
+└── data # Data files directory
+    ├── train.[ext] # Training dataset (required)
+    ├── test.[ext]  # Test dataset (required)
+    └── description.txt # Dataset and task description (recommended)
 ```
+Note:
+- The training and test files can be in any tabular data format (e.g., csv, parquet, xlsx)
+- While there are no strict naming requirements, we recommend using clear, descriptive filenames
+- The description file is optional but recommended for better model selection and optimization. It can include:
+  - Dataset description
+  - Problem context
+  - Evaluation metrics
+  - Any other relevant information
 
 Now you can launch the AutoGluon Assistant run using the following command:
 ```
