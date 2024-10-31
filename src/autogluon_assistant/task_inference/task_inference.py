@@ -43,7 +43,7 @@ class TaskInference:
         self.prompt_generator = None
         self.valid_values = None
 
-    def log_value(self, key: str, value: Any, max_width: int = 160) -> None:
+    def log_value(self, key: str, value: Any, max_width: int = 1600) -> None:
         """Logs a key-value pair with formatted output."""
         if not value:
             logger.info(f"AGA failed to identify the {key} of the task, it is set to None.")
