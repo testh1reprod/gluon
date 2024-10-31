@@ -65,7 +65,10 @@ class BaseFeatureTransformer(BaseTransformer):
                 transformed_train_data = pd.concat(
                     [transformed_train_data, task.train_data[task.test_id_column]], axis=1
                 )
-            transformed_test_data = pd.concat([test_x, task.test_data[task.test_id_column]], axis=1)
+            if task.test_id_column in task.test_data.columns:
+                transformed_test_data = pd.concat([test_x, task.test_data[task.test_id_column]], axis=1)
+            else:
+                transformed_test_data = test_x
 
             task = copy.deepcopy(task)
             task.train_data = transformed_train_data
