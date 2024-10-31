@@ -21,7 +21,7 @@ class BaseFeatureTransformer(BaseTransformer):
     def fit(self, task: TabularPredictionTask) -> "BaseFeatureTransformer":
         try:
             train_x = task.train_data.drop(
-                columns=task.columns_in_train_but_not_test + [task.train_id_column],
+                columns=task.columns_in_train_but_not_test + [task.test_id_column],
                 errors="ignore",
             )
             train_y = task.train_data[task.label_column]
@@ -47,28 +47,21 @@ class BaseFeatureTransformer(BaseTransformer):
     def transform(self, task: TabularPredictionTask) -> TabularPredictionTask:
         try:
             train_x = task.train_data.drop(
-                columns=task.columns_in_train_but_not_test + [task.train_id_column],
+                columns=task.columns_in_train_but_not_test + [task.test_id_column],
                 errors="ignore",
             )
             train_y = task.train_data[task.label_column]
-            if task.test_id_column in task.test_data.columns:
-                # Skip if test_id_column is not found
-                test_x = task.test_data.drop(columns=[task.test_id_column])
-            else:
-                test_x = task.test_data
+            test_x = task.test_data.drop(columns=[task.test_id_column])
 
             train_x, test_x = self._transform_dataframes(train_X=train_x, test_X=test_x)
 
             # add back id and label columns
             transformed_train_data = pd.concat([train_x, train_y.rename(task.label_column)], axis=1)
-            if task.train_id_column in task.train_data.columns:
+            if task.test_id_column in task.train_data.columns:
                 transformed_train_data = pd.concat(
-                    [transformed_train_data, task.train_data[task.train_id_column]], axis=1
+                    [transformed_train_data, task.train_data[task.test_id_column]], axis=1
                 )
-            if task.test_id_column in task.test_data.columns:
-                transformed_test_data = pd.concat([test_x, task.test_data[task.test_id_column]], axis=1)
-            else:
-                transformed_test_data = test_x
+            transformed_test_data = pd.concat([test_x, task.test_data[task.test_id_column]], axis=1)
 
             task = copy.deepcopy(task)
             task.train_data = transformed_train_data
