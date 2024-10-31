@@ -1,7 +1,7 @@
 import logging
 import os
 import pprint
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import boto3
 import botocore
@@ -172,7 +172,7 @@ class LLMFactory:
         )
 
     @classmethod
-    def get_chat_model(cls, config: DictConfig) -> AssistantChatOpenAI | AssistantChatBedrock:
+    def get_chat_model(cls, config: DictConfig) -> Union[AssistantChatOpenAI, AssistantChatBedrock]:
         valid_providers = cls.get_valid_providers()
         assert config.provider in valid_providers, f"{config.provider} is not a valid provider in: {valid_providers}"
 
