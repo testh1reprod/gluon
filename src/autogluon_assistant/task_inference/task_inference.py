@@ -46,7 +46,7 @@ class TaskInference:
     def log_value(self, key: str, value: Any, max_width: int = 1600) -> None:
         """Logs a key-value pair with formatted output."""
         if not value:
-            logger.info(f"Failed to identify the {key} of the task, it is set to None.")
+            logger.info(f"WARNING: Failed to identify the {key} of the task, it is set to None.")
             return
 
         prefix = key # f"Identified the {key} of the task: "
@@ -158,6 +158,7 @@ class DescriptionFileNameInference(TaskInference):
         descriptions_read = self._read_descriptions(parser_output)
         if descriptions_read:
             task.metadata["description"] = descriptions_read
+        self.log_value("description", descriptions_read)
         return task
 
 
