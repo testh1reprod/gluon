@@ -69,6 +69,7 @@ class BaseFeatureTransformer(BaseTransformer):
                 # from test set before feature transformation
                 label_column_avaialable_in_test_set = True
                 test_x = test_x.drop(columns=[task.label_column])
+                test_y = task.test_data[task.label_column]
 
             train_x, test_x = self._transform_dataframes(train_X=train_x, test_X=test_x)
 
