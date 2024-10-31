@@ -91,9 +91,12 @@ class TabularPredictionAssistant:
                     task = preprocessor.transform(task)
             except Exception as e:
                 self.handle_exception(f"Task inference preprocessing: {preprocessor_class}", e)
+        
+        bold_start = "\033[1m"
+        bold_end = "\033[0m"
 
-        logger.info(f"###Total number of prompt tokens:###\n{self.llm.input_}")
-        logger.info(f"###Total number of completion tokens:###\n{self.llm.output_}")
+        logger.info(f"{bold_start}Total number of prompt tokens:{bold_end} {self.llm.input_}")
+        logger.info(f"{bold_start}Total number of completion tokens:{bold_end} {self.llm.output_}")
         logger.info("Task understanding completes!")
         return task
 

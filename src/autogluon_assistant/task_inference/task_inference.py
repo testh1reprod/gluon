@@ -158,7 +158,6 @@ class DescriptionFileNameInference(TaskInference):
         descriptions_read = self._read_descriptions(parser_output)
         if descriptions_read:
             task.metadata["description"] = descriptions_read
-        self.log_value("description", descriptions_read)
         return task
 
 
