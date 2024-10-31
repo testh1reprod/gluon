@@ -108,17 +108,6 @@ def run_assistant(
     assistant = TabularPredictionAssistant(config)
     task = assistant.preprocess_task(task)
 
-    rprint("[green]Task preprocessing complete![/green]")
-    task_description = task.describe()
-
-    for data_key in ["train_data", "test_data", "sample_submission_data"]:
-        if data_key in task_description:
-            rprint(f"{data_key}:")
-            rprint(pd.DataFrame(task_description.pop(data_key, {})).T)
-
-    rprint("[green]Task description:[/green]")
-    rprint(task_description)
-
     rprint("Predictor fit starts!")
 
     assistant.fit_predictor(task)
