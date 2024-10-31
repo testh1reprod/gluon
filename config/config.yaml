@@ -9,7 +9,10 @@ save_artifacts:
 feature_transformers:
   - _target_: autogluon_assistant.transformer.CAAFETransformer
     eval_model: lightgbm
-    llm_model: gpt-4o-2024-08-06
+    llm_provider: bedrock
+    llm_model: "anthropic.claude-3-5-sonnet-20241022-v2:0"
+    # llm_provider: openai
+    # llm_model: gpt-4o-2024-08-06
     num_iterations: 5
     optimization_metric: roc
   - _target_: autogluon_assistant.transformer.OpenFETransformer
