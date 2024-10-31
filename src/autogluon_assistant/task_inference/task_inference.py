@@ -48,12 +48,12 @@ class TaskInference:
             logger.info(f"WARNING: Failed to identify the {key} of the task, it is set to None.")
             return
 
-        prefix = key # f"Identified the {key} of the task: "
+        prefix = key  # f"Identified the {key} of the task: "
         value_str = str(value).replace("\n", "\\n")
 
         if len(prefix) + len(value_str) > max_width:
             value_str = value_str[: max_width - len(prefix) - 3] + "..."
-        
+
         bold_start = "\033[1m"
         bold_end = "\033[0m"
 

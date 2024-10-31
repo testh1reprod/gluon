@@ -87,7 +87,7 @@ class TabularPredictionAssistant:
                     task = preprocessor.transform(task)
             except Exception as e:
                 self.handle_exception(f"Task inference preprocessing: {preprocessor_class}", e)
-        
+
         bold_start = "\033[1m"
         bold_end = "\033[0m"
 
