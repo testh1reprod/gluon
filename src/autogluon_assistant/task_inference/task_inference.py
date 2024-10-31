@@ -46,10 +46,10 @@ class TaskInference:
     def log_value(self, key: str, value: Any, max_width: int = 1600) -> None:
         """Logs a key-value pair with formatted output."""
         if not value:
-            logger.info(f"AGA failed to identify the {key} of the task, it is set to None.")
+            logger.info(f"AG-A failed to identify the {key} of the task, it is set to None.")
             return
 
-        prefix = f"AGA has identified the {key} of the task: "
+        prefix = f"AG-A has identified the {key} of the task: "
         value_str = str(value).replace("\n", "\\n")
 
         if len(prefix) + len(value_str) > max_width:
