@@ -51,7 +51,9 @@ class BaseFeatureTransformer(BaseTransformer):
                 errors="ignore",
             )
             train_y = task.train_data[task.label_column]
-            test_x = task.test_data.drop(columns=[task.test_id_column])
+            if task.test_id_column in task.test_data.columns:
+                # Skip if test_id_column is not found
+                test_x = task.test_data.drop(columns=[task.test_id_column])
 
             train_x, test_x = self._transform_dataframes(train_X=train_x, test_X=test_x)
 
