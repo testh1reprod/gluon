@@ -113,7 +113,7 @@ class LLMFactory:
     @staticmethod
     def get_bedrock_models() -> List[str]:
         try:
-            bedrock = boto3.client("bedrock")
+            bedrock = boto3.client("bedrock", region_name="us-west-2")
             response = bedrock.list_foundation_models()
             return [
                 model["modelId"]
