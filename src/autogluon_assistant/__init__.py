@@ -108,13 +108,13 @@ def run_assistant(
     assistant = TabularPredictionAssistant(config)
     task = assistant.preprocess_task(task)
 
-    rprint("Predictor fit starts!")
+    rprint("Model training starts...")
 
     assistant.fit_predictor(task)
 
-    rprint("[green]Predictor fit complete![/green]")
+    rprint("[green]Model training complete![/green]")
 
-    rprint("Prediction starts!")
+    rprint("Prediction starts...")
 
     predictions = assistant.predict(task)
 
