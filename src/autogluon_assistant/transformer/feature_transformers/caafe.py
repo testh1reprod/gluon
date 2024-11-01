@@ -11,6 +11,7 @@ from .base import BaseFeatureTransformer
 logger = logging.getLogger(__name__)
 warnings.filterwarnings(action="ignore")
 
+
 class CAAFETransformer(BaseFeatureTransformer):
 
     identifier = "caafe"
