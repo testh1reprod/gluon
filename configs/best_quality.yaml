@@ -5,7 +5,6 @@ save_artifacts:
   enabled: False
   append_timestamp: True
   path: "./aga-artifacts"
-  # path: "s3://autogluon-assistant-agts/outputs/<run_id>/aga-artifacts/"
 feature_transformers:
   - _target_: autogluon_assistant.transformer.CAAFETransformer
     eval_model: lightgbm
@@ -24,8 +23,8 @@ autogluon:
   predictor_init_kwargs: {}
   predictor_fit_kwargs:
     verbosity: 2
-    presets: best_quality
-    time_limit: 60
+    presets: medium_quality
+    time_limit: 120
     dynamic_stacking: True
     num_bag_folds: 5
     num_stack_levels: 2
@@ -33,11 +32,10 @@ llm:
   # Note: bedrock is only supported in limited AWS regions
   provider: bedrock
   api_key_location: BEDROCK_API_KEY
-  model: "anthropic.claude-3-5-sonnet-20241022-v2:0" #"anthropic.claude-3-5-sonnet-20240620-v1:0"
+  model: "anthropic.claude-3-5-sonnet-20241022-v2:0"
   # provider: openai
   # api_key_location: OPENAI_API_KEY
   # model: gpt-4o-2024-08-06
-  # model: gpt-3.5-turbo
   max_tokens: 512
   proxy_url: null
   temperature: 0

@@ -4,14 +4,18 @@ from typing import Any, Dict, List, Optional
 
 from omegaconf import OmegaConf
 
+from ..constants import CONFIGS
 
-def _get_default_config_path() -> Path:
+
+def _get_default_config_path(
+    presets: str,
+) -> Path:
     """
     Get default config folder under package root
     Returns Path to the config.yaml file
     """
     current_file = Path(__file__).parent.parent.parent.parent.absolute()
-    config_path = current_file / "config" / "config.yaml"
+    config_path = current_file / CONFIGS / f"{presets}.yaml"
 
     if not config_path.exists():
         raise ValueError(f"Config file not found at expected location: {config_path}")
@@ -77,7 +81,9 @@ def apply_overrides(config: Dict[str, Any], overrides: List[str]) -> Dict[str, A
     return OmegaConf.merge(config, override_conf)
 
 
-def load_config(config_path: Optional[str] = None, overrides: Optional[List[str]] = None) -> Dict[str, Any]:
+def load_config(
+    presets: str, config_path: Optional[str] = None, overrides: Optional[List[str]] = None
+) -> Dict[str, Any]:
     """
     Load configuration from yaml file, merging with default config and applying overrides
 
@@ -92,7 +98,7 @@ def load_config(config_path: Optional[str] = None, overrides: Optional[List[str]
         ValueError: If config file not found or invalid
     """
     # Load default config
-    default_config_path = _get_default_config_path()
+    default_config_path = _get_default_config_path(presets)
     logging.info(f"Loading default config from: {default_config_path}")
     config = OmegaConf.load(default_config_path)
 

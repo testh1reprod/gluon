@@ -11,7 +11,7 @@ from rich import print as rprint
 from typing_extensions import Annotated
 
 from .assistant import TabularPredictionAssistant
-from .constants import NO_ID_COLUMN_IDENTIFIED
+from .constants import DEFAULT_QUALITY, NO_ID_COLUMN_IDENTIFIED, PRESETS
 from .task import TabularPredictionTask
 from .utils import load_config
 
@@ -74,6 +74,10 @@ def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFra
 
 def run_assistant(
     task_path: Annotated[str, typer.Argument(help="Directory where task files are included")],
+    presets: Annotated[
+        Optional[str],
+        typer.Option("--presets", "-p", help="Presets"),
+    ] = None,
     config_path: Annotated[
         Optional[str],
         typer.Option("--config-path", "-c", help="Path to the configuration file (config.yaml)"),
@@ -90,9 +94,15 @@ def run_assistant(
 ) -> str:
     logging.info("Starting AutoGluon-Assistant")
 
+    if presets is None or presets not in PRESETS:
+        logging.info(f"Presets is not provided or invalid: {presets}")
+        presets = DEFAULT_QUALITY
+        logging.info(f"Using default presets: {presets}")
+    logging.info(f"Presets: {presets}")
+
     # Load config with all overrides
     try:
-        config = load_config(config_path, config_overrides)
+        config = load_config(presets, config_path, config_overrides)
         logging.info("Successfully loaded config")
     except Exception as e:
         logging.error(f"Failed to load config: {e}")

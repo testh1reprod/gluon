@@ -1,0 +1,29 @@
+infer_eval_metric: True
+detect_and_drop_id_column: False
+task_preprocessors_timeout: 3600
+save_artifacts:
+  enabled: False
+  append_timestamp: True
+  path: "./aga-artifacts"
+feature_transformers:
+autogluon:
+  predictor_init_kwargs: {}
+  predictor_fit_kwargs:
+    verbosity: 2
+    presets: medium_quality
+    time_limit: 600
+    dynamic_stacking: True
+    num_bag_folds: 5
+    num_stack_levels: 2
+llm:
+  # Note: bedrock is only supported in limited AWS regions
+  provider: bedrock
+  api_key_location: BEDROCK_API_KEY
+  model: "anthropic.claude-3-5-sonnet-20241022-v2:0"
+  # provider: openai
+  # api_key_location: OPENAI_API_KEY
+  # model: gpt-4o-2024-08-06
+  max_tokens: 512
+  proxy_url: null
+  temperature: 0
+  verbose: True
