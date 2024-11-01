@@ -72,8 +72,8 @@ Note:
 
 Now you can launch the AutoGluon Assistant run using the following command:
 ```
-autogluon-assistant [NAME_OF_CONFIG_DIR] [NAME_OF_DATA_DIR]
-# e.g. autogluon-assistant ./config ./toy_data
+aga [NAME_OF_DATA_DIR]
+# e.g. aga ./toy_data
 ```
 
 After the run is complete, model predictions on test dataset are saved into the `aga-output-<timestamp>.csv` file which is formatted according to `sample_submission.csv` file.
@@ -85,7 +85,11 @@ the `config_overrides` parameter with Hydra syntax from the command line.
 
 Here’s an example command with some configuration overrides:
 ```
-autogluon-assistant ./config ./data --output-filename my_output.csv --config-overrides "autogluon.predictor_fit_kwargs.time_limit=120 autogluon.predictor_fit_kwargs.verbosity=3 autogluon.predictor_fit_kwargs.presets=medium_quality llm.temperature=0.7 llm.max_tokens=256"
+autogluon-assistant ./data ./config --output-filename my_output.csv --config-overrides "autogluon.predictor_fit_kwargs.time_limit=120 autogluon.predictor_fit_kwargs.verbosity=3 autogluon.predictor_fit_kwargs.presets=medium_quality llm.temperature=0.7 llm.max_tokens=256"
+
+# OR
+
+aga ./data ./config --output-filename my_output.csv --config-overrides "autogluon.predictor_fit_kwargs.time_limit=120 autogluon.predictor_fit_kwargs.verbosity=3 autogluon.predictor_fit_kwargs.presets=medium_quality llm.temperature=0.7 llm.max_tokens=256"
 ```
 
 `autogluon-assistant-tools` provides more functionality and utilities for benchmarking, wrapped around autogluon-assistant. Please check out the [repo](https://github.com/autogluon/autogluon-assistant-tools/) for more details.

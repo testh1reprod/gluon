@@ -78,10 +78,13 @@ def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFra
 
 
 def run_assistant(
-    config_path: Annotated[
-        str, typer.Argument(help="Path to the configuration directory, which includes a config.yaml file")
-    ],
     task_path: Annotated[str, typer.Argument(help="Directory where task files are included")],
+    config_path: Annotated[
+        Optional[str],
+        typer.Option(
+            "--config-path", "-c", help="Path to the configuration directory, which includes a config.yaml file"
+        ),
+    ] = "./config/",
     output_filename: Annotated[Optional[str], typer.Option(help="Output File")] = "",
     config_overrides: Annotated[Optional[str], typer.Option(help="Overrides for the config in Hydra format")] = "",
 ) -> str:

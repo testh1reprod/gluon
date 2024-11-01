@@ -44,12 +44,13 @@ dev = [
 
 [project.scripts]
 autogluon-assistant = "autogluon_assistant:main"
+aga = "autogluon_assistant:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-"autogluon_assistant_tools.config" = ["**/*.yaml"]
+"autogluon_assistant.config" = ["**/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = "tests"
