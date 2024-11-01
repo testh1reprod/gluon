@@ -9,9 +9,10 @@ import pandas as pd
 import torch
 from gensim.utils import tokenize
 from sentence_transformers import SentenceTransformer
-
+import warnings
 from .base import BaseFeatureTransformer
 
+warnings.filterwarnings(action="ignore")
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
