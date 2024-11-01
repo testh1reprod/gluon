@@ -3,10 +3,8 @@ import logging
 import os
 from pathlib import Path
 from typing import Optional
-
 import pandas as pd
 import typer
-from hydra import compose, initialize
 from omegaconf import OmegaConf
 from rich import print as rprint
 from typing_extensions import Annotated
@@ -20,9 +18,52 @@ logging.basicConfig(level=logging.INFO)
 __all__ = ["TabularPredictionAssistant", "TabularPredictionTask"]
 
 
-def _resolve_config_path(path: str):
-    print(Path.cwd())
-    return os.path.relpath(Path(path), Path(__file__).parent.absolute())
+def _get_default_config_path() -> Path:
+    """
+    Get default config folder under package root
+    Returns Path to the config.yaml file
+    """
+    current_file = Path(__file__).resolve()
+    package_root = current_file.parent.parent.parent.absolute()
+    config_path = package_root / "config" / "config.yaml"
+    
+    if not config_path.exists():
+        raise ValueError(f"Config file not found at expected location: {config_path}")
+        
+    return config_path
+
+
+def load_config(config_path: Optional[str] = None) -> dict:
+    """
+    Load configuration from yaml file, merging with default config
+    
+    Args:
+        config_path: Optional path to config file. If provided, will merge with and override default config
+    
+    Returns:
+        Loaded and merged configuration
+    """
+    # Load default config
+    default_config_path = _get_default_config_path()
+    logging.info(f"Loading default config from: {default_config_path}")
+    default_config = OmegaConf.load(default_config_path)
+    
+    # If custom config provided, load and merge it
+    if config_path:
+        custom_config_path = Path(config_path)
+        if not custom_config_path.is_file():
+            raise ValueError(f"Custom config file not found at: {custom_config_path}")
+            
+        logging.info(f"Loading custom config from: {custom_config_path}")
+        custom_config = OmegaConf.load(custom_config_path)
+        
+        # Merge configs, with custom config taking precedence
+        config = OmegaConf.merge(default_config, custom_config)
+        logging.info("Successfully merged custom config with default config")
+    else:
+        config = default_config
+        
+    return config
 
 
 def get_task(path: Path) -> TabularPredictionTask:
@@ -82,17 +123,20 @@ def run_assistant(
     config_path: Annotated[
         Optional[str],
         typer.Option(
-            "--config-path", "-c", help="Path to the configuration directory, which includes a config.yaml file"
+            "--config-path", "-c", help="Path to the configuration file (config.yaml)"
         ),
-    ] = "./config/",
+    ] = None,
     output_filename: Annotated[Optional[str], typer.Option(help="Output File")] = "",
-    config_overrides: Annotated[Optional[str], typer.Option(help="Overrides for the config in Hydra format")] = "",
 ) -> str:
-    """Run AutoGluon-Assistant on a task defined in a path."""
-    rel_config_path = _resolve_config_path(config_path)
-    with initialize(version_base=None, config_path=rel_config_path):
-        overrides_list = config_overrides.split(" ") if config_overrides else []
-        config = compose(config_name="config", overrides=overrides_list)
+    logging.info("Starting run_assistant")
+    
+    # Load config
+    try:
+        config = load_config(config_path)
+        logging.info("Successfully loaded config")
+    except Exception as e:
+        logging.error(f"Failed to load config: {e}")
+        raise
 
     rprint("🤖 [bold red] Welcome to AutoGluon-Assistant [/bold red]")
 
