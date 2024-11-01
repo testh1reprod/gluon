@@ -75,21 +75,20 @@ def run_assistant(
     task_path: Annotated[str, typer.Argument(help="Directory where task files are included")],
     config_path: Annotated[
         Optional[str],
-        typer.Option(
-            "--config-path", "-c", help="Path to the configuration file (config.yaml)"
-        ),
+        typer.Option("--config-path", "-c", help="Path to the configuration file (config.yaml)"),
     ] = None,
     config_overrides: Annotated[
         Optional[List[str]],
         typer.Option(
-            "--config_overrides", "-o",
-            help="Override config values. Format: key=value or key.nested=value. Can be used multiple times."
+            "--config_overrides",
+            "-o",
+            help="Override config values. Format: key=value or key.nested=value. Can be used multiple times.",
         ),
     ] = None,
     output_filename: Annotated[Optional[str], typer.Option(help="Output File")] = "",
 ) -> str:
-    logging.info("Starting run_assistant")
-    
+    logging.info("Starting AutoGluon-Assistant")
+
     # Load config with all overrides
     try:
         config = load_config(config_path, config_overrides)
@@ -97,7 +96,6 @@ def run_assistant(
     except Exception as e:
         logging.error(f"Failed to load config: {e}")
         raise
-
 
     rprint("🤖 [bold red] Welcome to AutoGluon-Assistant [/bold red]")
 
