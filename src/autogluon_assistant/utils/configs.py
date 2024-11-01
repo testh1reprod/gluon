@@ -1,6 +1,7 @@
-from pathlib import Path
 import logging
-from typing import Optional, List, Dict, Any
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 from omegaconf import OmegaConf
 
 
