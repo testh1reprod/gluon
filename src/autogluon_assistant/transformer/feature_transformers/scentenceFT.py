@@ -1,5 +1,6 @@
 import logging
 import os
+import warnings
 from collections import namedtuple
 from typing import Tuple
 
@@ -9,7 +10,7 @@ import pandas as pd
 import torch
 from gensim.utils import tokenize
 from sentence_transformers import SentenceTransformer
-import warnings
+
 from .base import BaseFeatureTransformer
 
 warnings.filterwarnings(action="ignore")
