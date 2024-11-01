@@ -50,7 +50,7 @@ class BaseFeatureTransformer(BaseTransformer):
                 columns=task.columns_in_train_but_not_test + [task.train_id_column],
                 errors="ignore",
             )
-            label_column_avaialable_in_test_set = False
+            label_column_available_in_test_set = False
             if task.label_column in train_x.columns:
                 # Label Column also present in test data
                 # requires explicit dropping of the column
@@ -67,7 +67,7 @@ class BaseFeatureTransformer(BaseTransformer):
                 # Label Column also present in test data
                 # requires explicit dropping of the column
                 # from test set before feature transformation
-                label_column_avaialable_in_test_set = True
+                label_column_available_in_test_set = True
                 test_x = test_x.drop(columns=[task.label_column])
                 test_y = task.test_data[task.label_column]
 
@@ -75,7 +75,7 @@ class BaseFeatureTransformer(BaseTransformer):
 
             # add back label columns
             transformed_train_data = pd.concat([train_x, train_y.rename(task.label_column)], axis=1)
-            if label_column_avaialable_in_test_set:
+            if label_column_available_in_test_set:
                 # Add back label column to test set as it was available before
                 transformed_test_data = pd.concat([test_x, test_y.rename(task.label_column)], axis=1)
             else:
@@ -92,7 +92,7 @@ class BaseFeatureTransformer(BaseTransformer):
             task = copy.deepcopy(task)
             task.train_data = transformed_train_data
             task.test_data = transformed_test_data
-        except:
-            logger.warning(f"FeatureTransformer {self.__class__.__name__} failed to transform.")
+        except Exception as e:
+            logger.warning(f"FeatureTransformer {self.__class__.__name__} failed to transform. Error: {str(e)}")
         finally:
             return task
