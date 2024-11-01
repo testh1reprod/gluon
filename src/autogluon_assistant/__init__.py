@@ -2,7 +2,8 @@ import datetime
 import logging
 import os
 from pathlib import Path
-from typing import Optional, List
+from typing import List, Optional
+
 import pandas as pd
 import typer
 from omegaconf import OmegaConf

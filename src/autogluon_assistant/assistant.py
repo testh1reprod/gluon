@@ -6,11 +6,7 @@ from typing import Any, Dict, Union
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 
-from autogluon_assistant.llm import (
-    AssistantChatBedrock,
-    AssistantChatOpenAI,
-    LLMFactory,
-)
+from autogluon_assistant.llm import AssistantChatBedrock, AssistantChatOpenAI, LLMFactory
 
 from .predictor import AutogluonTabularPredictor
 from .task import TabularPredictionTask
