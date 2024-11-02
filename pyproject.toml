@@ -27,7 +27,8 @@ dependencies = [
     "python-calamine",
     "sentence-transformers>=3.1.0",
     "tenacity>=8.2.2,<10.0",
-    "gensim>=4.3", 
+    "gensim>=4.3",
+    "pandas>=2.2"
 ]
 
 [project.optional-dependencies]
@@ -50,7 +51,7 @@ aga = "autogluon_assistant:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"autogluon_assistant.config" = ["**/*.yaml"]
+"autogluon_assistant" = ["configs/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = "tests"

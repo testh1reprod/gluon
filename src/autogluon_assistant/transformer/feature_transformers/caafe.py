@@ -19,45 +19,53 @@ class CAAFETransformer(BaseFeatureTransformer):
 
     def __init__(
         self,
+        llm_provider: str = "openai",
         llm_model: str = "gpt-3.5-turbo",
         num_iterations: int = 2,
         optimization_metric: str = "roc",
         eval_model: str = "lightgbm",
+        region_name: str = "us-west-2",
         **kwargs,
     ) -> None:
-        import openai
+        # Set up credentials if using OpenAI
+        if llm_provider == "openai":
+            import openai
 
-        openai.api_key = kwargs.get("openai_api_key", os.environ.get("OPENAI_API_KEY"))
+            openai.api_key = kwargs.get("openai_api_key", os.environ.get("OPENAI_API_KEY"))
 
         pd.set_option("future.no_silent_downcasting", True)
 
+        self.llm_provider = llm_provider
         self.llm_model = llm_model
         self.iterations = num_iterations
         self.optimization_metric = optimization_metric
         self.eval_model = eval_model
+        self.region_name = region_name
 
+        # Initialize the base classifier
         if self.eval_model == "tab_pfn":
             from tabpfn import TabPFNClassifier
 
             clf_no_feat_eng = TabPFNClassifier(device="cpu", N_ensemble_configurations=16)
-
         elif self.eval_model == "lightgbm":
             from lightgbm import LGBMClassifier
 
             clf_no_feat_eng = LGBMClassifier()
-
         else:
             raise ValueError(f"Unsupported CAAFE eval model: {self.eval_model}")
 
         self.caafe_clf = CAAFEClassifier(
             base_classifier=clf_no_feat_eng,
             optimization_metric=self.optimization_metric,
+            llm_provider=self.llm_provider,
             llm_model=self.llm_model,
             iterations=self.iterations,
+            region_name=self.region_name,
             display_method="print",
+            **kwargs,  # Pass through any additional provider-specific kwargs
         )
 
-        self.metadata = {"transformer": "CAAFE"}
+        self.metadata = {"transformer": "CAAFE", "llm_provider": llm_provider, "llm_model": llm_model}
 
     def _fit_dataframes(
         self,
@@ -85,7 +93,8 @@ class CAAFETransformer(BaseFeatureTransformer):
             train_X.columns,
             target_column_name,
         )
-        logger.info("CAAFE generated features:")
+
+        logger.info(f"CAAFE generated features using {self.llm_provider} model {self.llm_model}:")
         logger.info(self.caafe_clf.code)
 
     def _transform_dataframes(self, train_X: pd.DataFrame, test_X: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
