@@ -51,7 +51,7 @@ aga = "autogluon_assistant:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"autogluon_assistant" = ["configs/**/*"]
+"autogluon_assistant.config" = ["**/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = "tests"
