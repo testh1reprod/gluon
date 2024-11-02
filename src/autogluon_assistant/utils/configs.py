@@ -17,17 +17,17 @@ def _get_default_config_path(
     """
     try:
         # Get the package root directory using relative import
-        package_root = Path(importlib.resources.files(__package__.split('.')[0]))
-        
+        package_root = Path(importlib.resources.files(__package__.split(".")[0]))
+
         # Construct path to configs directory
         config_path = package_root / CONFIGS / f"{presets}.yaml"
-        
+
         if not config_path.exists():
             raise ValueError(
                 f"Config file not found at expected location: {config_path}\n"
                 f"Please ensure the config files are properly installed in the configs directory."
             )
-        
+
         return config_path
     except Exception as e:
         logging.error(f"Error finding config file: {str(e)}")
