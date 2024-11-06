@@ -10,18 +10,10 @@ from autogluon.core.metrics import make_scorer
 from autogluon.tabular import TabularDataset, TabularPredictor
 from sklearn.metrics import mean_squared_log_error
 
+from .constants import BINARY, CLASSIFICATION_PROBA_EVAL_METRIC, MULTICLASS
 from .task import TabularPredictionTask
 
 logger = logging.getLogger(__name__)
-
-BINARY_PROBA_INDICATORS = [
-    "logloss",
-    "log loss",
-    "logarithmic loss",
-    "ROC curve",
-    "AUCROC",
-    "Gini Coefficient",
-]
 
 
 def rmsle_func(y_true, y_pred, **kwargs):
@@ -119,19 +111,12 @@ class AutogluonTabularPredictor(Predictor):
         Exception
             `TabularPredictor.predict` fails
         """
-        if self.predictor.problem_type == "binary" and any(
-            indicator in task.metadata["description"] for indicator in BINARY_PROBA_INDICATORS
-        ):
-            # TODO: Turn BINARY_PROBA_INDICATORS into an llm call in the future (add test cases)
-            return self.predictor.predict_proba(task.test_data)[1]
-
-        elif self.predictor.problem_type == "multiclass" and len(task.output_columns) != 2:
-            # TODO: match prediction columns with submission columns
-            predictions = self.predictor.predict_proba(task.test_data)
-            if len(predictions.columns) != len(task.output_columns) - 1:
-                raise Exception(
-                    "Predicted number of multiclass classes does not match number in sample submission file"
-                )
-            return predictions
-
-        return self.predictor.predict(task.test_data)
+        if task.eval_metric in CLASSIFICATION_PROBA_EVAL_METRIC and self.predictor.problem_type in [
+            BINARY,
+            MULTICLASS,
+        ]:
+            return self.predictor.predict_proba(
+                task.test_data, as_multiclass=(self.predictor.problem_type == MULTICLASS)
+            )
+        else:
+            return self.predictor.predict(task.test_data)

@@ -16,7 +16,7 @@ from tqdm import tqdm
 
 from .base import BaseFeatureTransformer
 
-warnings.filterwarnings(action="ignore", category=UserWarning)
+warnings.filterwarnings(action="ignore")
 
 logger = logging.getLogger(__name__)
 

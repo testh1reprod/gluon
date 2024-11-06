@@ -1,10 +1,10 @@
 from .task_inference import (
     DataFileNameInference,
     DescriptionFileNameInference,
-    ProblemTypeInference,
+    EvalMetricInference,
     LabelColumnInference,
+    OutputIDColumnInference,
+    ProblemTypeInference,
     TestIDColumnInference,
     TrainIDColumnInference,
-    OutputIDColumnInference,
-    EvalMetricInference,
 )
