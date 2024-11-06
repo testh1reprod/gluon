@@ -1,6 +1,6 @@
 import streamlit as st
 import re
-from constants import *
+from constants import TIME_LIMIT_MAPPING
 from stqdm import stqdm
 import time
 
@@ -66,7 +66,7 @@ def show_logs():
         with tab1:
             for stage, logs in st.session_state.stage_container.items():
                 if logs:
-                    with st.status(stage, expanded=False, state="complete") as status:
+                    with st.status(stage, expanded=False, state="complete"):
                         for log in logs:
                             show_log_line(log)
         with tab2:
