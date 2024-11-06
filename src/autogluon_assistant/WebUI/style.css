@@ -5,6 +5,9 @@ html, body, [class*="css"] {
   font-optical-sizing: auto;
   font-style: normal;
 }
+.element-container:has(iframe[height="0"]) {{
+    display: None;
+}}
 
 .appview-container .main .block-container{
     padding-left:0;
@@ -165,3 +168,15 @@ div[data-baseweb="select"] > div:hover {
 div[data-testid='stExpanderDetails'] p{
     font-size:0.8rem
 }
+
+/*tutorial.py*/
+.left-section {
+        width: 47vw;
+        background-image: url("data:image/png;base64,%s");
+        background-size: 45vw;
+        background-repeat: no-repeat;
+        background-position: left top;
+        display: flex;
+        background-color: #ececec;
+        flex-direction: column;
+    }

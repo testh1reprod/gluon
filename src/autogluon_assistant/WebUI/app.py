@@ -44,17 +44,6 @@ reload_warning = """
 
 components.html(reload_warning, height=0)
 
-st.markdown(
-    f"""
-               <style>
-               .element-container:has(iframe[height="0"]) {{
-                 display: None;
-               }}
-               </style>
-           """,
-    unsafe_allow_html=True,
-)
-
 
 def initial_session_state():
     if "config_overrides" not in st.session_state:
@@ -107,8 +96,6 @@ def initial_session_state():
         st.session_state.stage_status = {}
     if "show_remaining_time" not in st.session_state:
         st.session_state.show_remaining_time = False
-    if "remain_time" not in st.session_state:
-        st.session_state.remain_time = 0
     if "model_path" not in st.session_state:
         st.session_state.model_path = None
     if "increment_time" not in st.session_state:
