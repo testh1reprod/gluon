@@ -3,7 +3,7 @@ NO_FILE_IDENTIFIED = "NO_FILE_IDENTIFIED"
 NO_ID_COLUMN_IDENTIFIED = "NO_ID_COLUMN_IDENTIFIED"
 
 # Supported File Types
-TEXT_EXTENSIONS = ['.txt', '.md', '.csv', '.json', '.yml', '.yaml', '.xml', '.log']
+TEXT_EXTENSIONS = [".txt", ".md", ".json", ".yml", ".yaml", ".xml", ".log"]
 
 # Data types
 TRAIN = "train"
@@ -15,6 +15,15 @@ BINARY = "binary"
 MULTICLASS = "multiclass"
 REGRESSION = "regression"
 PROBLEM_TYPES = [BINARY, MULTICLASS, REGRESSION]
+CLASSIFICATION_PROBLEM_TYPES = [BINARY, MULTICLASS]
+
+# Presets/Configs
+CONFIGS = "configs"
+MEDIUM_QUALITY = "medium_quality"
+HIGH_QUALITY = "high_quality"
+BEST_QUALITY = "best_quality"
+DEFAULT_QUALITY = BEST_QUALITY
+PRESETS = [MEDIUM_QUALITY, HIGH_QUALITY, BEST_QUALITY]
 
 # Metrics
 ROC_AUC = "roc_auc"
@@ -28,6 +37,8 @@ MEAN_SQUARED_ERROR = "mean_squared_error"
 MEAN_ABSOLUTE_ERROR = "mean_absolute_error"
 R2 = "r2"
 ROOT_MEAN_SQUARED_LOGARITHMIC_ERROR = "root_mean_squared_logarithmic_error"
+
+CLASSIFICATION_PROBA_EVAL_METRIC = [ROC_AUC, LOG_LOSS, F1]
 
 METRICS_DESCRIPTION = {
     ROC_AUC: "Area under the receiver operating characteristics (ROC) curve",

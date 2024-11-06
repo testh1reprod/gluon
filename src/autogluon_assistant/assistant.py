@@ -1,25 +1,26 @@
 import logging
+import os
 import signal
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 
-from autogluon_assistant.llm import AssistantChatOpenAI, LLMFactory
+from autogluon_assistant.llm import AssistantChatBedrock, AssistantChatOpenAI, LLMFactory
 
 from .predictor import AutogluonTabularPredictor
 from .task import TabularPredictionTask
-from .transformer import TransformTimeoutError
 from .task_inference import (
-    EvalMetricInference,
     DataFileNameInference,
     DescriptionFileNameInference,
+    EvalMetricInference,
     LabelColumnInference,
     OutputIDColumnInference,
     ProblemTypeInference,
     TestIDColumnInference,
     TrainIDColumnInference,
 )
+from .transformer import TransformTimeoutError
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ class TabularPredictionAssistant:
 
     def __init__(self, config: DictConfig) -> None:
         self.config = config
-        self.llm: AssistantChatOpenAI = LLMFactory.get_chat_model(config.llm)
+        self.llm: Union[AssistantChatOpenAI, AssistantChatBedrock] = LLMFactory.get_chat_model(config.llm)
         self.predictor = AutogluonTabularPredictor(config.autogluon)
         self.feature_transformers_config = config.feature_transformers
 
@@ -60,15 +61,20 @@ class TabularPredictionAssistant:
         raise Exception(str(exception), stage)
 
     def inference_task(self, task: TabularPredictionTask) -> TabularPredictionTask:
+        logger.info("Task understanding starts...")
         task_inference_preprocessors = [
             DescriptionFileNameInference,
             DataFileNameInference,
             LabelColumnInference,
             ProblemTypeInference,
-            OutputIDColumnInference,
-            TrainIDColumnInference,
-            TestIDColumnInference,
         ]
+
+        if self.config.detect_and_drop_id_column:
+            task_inference_preprocessors += [
+                OutputIDColumnInference,
+                TrainIDColumnInference,
+                TestIDColumnInference,
+            ]
         if self.config.infer_eval_metric:
             task_inference_preprocessors += [EvalMetricInference]
         for preprocessor_class in task_inference_preprocessors:
@@ -82,8 +88,12 @@ class TabularPredictionAssistant:
             except Exception as e:
                 self.handle_exception(f"Task inference preprocessing: {preprocessor_class}", e)
 
-        logger.info(f"###LLM Inference Results:###\n{task.metadata}")
+        bold_start = "\033[1m"
+        bold_end = "\033[0m"
 
+        logger.info(f"{bold_start}Total number of prompt tokens:{bold_end} {self.llm.input_}")
+        logger.info(f"{bold_start}Total number of completion tokens:{bold_end} {self.llm.output_}")
+        logger.info("Task understanding complete!")
         return task
 
     def preprocess_task(self, task: TabularPredictionTask) -> TabularPredictionTask:
@@ -91,7 +101,16 @@ class TabularPredictionAssistant:
         # and columns as well as the feature extractors
         task = self.inference_task(task)
         if self.feature_transformers_config:
-            fe_transformers = [instantiate(ft_config) for ft_config in self.feature_transformers_config]
+            logger.info("Automatic feature generation starts...")
+            if "OPENAI_API_KEY" not in os.environ:
+                logger.info("No OpenAI API keys found, therefore, skip CAAFE")
+                fe_transformers = [
+                    instantiate(ft_config)
+                    for ft_config in self.feature_transformers_config
+                    if ft_config["_target_"] != "autogluon_assistant.transformer.CAAFETransformer"
+                ]
+            else:
+                fe_transformers = [instantiate(ft_config) for ft_config in self.feature_transformers_config]
             for fe_transformer in fe_transformers:
                 try:
                     with timeout(
@@ -101,7 +120,9 @@ class TabularPredictionAssistant:
                         task = fe_transformer.fit_transform(task)
                 except Exception as e:
                     self.handle_exception(f"Task preprocessing: {fe_transformer.name}", e)
-
+            logger.info("Automatic feature generation complete!")
+        else:
+            logger.info("Automatic feature generation is disabled.")
         return task
 
     def fit_predictor(self, task: TabularPredictionTask):
