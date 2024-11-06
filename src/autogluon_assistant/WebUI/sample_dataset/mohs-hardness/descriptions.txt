@@ -1,0 +1,2 @@
+You are solving this data science tasks of regression: 
+The dataset presented here (the Mohs Hardness Dataset) comprises a lot of numerical features. We have splitted the dataset into three parts of train, valid and test. Your task is to predict the strength item. The evaluation metric is the median absolute error (MedAE).

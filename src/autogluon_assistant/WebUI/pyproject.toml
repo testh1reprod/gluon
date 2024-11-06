@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autogluon-assistant-WebUI"
+version = "0.1.0"
+description = "A streamlit-based web UI for AutoGluon Assistant"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies =[
+"stqdm==0.0.5",
+"streamlit==1.37.1",
+"streamlit-aggrid==1.0.5",
+"streamlit-extras==0.4.7",
+"psutil>=5.9.8",
+#"autogluon-assistant",
+"autogluon-assistant  @ git+https://github.com/autogluon/autogluon-assistant.git@main",
+]
+
+
+[project.urls]
+"Documentation" = "https://github.com/autogluon/autogluon-assistant"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.codespell]
+skip = '.git,*.pdf,*.svg,*.ipynb,*.csv,'
+
+[tool.ruff]
+lint.ignore = [
+    "E501",  # Line too long
+    "E731",  # Do not assign a `lambda` expression, use a `def`
+    "E722",  # Do not use bare `except`
+]
+
+[tool.mypy]
+ignore_missing_imports = true

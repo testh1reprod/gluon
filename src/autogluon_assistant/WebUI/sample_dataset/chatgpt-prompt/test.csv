@@ -1,0 +1,1009 @@
+Sentence,Label
+Formula E is an electric car race. It is a championship of single-seater electric cars.,3
+Suggest a packing list for a two-week hiking trip in the Rockies,6
+Are there any security vulnerabilities in this PHP code: your_code_here?,0
+Explain the concept of quantum computing and its potential applications.,1
+"const passphrase = process.env.SECRET_KEY as string;
+
+try {
+  const check = await collections.account?.findOne({ email_id: value });
+  
+  if (check) {
+    const encryptedPassword = check.password;
+    console.log('Encrypted Password:', encryptedPassword);
+    resolve(check);
+  } else {
+    // Handle the case where no document was found for the given email_id.
+    // You may want to return an appropriate error response or take other actions.
+    resolve(/* Handle No Document Found */);
+  }
+} catch (error) {
+  console.error('Error occurred:', error);
+  resolve(ErrorCodes.DatabaseError);
+  return;
+}",0
+"In 2015, Hermes partnered with Apple Inc to produce the Apple Watch Hermes, combining Apple’s smartwatch with Hermes’s specially crafted single tour, double tour, and cuff watch bands.",2
+The Border Gavaskar Trophy is conducted by the BCCI and Cricket Australia; and is played via ICC.,3
+Interview successful business people for valuable insights.,7
+"This was followed by NASA’s Skylab space station, the first orbital laboratory in which astronauts and scientists studied Earth and the effects of spaceflight on the human body.",4
+"Please write code for subject data visualization and exploration, including scatter plots, histograms, and correlation matrices.",0
+Companies and countries are pouring billions of dollars into quantum computing research and development.,1
+"The brand markets these products under several labels: Giorgio Armani Prive, Giorgio Armani, Armani Collezioni, Emporio Armani (including EA7), Armani Jeans, Armani Junior, and Armani Exchange.",2
+"Create a C++ class to model a simple library system with methods for adding books, checking out, and returning.",0
+India has gained its 79th Grandmaster with the title being awarded to 16-year-old Pranesh M from Tamil Nadu.,3
+"You're designing a collection for a major fashion show. What styles and fabrics would you incorporate, and how would you make sure your designs stand out?",2
+The International Shooting Sport Federation conducts the ISSF World Shooting Championship.,3
+Describe potential use cases for implementing machine learning algorithms in a data analysis application.,0
+Paul Gascoigne's superb free-kick against Arsenal was greeted with superb commentary,5
+"If a star passes too close to a black hole, it can be torn apart.",4
+Vijay Hazare Trophy: Himachal's Arpit Guleria picks up 8-wicket haul vs Gujarat,3
+"Electric cars are energy efficient, and they do not cause much air and noise pollution.",1
+"According to mathematics, white holes are possible, although as of yet we have found none.",4
+"I have a dataset of customer transactions. Please write code to calculate various customer lifetime value (CLV) metrics, such as metrics.",0
+Write about a goal you achieved and how you did it.,7
+"const cars = [
+  {type:""Volvo"", year:2016},
+  {type:""Saab"", year:2001},
+  {type:""BMW"", year:2010}
+];",0
+"<button onclick=""myFunction2()"">Sort Numerically</button>
+
+<p id=""demo""></p>
+
+<script>
+const points = [40, 100, 1, 5, 25, 10];
+document.getElementById(""demo"").innerHTML = points;
+
+function myFunction1() {
+  points.sort();
+  document.getElementById(""demo"").innerHTML = points;
+}
+
+function myFunction2() {
+  points.sort(function(a, b){return a - b});
+  document.getElementById(""demo"").innerHTML = points;
+}
+</script>",0
+"While Mars seems quiet now, gigantic volcanoes once dominated the surface of the planet.",4
+"While the video game industry was expected to get an economic boost from virtual reality, the broader tech industry sees other applications for the nascent technology, including education, health care, architecture and entertainment.",1
+"Genetic engineering is a powerful technology that has the potential to cure diseases, improve crops, and create new organisms. However, it also raises ethical concerns about the manipulation of life.",1
+"Two-piece summer outfit with a matching crop top and shorts in a playful print, worn with slide sandals and a statement cuff bracelet.",2
+"Smartphones have become ubiquitous in the 21st century, and they have changed the way we communicate, work, and entertain ourselves.",1
+Evaluate the effectiveness of different strategies for encouraging and supporting emerging fashion talent.,2
+I did not remove Virat Kohli from captaincy: Sourav Ganguly,3
+"Those first, blurry images of Mars's craters and barren landscape suggested to some scientists that the planet was similar to our moon and dispelled hope that it had ever held life.",4
+"Because of lower gravity, a person who weighs 220 lbs on Earth would weigh 84 lbs on Mars.",4
+Discuss the potential benefits and drawbacks of fashion's influence on consumer behavior.,2
+"document.getElementById(""myH"").innerHTML = ""My First Page"";",0
+Plan a trip to Kullu manali,6
+"This shirt spoke to me, as soon as i entered the store! i love the colorful plaid, the flattering cut, and the light, airy material. at very least, i think this will be a three-season go to!",2
+"Effortless and super cute! i'm currently wearing my blue tunic for the first time with black leggings and booties - i absolutely love the everyday comfort of this piece! a few have mentioned length as being an issue - i'm wearing a regular s (my normal size) at 5'7"" and find the length similar to the model's. the cut on this is perfect - i was worried that it would look like a plaid sack on, but it's a slim cut that looks polished without needing to be belted. this will surely be a go-to for me",2
+Discuss the role of fashion in fostering cultural exchange and understanding.,2
+"What is the human microbiome, and how does it impact our health and well-being?",1
+Plan a trip to Switzerland,6
+"Retired NASA astronaut Mary Cleave, a veteran of two NASA spaceflights, died Nov. 27.",4
+Discuss the role of fashion in promoting social status and hierarchy.,2
+"Blockchain technology employs a highly decentralized, tamper-resistant ledger that records transactions across a network of computers.",1
+Implement a C++ program that uses a loop to print the multiplication table for a given number.,0
+You're designing a line of clothing for a major sporting event. What features would you include to ensure your designs are both functional and fashionable?,2
+"1966 would prove to be a significant year for the Soviet space program. In February of that year, the USSR would land an unmanned spacecraft called Luna on the moon that sent back transmissions to Earth",4
+"Orbiting satellites also have provided, and continue to provide, important services to the everyday life of many people on Earth. ",4
+"Rajasthan Royals full list of players retained, released, traded ahead of IPL 2024 auction",3
+"But as the smart home and the voice assistants that power it have soared in popularity, they have been beset by concerns, too. ",1
+"The largest known star is UY Scuti, with a diameter over 1700 times that of our sun.",4
+Go to events with your kids and review the experience for families.,7
+Share business success stories to inspire your audience.,7
+You're designing a line of clothing for an up-and-coming music artist. What elements would you incorporate to make sure the artist's style and personality shine through?,2
+lex Ferguson Hugs Ronaldo after EuroCup 2016,5
+"The 2022 Winter Olympics ended on February 20, 2022, by uplifting closing ceremony.",3
+"<script src=""/js/myScript.js""></script>",0
+Review this C++ function for errors: your_code_here.,0
+Analyze the influence of fashion on societal attitudes and perceptions.,2
+"What is the theory of evolution, and how does it explain the diversity of life on Earth?",1
+"int myNumbers[] = {25, 50, 75, 100};
+int i;
+
+for (i = 0; i < 4; i++) {
+  printf(""%d\n"", myNumbers[i]);
+}",0
+Thom Browne has grown from a small “by appointment” shop to a globally admired lifestyle label.,2
+"I am giving it five stars because the colors and design are so beautiful. but i am a medium, size 6 around 5' 8, and i chose the m/l, which is just too big. i also found a run in the fabric, which is very loose and knit-like in places. but i don't care, i am exchanging for another one in small.",2
+Write about a mistake you made and what you learned.,7
+"Casual summer outfit with a sleeveless chambray shirt, khaki shorts, flat leather sandals, and a simple pendant necklace.",2
+"Cloud computing has democratized access to powerful computing resources which has given birth to innovation across industries, from AI and IoT to e-commerce and healthcare. ",1
+"P V Sindhu won the Swiss Open 2022 defeating Busanan Ongbamrungphan of Thailand in the finals of the Swiss Open Super 300 badminton tournament held in Basel, Switzerland.",3
+Variable 'words' implicitly has type 'any[]' in some locations where its type cannot be determined.ts(7034),0
+Discuss the role of gender and sexuality in shaping fashion trends and norms.,2
+Analyze the challenges and opportunities associated with the circular economy in fashion.,2
+im having trouble understanding this section of the code written in a certain programming language. Can you explain it,0
+The Khelo India scheme was launched to increase the sports skills of the youth in the country and also to increase the sports infrastructure.,3
+Share stock market predictions based on your analysis.,7
+Provide tips for sustainable travel in Costa Rica,6
+Suggest a budget-friendly itinerary for a 3-day trip to Dubai.,6
+"On July 17, 2022 PV Sindhu acquired the first Super 500 title in her career, after defeating Asian champion Wang Zhi Yi from China.",3
+Artificial intelligence – simulating human intelligence in machines – used to be confined to science fiction.,1
+"I was walking by my local retailer and saw this in the window and loved the colors. it's a great combination and looks good with white jeans, and regular denim. i like the cuffs on the sleeves and the textured material. it is a kimono - so in essence it is not form fitting. it's meant to flow over whatever else you have on. i purchased the xs/s and i am a normal size 2 and it looks cute. i got lots of compliments when i wore it! there are slits on either side at the bottom hem as well which allow",2
+Design a line of clothing for an emerging city. What styles and colors would you incorporate to make sure your designs are both fashionable and relevant to the locale?,2
+"Perhaps bigger than bitcoin is blockchain, the encryption technology behind the cryptocurrency.",1
+"Japan is the largest manufacturer of robots in the world with more than fifty percent of the world’s robot manufactured in Japan. They have a lot of robots working in their hotels as staff. Also, some factories run entirely by robots, and they make other robots. Moreover, kids are taught about how to make a robotic arm in Holiday Programs.",1
+I want you to act as a programmer in programming language. Please simplify this code: insert code.,0
+"Tropical-print wide-leg jumpsuit with a smocked bodice, worn with platform heels, a statement necklace, and a clutch for a night out.",2
+"Copa América Semifinals in New Jersey and Charlotte, Among 14 U.S. Cities Hosting Next Summer",3
+Bhuvneshwar Kumar's international career has hit a roadblock: Aakash Chopra,3
+"import pandas from sklearn import tree from sklearn.tree import DecisionTreeClassifier import matplotlib.pyplot as plt df = pandas.read_csv(""data.csv"") d = {'UK': 0, 'USA': 1, 'N': 2} df['Nationality'] = df['Nationality'].map(d) d = {'YES': 1, 'NO': 0} df['Go'] = df['Go'].map(d) features = ['Age', 'Experience', 'Rank', 'Nationality'] X = df[features] y = df['Go'] dtree = DecisionTreeClassifier() dtree = dtree.fit(X, y) tree.plot_tree(dtree, feature_names=features)",0
+Write a Python function to calculate the factorial of a given number.,0
+"d = {'UK': 0, 'USA': 1, 'N': 2}
+df['Nationality'] = df['Nationality'].map(d)
+d = {'YES': 1, 'NO': 0}
+df['Go'] = df['Go'].map(d)
+
+print(df)",0
+"Develop a C++ program that handles exceptions when dividing two numbers, providing a meaningful error message.",0
+" It transmitted its first pictures of Jupiter back to Earth in April 1978, when it was 165 million miles away. Voyager 1 was the first to journey into interstellar space in 2012.",4
+"A space probe is an unpiloted, unmanned device sent to explore space and gather scientific information.",4
+"The first space station, Salyut 1, launched by the Soviet Union on April 19, 1971, achieved significant progress in humankind's ability to live and work in space.",4
+Raf Simon’s inclusion to the top fashion labels in the world rank is based on:,2
+"Even so, the market isn't showing any signs of stalling. In the US alone, the facial recognition industry is expected to grow from $3.2 billion in 2019 to $7 billion by 2024.",1
+"switch (n) {
+  case label1:
+    code to be executed if n=label1;
+    break;
+  case label2:
+    code to be executed if n=label2;
+    break;
+  case label3:
+    code to be executed if n=label3;
+    break;
+    ...
+  default:
+    code to be executed if n is different from all labels;
+}",0
+"Based on the trip you created, what will be the total expense of traveling around and just enjoying myself for just one person? Exclude hotel and flights.",6
+"var x = 10;
+// Here x is 10
+
+{
+var x = 2;
+// Here x is 2
+}
+
+// Here x is 2",0
+"Cartier International SNC, or simply Cartier is a French luxury goods conglomerate that designs, manufactures, distributes, and sells jewellery and watches. ",2
+"cryptocurrencies have also received a lot of criticism for their use in illegal activities. Some cryptocurrencies are valued for their privacy and anonymity, making their transactions harder to track.",1
+3D printing has enabled the creation of physical objects from digital designs and has forever changed the landscape of manufacturing.,1
+The Indian space agency ISRO announced Dec. 4 that the propulsion module for the Chandrayaan-3 mission is now in a high orbit around the Earth after a series of maneuvers since October that returned the spacecraft from a low lunar orbit,4
+"Laxman Rawat of PSPB emerged victorious in the ‘Baulkline’ NSCI All India Snooker Open, beating fellow PSPB challenger Aditya Mehta 9-6 in a best-of-17-frame final.",3
+"The largest known star is UY Scuti, with a diameter over 1700 times that of our sun.",4
+Our solar system is 4.57 billion years old.,4
+The hottest planet in our solar system is Venus.,4
+"Several weeks after Alan Shepard became the first American in space, President John F, Kennedy gave a speech before both houses of Congress, committing the nation to space exploration.",4
+"The official logo, mascot and hashtag were unveiled by the Chief Minister of Tamil Nadu M K Stalin and President of AICF Dr. Sanjay Kapoor in Chennai.",3
+"def my_function(x):
+  return x[::-1]
+
+mytxt = my_function(""I wonder how this text looks like backwards"")
+
+print(mytxt)",0
+"Love, love these jeans. being short they come right to my ankle. super soft and don?t require any hemming. i ordered my typical jean size of 26 and they fit like a glove. would love to have these in black and grey.",2
+Smart grids revolutionize energy management by improving efficiency and reliability,1
+India’s Rameshbabu Praggnanandhaa has defeated the reigning world champion Norway’s Magnus Carlsen.,3
+"Classic white shirtdress worn over a colorful bikini, accessorized with a beach tote, flip-flops, and a floppy sun hat.",2
+"Flowy tiered sundress in a soft, feminine print, worn with strappy flat sandals, a charm bracelet, and a dainty pendant necklace for a romantic summer look.",2
+Shane Warne was a cricketer from Australia. He was a right-arm leg spinner who is widely regarded as one of the finest bowlers in cricket history,3
+"// Declare an array of four integers:
+int myNumbers[4];
+
+// Add elements
+myNumbers[0] = 25;
+myNumbers[1] = 50;
+myNumbers[2] = 75;
+myNumbers[3] = 100;",0
+Explain the concept of sustainable fashion and its importance.,2
+"AttributeError                            Traceback (most recent call last)
+/tmp/ipykernel_32/559223769.py in ?()
+----> 1 data = data.append(data2)
+
+/opt/conda/lib/python3.10/site-packages/pandas/core/generic.py in ?(self, name)
+   5985             and name not in self._accessors
+   5986             and self._info_axis._can_hold_identifiers_and_holds_name(name)
+   5987         ):
+   5988             return self[name]
+-> 5989         return object.__getattribute__(self, name)
+
+AttributeError: 'DataFrame' object has no attribute 'append'",0
+"Implement a basic sorting algorithm (e.g., bubble sort) in Python, C++, and Ruby.",0
+"By combining data from NASA's Chandra X-ray Observatory and NASA's James Webb Space Telescope, a team of researchers was able to find the telltale signature of a growing black hole just 470 million years after the big bang",4
+Smartphone apps like the PokÃ©mon Go game and Snapchat filters are just two small popular examples of modern augmented reality applications,1
+Can you review this Shell script: your_code_here and suggest areas for error handling?,0
+"let person=""Hege"";",0
+"I need a dataset with number rows and number columns. The columns should include “age,” “gender,” “income,” and “purchase history.” Please provide the dataset in CSV format.",0
+Examine the impact of globalization on fashion trends and the fashion industry.,2
+Evaluate the effectiveness of various strategies for promoting body positivity and inclusivity in fashion.,2
+Describe the key features and benefits of the latest smartphone models.,1
+"How could I make this data processing code more efficient lb = LabelEncoder()
+mx = MinMaxScaler()
+",0
+"Advanced 3d printing is another item within this realm of emerging technologies, 3d printing poses the question",1
+Humans have been sending space probes into space since the 1950s.,4
+Can you find any performance issues in this Ruby code: your_code_here?,0
+"First, the planet rotates on its side, appearing to roll around the sun like a ball, according to NASA's Uranus guide. ",4
+Create career development guides tailored to your audience.,7
+"Imagine you're creating a swimwear line for women. What styles, prints, and colors would you incorporate to make sure each piece is unique?",2
+Messi Cries after Losing The Copa America Final,5
+"From being used in agriculture, aerial photography, surveillance and logistics to increasing efficiency, reducing costs, and transforming industries from farming to filmmaking, drones have been proven to be one of the most impactful inventions of all time. ",1
+"import pymongo
+
+myclient = pymongo.MongoClient(""mongodb://localhost:27017/"")
+mydb = myclient[""mydatabase""]
+mycol = mydb[""customers""]
+
+mydict = { ""name"": ""John"", ""address"": ""Highway 37"" }
+
+x = mycol.insert_one(mydict)",0
+"The Qatar World Cup marked several firsts in the history of the tournament - the first held in the Middle East, the first taking place in winter of the Northern Hemisphere.",3
+"Elegant maxi dress with a halter neckline, worn with metallic sandals, a beaded clutch, and chandelier earrings for an evening event.",2
+"Sally Ride became first American woman in space, about 20 years after Soviet cosmonaut Tereshkova became the first woman in space. Ride, who held a doctorate in physics, was selected as one of NASA's first six female astronauts. ",4
+Can you help me perform dimensionality reduction on a high-dimensional dataset? Please write a structured query language (SQL) code to apply principal component analysis (PCA) and visualize the data in a reduced dimension space.,0
+No list of emerging top technology trends is ever complete without talking about 5G,1
+"As new smart devices and connected objects come into play, they’ll require a stronger connection to transmit data quickly and reliably. That’s where 5G comes in.",1
+"Provide optimization suggestions for the following  code   public class RightTriangleStarPattern {
+    public static void main(String[] args) {
+        int rows = 5; // Input number of rows
+ 
+        for (int i = 1; i <= rows; i++) {
+            for (int j = 1; j <= i; j++) {
+                System.out.print(""* "");
+            }
+            System.out.println();
+        }
+    }
+}
+used to process.",0
+The city of Mumbai will be hosting the 2023 International Olympic Committee session.,3
+"{
+  let x = 2;
+}",0
+I need a dataset for sentiment analysis with number rows and number columns: “text” and “label” (positive/negative). Please generate the dataset in CSV format.,0
+The Union Cabinet has approved the signing for hosting the FIFA Under-17 Women’s World Cup 2022 in India.,3
+"Glenn was already a military hero by the time he was chosen to be an astronaut for Project Mercury. After he completed his mission, he went on to a successful political career as senator from Ohio. ",4
+"Robotics and Automation - Robotics and automation technologies are being used to automate a growing number of tasks in industries such as manufacturing, retail, and healthcare.",1
+"Can you provide a more efficient version of this algorithm function Car(props) {
+  return <h2>I am a {props.color} Car!</h2>;
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<Car color=""red""/>);
+",0
+"Less than two years after Laika perished while orbiting the Earth, two monkeys, Able and Baker, became the first living beings to return to our planet alive.",4
+"While components of the technology have existed for decades, the first modern e-cigarette was introduced in 2006",1
+Rafael Nadal won his 21st Grand Slam title. He beat Daniil Medvedev at the Australian Open Final to grab his Grand Slam.,3
+What does this section of the code written in a certain programming language do,0
+Did the fashion among the people has changed,7
+"American astronauts Neil Armstrong and Buzz Aldrin became the first humans to set foot on a celestial entity other than Earth on July 20, 1969, fulfilling President John F. Kennedy's hope of landing humans on the moon before the end of the decade",4
+"import mysql.connector
+
+mydb = mysql.connector.connect(
+  host=""localhost"",
+  user=""yourusername"",
+  password=""yourpassword""
+)
+
+mycursor = mydb.cursor()
+
+mycursor.execute(""SHOW DATABASES"")
+
+for x in mycursor:
+  print(x)",0
+Tigist Assefa Shatters Women’s Marathon World Record in Berlin,3
+"The All India Football Federation (AIFF) has announced that the 2023 edition of the SAFF Championship, South Asia’s most prestigious international football tournament, will be held in Bengaluru from June 21 to July 3.",3
+const date = new Date();,0
+Write a Python loop that prints the first 10 Fibonacci numbers.,0
+Is Maggie bad for health,7
+"A less belligerent, but no less competitive, part of the Cold War was the space race.",4
+"The Swedish forward did his bit scoring two goals in the second leg, but ultimately it was Ronaldo who triumphed, securing a 4-2 win on aggregate",5
+Describe the stages of the scientific method and provide an example of how it is applied in research.,1
+This is a great layering tank that is super comfy! the sale price is a bargain!,2
+"/*
+document.getElementById(""myH"").innerHTML = ""My First Page"";
+document.getElementById(""myP"").innerHTML = ""My first paragraph."";
+*/",0
+"How can I improve the performance of this script export class HomeComponent implements OnInit {
+  spelling="""";
+
+  tokenizeSpellingEnglish(item: string): string{
+  if (item ==""houses""){
+    item = ""house"";
+  }
+     return item;
+  }
+
+   onNameKeyUp(event: any){
+    this.spelling = event;
+    this.spelling = this.spelling.toLowerCase();
+    this.tokenizeSpellingEnglish(this.spelling);
+    this.elem.nativeElement.focus();   
+   }
+",0
+Indian Chess Grandmaster Karthikeyan Murali Achieves Victory Over Magnus Carlsen,3
+Interview people who work in the tech industry for unique perspectives.,7
+Explain the differences between open-source and proprietary software.,1
+Discuss the Big Bang Theory and its role in our understanding of the origin of the universe.,1
+"Break down this class written in a specific programming language, and explain how its methods accomplish a certain task.",0
+Generate sample data for testing a social media analytics platform.,0
+Imagine you're designing a line of clothing for a celebrity who has a unique personal style. How would you incorporate their individuality into your designs?,2
+"India’s former doubles World No. 1 champion, Sania Mirza, has announced that she will retire from professional tennis in February at the WTA 1000 event in Dubai.",3
+"Advancements in light emitting electrodes, image sensors, and optical design in the ’90s led to the emergence of capsule endoscopy, first used in patients in 2001.",1
+"Imagine you're creating a line of clothing for a new start-up company. What styles, materials, and designs would you prioritize to ensure the brand stands out?",2
+"enum Level { LOW = 5, MEDIUM, // Now 6 HIGH // Now 7 };",0
+Evaluate the impact of fashion on the environment and climate change.,2
+Help me understand what this programming language code snippet does:,0
+Compare and contrast different fashion eras and their cultural significance.,2
+Develop a flowchart for a software testing process on a large-scale project.,0
+Suggest ways to handle user authentication in a web application for improved security.,0
+The Whirlpool Galaxy (M51) was the first celestial object identified as being spiral.,4
+which type of api do not store login credentials. And what is the name of those websites,0
+Write a 60-second YouTube script for using about the company.,7
+List in detail 3 reasons why you love your favourite football team,5
+"mydict = { ""name"": ""Peter"", ""address"": ""Lowstreet 27"" }
+
+x = mycol.insert_one(mydict)
+
+print(x.inserted_id)
+Run example »
+",0
+Viral video of heated argument between Pakistan's Sarfaraz and Saud surfaces,3
+"First telescopic observation of the night sky: discovery of the Galilean moons, lunar craters and the phases of Venus.",4
+"His final goal, which brought the game level at 3-3 in the 88th minute, was a sumptuous trademark Ronaldo free kick",5
+"VR and AR are still in their early stages of development, but they have the potential to change the way we interact with the world around us.",1
+Brandon Ingram Leads the Pelicans Past the Kings 127-117 to Advance to In-Season Tournament Semis,3
+"But there's also fear that a dystopian future is looming with the creation of autonomous weapons, including  drones, missile defense systems and sentry robots.",1
+"Bought this shirt in red in my usual size small. it is so comfortable and easy to wear. i am 5' 8.5"" tall and it fall on me similar to the model in the picture. not sure if i can wear with leggings--may be too short in front. i'm looking forward to layering it under sweaters and sweater vests for a pop of color.",2
+Analyze the impact of fashion on youth culture and identity.,2
+"<script src=""myScript.js""></script>",0
+In 1986 the International Shooting Sport Federation introduced the ISSF World Cup.,3
+when i clear the input by clicking backspace key. Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.,0
+"Prada brand offers men’s and women’s leather goods, clothing and footwear",2
+"On the internet, it's used for everything from speech recognition to spam filtering",1
+Arguably the greatest game in Premier League history and certainly the greatest title collapse,5
+India is set to host the 2023 IBA Women’s World Boxing Championship. IBA Women’s World Boxing Championship IBA Women’s World Boxing Championship is the biennial amateur boxing competition organized by the International Boxing Association (IBA). ,3
+"The Kodava hockey festival, an annual inter-family field hockey tournament held in the Kodagu district of Karnataka, is set to return after a four-year hiatus.",3
+"let total = price1 + price2;
+Try it Yourself »
+",0
+alert(“Hi this is raghul”),0
+"Veteran Indian hockey goalkeeper PR Sreejesh, recently won ‘World Games Athlete of the Year, 2021. Key Facts PR Sreejesh was part of men’s team, which claimed a bronze medal in the Tokyo Olympics.",3
+You're designing a special line for Pride Month. What colors and themes would you incorporate to show support and celebration?,2
+"Boho-chic look with a lace-trimmed maxi skirt, a lightweight blouse with bell sleeves, and ankle-wrap sandals, finished with a fringe bag and layered jewelry.",2
+"The virtual private network, essentially an encrypted tunnel for transferring data on the internet, has proven invaluable for both businesses and individuals.",1
+"19 years ago today, Cristiano Ronaldo scored his first goal for Portugal against Greece at the Euro 2004.",5
+"int sum(int k);
+
+int main() {
+  int result = sum(10);
+  printf(""%d"", result);
+  return 0;
+}
+
+int sum(int k) {
+  if (k > 0) {
+    return k + sum(k - 1);
+  } else {
+    return 0;
+  }
+}",0
+"Act as an automatic machine learning (AutoML) bot using TPOT. I’m working on a model that predicts credit card fraud. Provide Python code to identify the optimal classification model, aiming for the highest AUC score on the test dataset.",0
+Explain the basics of augmented intelligence and its role in data analysis.,1
+"<html>
+<body>
+
+<form action=""welcome.php"" method=""post"">
+Name: <input type=""text"" name=""name""><br>
+E-mail: <input type=""text"" name=""email""><br>
+<input type=""submit"">
+</form>
+
+</body>
+</html>",0
+the Indian cricket team achieved a historic victory over Sri Lanka in the third and final match of the series at the Greenfield Stadium in Thiruvananthapuram.,3
+The referees show red and yellow cards for foul play in Football. ,3
+These electric cars are a good alternative that can resolve the challenges of environmental pollution.,1
+Act as a data scientist and build a machine learning model for me. I have a dataset of customer churn data. Please create a model that predicts customer churn using features such as metrics. Insert data set.,0
+"Cleave launched on her first mission, STS-61B, aboard space shuttle Atlantis on Nov. 26,1985. ",4
+India created history by winning the Thomas Cup title for the first time. ,3
+"const points = [40, 100, 1, 5, 25, 10];
+points.sort(function(a, b){return b - a});",0
+Write down potential topics for a workshop on agile software development practices.,0
+Export Your Travel Plan from ChatGPT,6
+The lander successfully touched down on the moon Aug. 23,4
+List a number of potential topics for beginners for a mobile app development course.,0
+Discuss the future of space exploration and the technologies involved.,1
+"The Hawaiian islands were formed as a hot spot in the mantle created a chain of volcanoes in the crust cruising by above it, so if the surface of Mars isn't moving, a volcano could build-up for longer in one spot. ",4
+Hermes is on the top fashion brands and leading luxury brands,2
+"On June 5, 2022, Rafael Nadal won the 14th French Open. With this win, his record extended to 22nd Grand Slam title. He became the oldest male champion at Roland Garros.",3
+The closest galaxy cluster to the Milky Way is the Virgo Cluster.,4
+"hierry Hermès in Paris, France, Hermès manufactures and sells luxury fashion goods",2
+Can you identify any bugs in this Python code snippet: your_code_here?,0
+"Write Python, C++, and Ruby scripts that communicate with each other using a simple file-based messaging system.",0
+You're designing a line of clothing for a winter sports brand. What materials and styles would you incorporate to make sure your pieces are both stylish and functional?,2
+Please explain what the following block of code written in a certain programming language does,0
+The 2022 US Open is a tennis tournament played on outdoor hard courts at the USTA Billie Jean King National Tennis Center.,3
+he captain of the Argentina football team Lionel Messi recently won the Best FIFA Men’s player award.,3
+Discuss the ethical implications of fashion production and consumption.,2
+Explain the Internet of Things (IoT) and how it’s transforming our daily lives.,1
+Develop a Python script that reads data from a CSV file and prints it out.,0
+"AB de Villiers Exclusive: From Gill to RCB return plans, former SA captain opens up",3
+All-time Chelsea v Man United Premier League XI,5
+"On 16th April 2022, the 2022 edition of the Invictus Games opened in The Hague, Netherlands. The Games are being held from 16th to 22nd April.",3
+Explain the principles behind CRISPR-Cas9 gene editing technology and its potential applications in medicine.,1
+"#include <stdio.h> int main() { printf(""Hello World!""); return 0; }",0
+Uranus’ blue glow is due to the gases in its atmosphere.,4
+"Design a line of beachwear for men that's both fashionable and functional. What styles, patterns, and materials would you incorporate to achieve this balance?",2
+Write investment guides for beginners in your field.,7
+"I need to improve the speed of this algorithm import java.io.*;
+ 
+// Java code to demonstrate right star triangle
+public class GeeksForGeeks {
+    // Function to demonstrate printing pattern
+    public static void StarRightTriangle(int n)
+    {
+        int a, b;
+ 
+        // outer loop to handle number of rows
+        // k in this case
+        for (a = 0; a < n; a++) {
+ 
+            // inner loop to handle number of columns
+            // values changing acc. to outer loop
+            for (b = 0; b <= a; b++) {
+                // printing stars
+                System.out.print(""* "");
+            }
+ 
+            // end-line
+            System.out.println();
+        }
+    }
+ 
+    // Driver Function
+    public static void main(String args[])
+    {
+        int k = 5;
+        StarRightTriangle(k);
+    }
+}
+ What changes would you recommend?",0
+Record-breaking NASA astronaut Frank Rubio provides the agency’s first Spanish-language video tour of humanity’s home in space – the International Space Station.,4
+"<?php
+$favcolor = ""red"";
+
+switch ($favcolor) {
+  case ""red"":
+    echo ""Your favorite color is red!"";
+    break;
+  case ""blue"":
+    echo ""Your favorite color is blue!"";
+    break;
+  case ""green"":
+    echo ""Your favorite color is green!"";
+    break;
+  default:
+    echo ""Your favorite color is neither red, blue, nor green!"";
+}
+?>",0
+Can you help me train a model name? Please provide the Python code to tune the hyperparameters and predict parameters.,0
+Do you see any memory leaks in this C# code: your_code_here?,0
+Ronaldo led his side to a place at the 2014 World Cup after scoring four goals against Sweden in a two-legged playoff,5
+"Lionel Messi and Kylian Mbappe both enjoyed a terrific World Cup and headed into the showpiece match neck-and-neck for the adidas Golden Boot, but only one could come out on top",5
+Create a LinkedIn post under 150 words using this ,3
+Manchester United face Chelsea tonight in a Premier League fixture at Old Trafford,5
+"Love this top, super soft and drapes great, even after washing. it is pretty long and loose, but it is so comfy and cute to wear with jeans or even joggers!",2
+"Autonomous vehicles, or self-driving cars have the potential to improve safety by reducing traffic congestion and improving mobility.",1
+"Voyager 2, launched into orbit with Voyager 1 in 1977, began transmitting images from Uranus in 1986. The massive planet showed some evidence of boiling oceanic water.",4
+A curious sport called “Pickleball” has become one the fastest growing sports in the United States.,3
+why dont u try to make the word into draggable words when the user clicks spacebar in keyboard. i'm saying like keyboard events,0
+Create a bridal collection that's both traditional and modern. What fabrics and designs would you use to achieve this balance?,2
+Discuss the importance of fashion journalism and its role in shaping the fashion industry.,2
+"<?php
+$x = 10.365;
+var_dump(is_float($x));
+?>",0
+Describe the fashion trends for the upcoming summer season.,2
+"I was surprised how great this blouse looks on! the color and texture are awesome.... very well made, but runs a tad small. this will be my new go to when i open my closet!",2
+"Imagine you're designing a line of clothing for a fictional queen or princess. What fabrics, colors, and designs would you use to create the perfect regal look?",2
+Space stations marked the next phase of space exploration.,4
+Zlatan Ibrahimovic’s Bicycle Kick against England,5
+"The highest mountain discovered is the Olympus Mons, which is located on Mars",4
+"Distressed denim mini skirt with a tucked-in graphic tee, completed with white sneakers, a denim jacket, and layered necklaces.",2
+"In closed circles, Loewe is called the mother of all luxury fashion brands.",2
+The 2022 Madrid Open was a professional tennis tournament that was organized from 28th April to 8th Amy 2022.,3
+Scientists using NASA's James Webb Space Telescope just made a breakthrough discovery in revealing how planets are made.,4
+"The Milky Way galaxy is 105,700 light-years wide.",4
+Manchester City are still alive here. Balotelli…Agueroooooooooooooooo!!!! I swear you’ll never see anything like this ever again,5
+"<?php
+$x = 5985;
+var_dump(is_int($x));
+
+$x = 59.85;
+var_dump(is_int($x));
+?>",0
+The first human in space was the Soviet cosmonaut Yuri Gagarin,4
+"Create a line of clothing for a music festival that's both comfortable and stylish. What designs, patterns, and materials would you incorporate to achieve this?",2
+"import pymongo
+
+myclient = pymongo.MongoClient(""mongodb://localhost:27017/"")
+mydb = myclient[""mydatabase""]
+mycol = mydb[""customers""]
+
+for x in mycol.find():
+  print(x)",0
+Convert the following Python code to Java.,0
+"<?php
+// define variables and set to empty values
+$nameErr = $emailErr = $genderErr = $websiteErr = """";
+$name = $email = $gender = $comment = $website = """";
+
+if ($_SERVER[""REQUEST_METHOD""] == ""POST"") {
+  if (empty($_POST[""name""])) {
+    $nameErr = ""Name is required"";
+  } else {
+    $name = test_input($_POST[""name""]);
+  }
+
+  if (empty($_POST[""email""])) {
+    $emailErr = ""Email is required"";
+  } else {
+    $email = test_input($_POST[""email""]);
+  }
+
+  if (empty($_POST[""website""])) {
+    $website = """";
+  } else {
+    $website = test_input($_POST[""website""]);
+  }
+
+  if (empty($_POST[""comment""])) {
+    $comment = """";
+  } else {
+    $comment = test_input($_POST[""comment""]);
+  }
+
+  if (empty($_POST[""gender""])) {
+    $genderErr = ""Gender is required"";
+  } else {
+    $gender = test_input($_POST[""gender""]);
+  }
+}
+?>",0
+How can I improve the performance of this function:when handling large dataset.,0
+"Voyager 2 was built to examine the farthest reaches of the solar system, and this included the planet Neptune. The spacecraft is the only human-made object to have flown to that planet.",4
+"How can I optimize this  xgb = XGBClassifier()
+xgb.fit(X_train,y_train)
+y_pred = xgb.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)*100
+print(f'Accuracy: {accuracy}')
+to perform more quickly  when handling and maintain accuracy of model?",0
+"High-waisted paper bag shorts with a tucked-in tank top, accessorized with a wide belt, block-heeled sandals, and a pendant necklace.",2
+Explain the basics of cryptocurrency for your readers.,7
+Scientists have found that its upper winds flow 50 times faster than the planet's rotation.,4
+"/*
+The code below will change
+the heading with id = ""myH""
+and the paragraph with id = ""myP""
+in my web page:
+*/
+document.getElementById(""myH"").innerHTML = ""My First Page"";
+document.getElementById(""myP"").innerHTML = ""My first paragraph."";",0
+What are the backend languages and databases ,0
+A cyber–physical system (CPS) or intelligent system is a computer system in which a mechanism is controlled or monitored by computer-based algorithms,1
+Footprints left on the Moon won’t disappear as there is no wind.,4
+"Explain the concept of climate change, its causes, and potential consequences for the planet.",1
+Review the latest products relevant to your niche.,7
+Dark matter may be composed of particles yet to be discovered.,4
+"ike Kho-Kho and Kabaddi, Dahi Handi has now been given the status of a game in Maharashtra.",3
+Which is trimmer is best for men to use,7
+Paul Gascoigne FA Cup semi-final free-kick,5
+"Internet of Things (IoT) - IoT refers to a network of physical devices, vehicles, home appliances and other items that are embedded with sensors, software, and network connectivity, allowing them to collect and exchange data.",1
+"Wind power generation at higher altitudes, increasing efficiency",1
+"High-waisted denim shorts with a cropped, off-the-shoulder peasant top, complemented by gladiator sandals and a colorful headscarf.",2
+"The International Shooting Sport Federation (ISSF) World Cup 2022 was held in Cairo, Egypt from 26th February to 8th March 2022.",3
+"import mysql.connector
+
+mydb = mysql.connector.connect(
+  host=""localhost"",
+  user=""yourusername"",
+  password=“yourpassword"",
+  database=""mydatabase""
+)",0
+Race Across India is Asia’s longest-ever cycle race. It was accorded the Asian Ultracycling Championship by the World Ultracycling Association. It was kicked off recently from Srinagar in the Union Territory of Jammu and Kashmir.,3
+"This American label Founded in 1994 by the designer with the same name, Rick Owens. Since then, the clothing brand has expanded its core audience through impressive streetwear collections.",2
+Write CTA messages about . I want combinations of one header and one subheading.,7
+"<script> document.getElementById(""demo"").innerHTML = ""My First JavaScript”;</script>",0
+<h1>My First Web Page</h1> <p>My first paragraph.</p>,0
+How can I create a budget-friendly itinerary for a week in Spain,6
+Create a sustainable fashion line that incorporates recycled materials. What designs and colors would you incorporate to make sure your pieces are both fashionable and environmentally-friendly?,2
+"You're designing a line of clothing for a major department store chain. What types of materials, styles, and colors would you prioritize to ensure your pieces meet the brand's standards and customer preferences?",2
+"The Spanish forward rounded Victor Valdes in stoppage time, rolling into the open goal to seal Chelsea",5
+"dblist = myclient.list_database_names()
+if ""mydatabase"" in dblist:
+  print(""The database exists."")",0
+"<html> <body> <h1>My First Web Page</h1> <p>My First Paragraph</p> <p id=""demo""></p> <script> document.getElementById(""demo"").innerHTML = 5 + 6; </script> </body> </html>",0
+"The satellite lifted off from Cape Canaveral in Florida under the direction of legendary German-born scientist Wernher Von Braun. Explorer 1, which was 80 inches long and 6.25 inches in diameter, revolved around Earth in a looping orbit that took it as close as 220 miles of Earth and as far away as 1,563 miles.",4
+You're designing a line of clothing for an esteemed fashion house. What elements and designs would you incorporate to maintain the brand's reputation and style?,2
+"In the eight-team Asia Cup hockey tournament, India beat Japan for the second time to win the bronze medal.",3
+"Lightweight midi skirt with a tropical print, paired with a knotted white blouse, slide sandals, and a statement necklace.",2
+"Imagine you're creating a line of clothing for a historic landmark or museum. What styles, materials, and designs would you use to represent the history and significance of the location?",2
+"Prime Minister Narendra Modi is scheduled to inaugurate 44th International Chess Olympiad on July 28, 2022.",3
+Give me ideas for incorporating the SOLID principles in my object-oriented design.,0
+Craft an email to customers for  who haven’t purchased from us in [number of months]. Include this offer.,7
+Analyze the impact of fashion on body image and self-esteem.,2
+Describe the structure of DNA and its significance in genetics and heredity.,1
+"With so much more wireless bandwidth available, it’s possible for more IoT devices to connect with each other. ",1
+import pandas as pd cars = pd.read_csv('data.csv') print(cars.to_string()),0
+Discuss the potential benefits and drawbacks of fashion as a form of self-expression.,2
+"Prime Minister Narendra Modi recently inaugurated the 36th National Games in Ahmedabad, Gujarat. Key facts The 2022 National Games of India will be held from September 29 to October 12 this year.",3
+"document.getElementById(""demo"").innerHTML = ""Hello Dolly."";",0
+"I like this top a lot - it's cuter in person than it looks on the model -- it's a little heathered. it definitely fits slimmer one me than on the model, and i'm pretty small on top.
+
+overall, nice to see a reasonably priced basic t on the retailer site",2
+"IND v AUS: Youngsters Rinku Singh, Ravi Bishnoi make strong case for T20 World Cup 2024 berths",3
+Predict how AI will affect different industries in the future.,7
+Write an article about the evolution of men's fashion over the decades.,2
+"function myFunction() {
+  document.getElementById(""demo1"").innerHTML = ""Hello Dolly!"";
+  document.getElementById(""demo2"").innerHTML = ""How are you?"";
+}",0
+Dave Roberts Expects Mookie Betts to Be Dodgers' Regular Second Baseman in 2024,3
+"Cryptocurrency also simplifies the process of digitally transferring funds, since it secures the transaction through public and private keys instead of through a bank or credit card company.",1
+"Cryptocurrency is digitally secured by cryptography, making it nearly impossible to counterfeit or double-spend. ",1
+"Today, Gucci sells luxurious fashion apparel, high-end leather goods",2
+count(),0
+"Less than a year after Gagarin became the first man to orbit the Earth, John Glenn became the first American to do so, completing three orbits around the planet aboard the Friendship 7 capsule.",4
+"Which Indian player won the USD 10,000 Julius Baer Challenger Championship in Tel Aviv",3
+San Francisco banned the sale of e-cigarettes in June.,1
+Goal Bafana Bafana! Goal for South Africa! Goal for all Africa,5
+HS Prannoy Clinches Bronze at BWF World Badminton Championships 2023,3
+The Martian day is 24 hours 39 minutes and 35 seconds long,4
+"On September 15, 2022, Roger Federer announced his retirement from the international tennis.",3
+"Fully self-driving cars may not arrive in dealerships for another decade, but we're already benefiting from the technology being developed for autonomous vehicles, including adaptive cruise control, automatic forward-collision braking, automatic parking, autopilot and lane-keep assist.",1
+Plan a trip to Himachal Pradesh,6
+"Premier League: Not a good moment to face Manchester United, says Chelsea’s Pochettino",3
+Suggest a selection of outfits for a winter vacation in a snowy location.,2
+"<!DOCTYPE html> <html> <body> <button onclick=""window.print()"">Print this page</button> </body> </html>",0
+"import numpy as np
+
+arr = np.array([[3, 2, 4], [5, 0, 1]])
+
+print(np.sort(arr))",0
+Generate a 7-day itinerary for a cultural trip to Rome.,6
+"Since the Apollo lunar program ended in 1972, human space exploration has been limited to low-Earth orbit",4
+"import pymongo
+
+myclient = pymongo.MongoClient(""mongodb://localhost:27017/"")
+mydb = myclient[""mydatabase""]
+
+mycol = mydb[""customers""]
+Run example »
+
+",0
+Create a conversation with Coco Chanel discussing her fashion philosophy.,2
+"const fruits = [""Banana"", ""Orange"", ""Apple"", ""Mango""];
+fruits.sort();",0
+The Hubble constant estimates the rate of the universe's expansion.,4
+"Vibrant tie-dye maxi dress with a cutout back, paired with flat metallic sandals and a wide cuff bracelet for an easygoing summer vibe.",2
+The Government of India conducts the Khelo India Youth Games every year to hunt talents from different parts of India.,3
+Look over this HTML script: your_code_here. Are there any bugs?,0
+give me code for this. the user types the input then the words are extracted by splitting when the user hits spacebar and shown to the user separately as draggable words.,0
+Loewe’s inclusion in the top-ranking fashion brands is based on,2
+Evaluate the impact of fashion on resource consumption and waste production.,2
+Discuss the role of fashion in preserving cultural heritage and traditions.,2
+df['Date'] = df['Date'].astype(int) # Convert datetime to Unix timestamp ,0
+"Design a command-line application with functionalities implemented in Python, C++, and Ruby, each handling a specific aspect of the application (e.g., data processing, user input, output formatting).",0
+"5G technology offers faster data speeds that enables innovations in healthcare, manufacturing, and autonomous vehicles, and the Internet of Things (IoT).",1
+The Fifth Khelo India Youth Games 2022 is set to be organized in Madhya Pradesh from January 31 to February 11 next year.,3
+"let x, y, z;  ",0
+Comfortable and soft are two of my favorite words when it comes to clothes. this shirt meets both requirement. it is a great length and can be casual and dressed up. must have for fall and winter.,2
+Create a line of clothing for an eco-resort. What materials and designs would you incorporate to ensure your pieces are both fashionable and environmentally-friendly?,2
+"Recently, Chief Minister Naveen Patnaik inaugurated the world’s largest dedicated hockey stadium in Rourkela, Odisha.",3
+The Board of Control for Cricket in India (BCCI) announced on January 1st that the Dexa bone density test will be mandatory for Indian players to be selected for the national team.,3
+Evaluate the effectiveness of various strategies for promoting ethical fashion practices.,2
+Create an Itinerary for a 5-day trip to Bali.Make sure to include the most beautiful yet safe places I can explore. Include a moderate amount of things to do since I also want some time to relax.,6
+"Yet, a watch or a piece of jewellery from Cartier is a statement of opulence and power, instantly recognised all over the world.",2
+Discuss the role of big data in business analytics and decision-making.,1
+"Gingham-print sundress with a fit-and-flare silhouette, paired with ankle-wrap sandals, a straw bag, and a pair of drop earrings.",2
+Write a Python regex that matches email addresses. The regex should account for variations in domain names and handle common email formats.,0
+"On February 6, 2022, India played its thousandth ODI match. ODI means One Day International. ",3
+"The recently concluded Janjatiya Khel Mahotsav at KIIT, Bhubneshwar witnessed an incredible display of talent and sportsmanship as tribal athletes from across India came together to compete in various disciplines.",3
+"document.getElementById(""demo"").innerHTML = ""Hello JavaScript"";",0
+The 15th edition of the FIH Men’s Hockey World Cup is set to begin on January 13th in India.,3
+What crisis? Man United gets morale-boosting 2-1 win over Chelsea. City lose,5
+Come up with  YouTube video ideas for about.,7
+"This function is running slower than I’d like. Any optimization suggestions export class HomeComponent implements OnInit {
+  spelling="""";
+
+  tokenizeSpellingEnglish(item: string): string{
+  if (item ==""houses""){
+    item = ""house"";
+  }
+     return item;
+  }
+
+   onNameKeyUp(event: any){
+    this.spelling = event;
+    this.spelling = this.spelling.toLowerCase();
+
+    // --> this.tokenizeSpellingEnglish(this.spelling); should be
+    this.spelling = this.tokenizeSpellingEnglish(this.spelling);
+
+    this.elem.nativeElement.focus();   
+   }
+",0
+Write a C++ program that reads data from a text file and displays it on the console.,0
+3D printing --  the process of synthesizing a three-dimensional object -- is one of those technologies that edges ever closer to mainstream use every year.,1
+Indian fencer C.A. Bhavani Devi achieved a historic milestone by securing India’s first-ever medal at the Asian fencing championships,3
+"In the 58th Senior National Chess Championship, that started on February 25, 2022, Grandmaster B Adhiban heads a star-studded field.",3
+"File photo taken on Oct. 1, 2022 shows team USA members celebrate during the awarding ceremony of the FIBA Women's Basketball World Cup 2022 in Sydney, Australia",3
+The electric car consists of an electric motor that propels it using the energy that is stored in a rechargeable battery,1
+Review the given Java code for potential scalability issues: your_code_here.,0
+"Hydrogen Fuel Cells produce electricity with only water vapor as a byproduct, reducing greenhouse gas emissions and dependence on fossil fuels.",1
+These jeans are so comfortable. they are well-made. they are the perfect pair of jeans. the only thing i do not love is they stretch out a little bit after wearing. i am going to order these again in the next smaller size.,2
+The Carabao cup is also called the EFL cup. It is a major football trophy played in England.,3
+"The promise of autonomous vehicles has been touted for more than a decade: Without human drivers, proponents say, cars will be safer and more comfortable, especially on long trips",1
+I am looking for t shirt,2
+Tommy Hilfiger is one of the most famous American luxury fashion brands,2
+Share productivity tips to help your audience work more efficiently.,7
+Ronaldinho Invited for Barcelona Team Photo,5
+// Change heading:,0
+"int i;
+
+for (i = 0; i < 10; i++) {
+  if (i == 4) {
+    break;
+  }
+  printf(""%d\n"", i);
+}",0
+Plan a trip to Chennai,6
+The smartphone and the internet we use today wouldn't have been possible without wireless communication technologies such as Wi-Fi. ,1
+"Roma have risen from their ruins! Manolas, the Greek God in Rome! The unthinkable unfolds before our eyes! This was not meant to happen! This could not happen! THIS IS HAPPENING",5
+Generate a list of essential items for a minimalist wardrobe.,2
+What does this recursive function written in a certain programming language do,0
+"Breezy floral sundress with spaghetti straps, paired with espadrille wedges and a straw tote bag for a beach-ready look.",2
+"You're designing a line of clothing for a luxury camping experience. What types of materials, designs, and colors would you incorporate to make sure your pieces are both stylish and outdoor-friendly?",2
+Mitchell Johnson slams David Warner’s Test selection for farewell match,3
+Write gift guides for different people and occasions based on your expertise.,7
+I don't buy many jackets (retired) but i think they are still useful. i had my doubts about this jacket -- like could they really get the trim straight at this price? but they did. the jacket is casual but sophisticated. i got the grey and the color is just as pictured. i will probably wear with dark jeans and i see several creative mashups with things in my closet. i am pleased and i think you will be too!,2
+"Artificial Intelligence (AI) and Machine Learning (ML) - AI and ML are transforming the way we live, work and interact.",1
+Give me an idea to take care of my hair along with the products to be used,7
+I am looking for checked shirt,2
+"Make ChatGPT act as a code formatter. Provide the input code, and it should format it according to the language’s style conventions.",0
+Humanoid robots are making a profound impact across different industries.,1
+"The shirt is amazing in the photo..but when it arrived in the package to my house, it is sooooo dark that you can't see the patchwork. not happy. going to return it. it was a holiday gift.",2
+"What are black holes, and how do they form? Discuss the current theories and observations related to black holes.",1
+"data = pd.read_csv('Corona_NLP_train.csv', encoding='ISO-8859-1')",0
+"The following  function  runs slower than expected when processing public static void changeRow(int n) // for moving to next row...n = 1 means last row
+    {
+        if(n == 0)
+        {
+            return;
+        }
+        changeRow(n - 1);
+        printRow(n); // when call stack of changeRow method is popping out we will print row 
+        System.out.print(""\n""); // new line after each column
+    }
+Any suggestions for optimization?",0
+"Blockchain Technology - Blockchain is a decentralized, secure, and transparent ledger of transactions that is maintained by a network of computers rather than a single central authority. ",1
+Quantum computing is a type of computing that uses quantum principles including quantum entanglement and superposition,1
+Write about financial news and explain its potential impact on your audience.,7
+What are some underrated architectural marvels in India worth visiting,6
+"function myArrayMin(arr) {
+  return Math.min.apply(null, arr);
+}",0
+"Create a line of clothing inspired by your favorite music artist. What materials, colors, and styles would you incorporate?",2
+Explain the process of 3D printing and its potential impact on manufacturing.,1
+Generate a week's worth of outfit ideas for a business casual office.,2
+World Cup stunning moments: Germany humiliate Brazil 7-1,5
+Make a travel budget.,6
+"print(dtree.predict([[40, 10, 7, 1]]))",0
+"<!DOCTYPE html> <html> <head> <script> function myFunction() { document.getElementById(""demo"").innerHTML = ""Paragraph changed.""; } </script> </head> body> <h2>Demo JavaScript in Head</h2> <p id=""demo"">A Paragraph</p> <button type=""button"" onclick=""myFunction()"">Try it</button> </body> </html>",0
+"import pandas as pd
+
+df = pd.read_csv('data.csv')
+
+print(df.to_string()) ",0
+Vetements creates menswear and womenswear inspired by “regular people wearing ordinary fashion,2
+I am looking for pair of socks,2
+"The Venera 3 impacted Venus, the first spacecraft to land on another planet, but the communications systems failed before any data could be retrieved.",4
+Write a Java method named calculateCircleArea that takes a double radius as input and returns the area of a circle. Use 3.14 for the value of Pi.,0
+"Iconic Tennis Star, Serena Williams announced her retirement on August 9, 2022.",3
+Analyze the relationship between fashion and other forms of art and design.,2
+The cosmic inflation theory explains the uniformity of the cosmic microwave background.,4
+"Giorgio Armani SpA, commonly known as Armani, is an Italian luxury fashion house founded by Giorgio Armani. ",2
+"In the eight-team Asia Cup hockey tournament, India beat Japan for the second time to win the bronze medal.",3
+"function myFunction() { document.getElementById(""demo"").innerHTML = ""Paragraph changed.""; }",0
+ ,0
+Can you recommend some unusual museums in London,6
+"Voyager 2 was built to examine the farthest reaches of the solar system, and this included the planet Neptune. The spacecraft is the only human-made object to have flown to that planet.",4
+Ralph Lauren flannel shirts for $40 each and simply screen printed the word ‘Pyrex’ and the number 23 on them,2
+Could you please explain how this JavaScript function works?” followed by the function you want to be explained,0
+I am looking for torn jeans,2
+"Crochet-trimmed kaftan worn over a swimsuit, paired with embellished sandals, a beach tote, and a pair of aviator sunglasses.",2
+Raf Simons launched his menswear label in 1995,2
+These tights are perfect. they seem like they will last a couple seasons with minimal wear. just the slightest texture and not shiny. i got the beige/brown to layer with dresses/skirts and boots. love.,2
+CSK confirms Dhoni will feature in IPL 2024,3
+Facial recognition is a blossoming field of technology that's playing an ever-growing role in our lives.,1
+"Drones have really taken off in recent years. What started out as a hobbyist gadget has transformed industries, with the unmanned aircraft shooting movie sequences, delivering packages to hard-to-reach places, surveying construction sites and spraying pesticide over crops to protect farms.",1
+import mysql.connector,0
+Create templates for key documents relevant to your audience.,7
+"In addition to launching the first artificial satellite, the first dog in space, and the first human in space, the Soviet Union achieved other space milestones ahead of the United States.",4
+"This product is just what i wanted. it was a great color and nice quality for the price. it is tighter than the model, but i am curvy and that's usually the case. looks cute with a patterned pant and jewelry!",2
+"import pymongo
+
+myclient = pymongo.MongoClient(""mongodb://localhost:27017/"")
+mydb = myclient[""mydatabase""]
+mycol = mydb[""customers""]
+
+mylist = [
+  { ""name"": ""Amy"", ""address"": ""Apple st 652""},
+  { ""name"": ""Hannah"", ""address"": ""Mountain 21""},
+  { ""name"": ""Michael"", ""address"": ""Valley 345""},
+  { ""name"": ""Sandy"", ""address"": ""Ocean blvd 2""},
+  { ""name"": ""Betty"", ""address"": ""Green Grass 1""},
+  { ""name"": ""Richard"", ""address"": ""Sky st 331""},
+  { ""name"": ""Susan"", ""address"": ""One way 98""},
+  { ""name"": ""Vicky"", ""address"": ""Yellow Garden 2""},
+  { ""name"": ""Ben"", ""address"": ""Park Lane 38""},
+  { ""name"": ""William"", ""address"": ""Central st 954""},
+  { ""name"": ""Chuck"", ""address"": ""Main Road 989""},
+  { ""name"": ""Viola"", ""address"": ""Sideway 1633""}
+]
+
+x = mycol.insert_many(mylist)
+
+#print list of the _id values of the inserted documents:
+print(x.inserted_ids)",0
+"As of June 2019, among the world’s top ten most expensive watches ever sold at auctions, three are Rolex watches",2
+"NASA's Magellan spacecraft began mapping the surface of Venus using radar equipment. The objective of the mission was to study land formations, plate tectonics, and erosion.",4
+"Gucci is well known for its distinctive “Double-G” monogram, as well as the iconic Gucci stripe, consisting of two green stripes interrupted by a single red bar",2
+"Battery-operated e-cigarettes hit the US market about a decade ago, touted as a safer alternative to traditional tobacco cigarettes.",1
+You're designing a line of clothing for a new luxury spa. What elements and designs would you use to create,2
+A light-year is the distance covered by light in a single year.,4
+The Sun contains 99.86% of the mass in our solar system.,4
+"On September 25, Kenya's two-time Olympic champion Eliud Kipchoge clocked two hours, one minute and nine seconds to win the 2022 Berlin Marathon, beating his own world record set in 2018 by 30 seconds",3
+"The T20 Women’s Cricket World cup is being held in Cape Town, South Africa.",3
+"We've been exploring space for more than 60 years, and have been lucky enough to get close-up pictures of dozens of celestial objects. ",4
+"This shirts dresses up anything-tights, jeans or a skirt. love the color and the length",2
+Share your personal story to connect with your audience.,7
+"You've been asked to design an international fashion collection that showcases the best of each culture represented. What materials, designs, and colors would you use to achieve this?",2
+"Cloud Computing - Cloud computing allows users to access and store data and applications on remote servers over the internet, rather than on local computers.",1
+"Create a Python class representing a basic banking account with methods for deposit, withdrawal, and checking the balance.",0
+"Blockchain is already revolutionizing nearly every industry, from technology, to finances, to healthcare.",1
+"Because blockchains work as a secure digital ledger, a bumper crop of startups hope to bring it to voting, lotteries, ID cards and identity verification, graphics rendering, welfare payments, job hunting and insurance payments.",1
+"const fruits = [""Banana"", ""Orange"", ""Apple"", ""Mango""];
+fruits.sort();
+fruits.reverse();",0
+You're designing a line of clothing for a non-profit organization. What elements and designs would you prioritize to make sure your pieces promote the organization's message and values?,2
+The Asian Football Cup is held once in four years. It is organized by the Asian Football Confederation.,3
+"Earth-observation satellites have also become extremely useful to the military authorities of several countries as complements to their land, sea, and air forces and have provided important security-related information to national leaders.",4
+Imagine you're designing a line of sustainable activewear for women. What are some key features you would include?,2
+The 2023 T20 Women’s world cup was held in South Africa. The final battle was between South Africa and Australia.,3
+Diego Maradona’s ‘Hand of ‘God’ Goal,5
+Evaluate the effectiveness of various strategies for promoting sustainable fashion practices.,2
+A stray husky-spitz mix named Laika was the first living creature to orbit the Earth. She was also the first fatal casualty in the Space Age.,4
+He appeared to be referring to a meeting of ISRO leadership chaired by Indian Prime Minister Narendra Modi Oct. 17.,4
+Tokyo Olympic gold medalist Neeraj Chopra has become the first Indian to win the prestigious Zurich Diamond League Final 2022 in Switzerland.,3
+Mercury & Venus are the only 2 planets in our solar system that have no moons.,4
+"Create a line of clothing for a major film or television series. What colors, materials, and styles would you use to represent the characters and setting?",2
+Quantum Computing - Quantum computing is a new type of computing that uses the principles of quantum mechanics to perform certain calculations much faster than traditional computers.,1
+The 2028 Olympics is to be held in Los Angeles. This is after the 2024 Olympics to be held in Paris. The 2022 Olympics was held in Tokyo.,3
+Write about industry news and share your perspectives.,7
+There are 79 known moons orbiting Jupiter.,4
+Discuss the differences between 4G and 5G networks in terms of speed and capabilities.,1
+Can you write a Ruby method to determine if a given word is a palindrome?,0
+Can you spot any potential problems with this Swift class definition: your_code_here?,0
+"Flowy wrap dress in a soft pastel shade, worn with heeled sandals, a minimalist necklace, and a top-handle bag for a polished look.",2
+"Comfortable tank dress in a bold color, worn with sporty slide sandals, a crossbody bag, and a stack of bracelets.",2
+You are the manager of your favourite football team. Create a game plan on how they can win their next game.,5
+Could you explain the logic behind this function written in a particular programming language,0
+"On October 1, the United States captured its fourth consecutive title at the FIBA Women's World Cup with an 83-61 victory over China. The silver medal for China's women represented the nation's best finish in the global showpiece since 1994",3
+"The 2022 Commonwealth Games was officially inaugurated on July 28, 2022, following a grand opening ceremony at the Alexander Stadium in Birmingham.",3
+"Vetements was founded by two Georgian fashion designers and brother, Demna Gvasalia and Guram",2
+3D printing got an early foothold as a way to design prototypes of just about anything.,1
+"You've been asked to create a collection that celebrates a specific culture. How would you approach this project, and what elements would you include?",2
+International Ice Hockey Federation to Mandate Neck Guards After the Death of a Player by Skate Cut,3
+Balenciaga is one of the most popular French haute-couture brands in the world.,2
+"VPN use has grown in popularity since then, with about a quarter of internet users using a VPN in 2018.",1
+"The Soviet Union bested its rival at nearly every turn, until the U.S. beat them to the finish line by landing astronauts on the moon.",4
+It's always going to be one 'Universe Boss': Chris Gayle,5
+" Louis Vuitton in Paris, France; Louis Vuitton is the world’s most valuable luxury brand and is a division of the French LVMH group",2
+"Leonov had to release a valve to partially depressurize his suit to allow him to get back into the spaceship. Three months later, Ed White would become the first American to walk in space.",4
+Can Hardik Pandya still return to Mumbai Indians from Gujarat Titans after the retention day,3
+The sun is mainly composed of hydrogen (about 74% by mass) and helium (about 24% by mass).,4
+Provide tips for styling a little black dress for different occasions.,2
+"Augmented reality, in which digital graphics are overlaid onto live footage to convey information in real time, has been around for a while. ",1
+"Stylish summer outfit with a button-front midi skirt, a sleeveless blouse, and espadrille flats, completed with a leather belt and a delicate choker necklace.",2
+Discuss the principles of Einstein’s theory of relativity and their implications for our understanding of space and time.,1
+"he Soyuz craft bore cosmonauts Alexei Leonov and Valery Kubasov, while the Apollo carried astronauts Thomas Stafford, Vance Brand, and Donald Slayton. ",4
+Explain the working principles behind blockchain technology and its impact on industries.,1
+Valentino is one of the most famous Italian luxury fashion brands,2
+Discuss the ethical concerns surrounding the use of facial recognition technology.,1
+Write a JavaScript function named filterEvenNumbers that takes an array of integers as input and returns a new array with only the odd numbers.,0
+ISRO said the maneuver allowed SHAPE to continue observations closer to Earth.,4
+Develop a RESTful API for a customer management system using Node.js and Express.js.,0
+"print(""Hello, World!"")",0
+"For many consumers, the heart of the smart home is a voice assistant such as Amazon's Alexa, Google's Assistant and Apple's Siri.",1
+"Could you break it down for me, especially the part where it implements a specific algorithm or feature?",0
+India’s first National Air Sports Policy (NASP 2022) has been released by Ministry of Civil Aviation.,3
+Messi and Mbappe trade blows in epic Final,5
+"Love these tanks so much i have them in every color. i wear them layered under blouses, thermals, henleys, blazers, etc. i'm typically and extra small but the small fits perfectly.",2
+Design a streetwear line that incorporates sustainable materials and practices. What types of fabrics and designs would you use to achieve this look?,2
+"Messi’s journey towards greatness commenced on the back of a goal from the then rising star, as he celebrated by hopping on teammate Ronaldinho’s back",5
+Generate a week's worth of outfit ideas for a business casual office.,2
+Write a C++ function named reverseString that takes a string as input and returns the string in reverse order.,0
+Valentino to recreate 20 looks from the SS20 and fall collections to be worn exclusively by the game’s avatars,2
+Michael Kors is one of the most popular American fashion brands,2
+Plan a trip to Ladak,6
+The Ministry of External Affairs officially announced the diplomatic boycott of Beijing winter Olympics of India.,3
+"Imagine you're designing a collection for a large department store. What trends would you focus on, and how would you make sure the line stands out?",2
+Plan a trip to Kerla.,6
+Create a conversation with a fashion stylist discussing the process of creating a look for a red carpet event.,2
+There are more volcanoes on Venus than any other planet in our solar system.,4
+Design a capsule wardrobe for a businesswoman who's always on the go. What pieces would be must-haves?,2
+Ralph Lauren is one of the most iconic American high fashion brands.,2
+Can you analyze this TypeScript code: your_code_here and point out potential errors?,0
+"Uranus usually appears in classroom solar system models as a featureless blue ball, but this gas giant of the outer solar system is pretty weird on closer inspection. ",4
+I want you to act as a brainstorming assistant and suggest ideas for a coding challenge that will test the problem-solving skills of junior developers.,0
+"Off-the-shoulder mini dress in a bright floral print, worn with lace-up sandals, a tassel necklace, and a fringe crossbody bag.",2
+"The Commonwealth Games 2022 were held from July 28 to August 8, 2022, in which India has been ranked at 4th place, in terms of medals.",3
+"Suggest improvements to optimize this function function Car() {
+  return <h2>Hi, I am a Car!</h2>;
+}
+",0
+Create an Instagram carousel with slides using this.,3
+"Though it wasn't the first smartphone, Apple really got the ball rolling with the introduction of the iPhone in 2007. ",1
+Quantum computing is a highly impactful invention owing to its ability to tackle complex problems exponentially faster than classical computers.,1
+You're creating a line of workout clothes that's both functional and stylish. What designs and materials would you incorporate to achieve this?,2
+Discuss the significance of cybersecurity in the modern digital age.,1
+Suggest ideas for a game development course engaging game developers.,0
+"enum Level {
+  LOW = 1,
+  MEDIUM,
+  HIGH
+};
+
+int main() {
+  enum Level myVar = MEDIUM;
+
+  switch (myVar) {
+    case 1:
+      printf(""Low Level"");
+      break;
+    case 2:
+      printf(""Medium level"");
+      break;
+    case 3:
+      printf(""High level"");
+      break;
+  }
+  return 0;
+}",0
+Sergio Ramos Garcia is a Spanish Football player. He is popular for his aggressive play.,3
+"int myNumbers[] = {25, 50, 75, 100};",0
+"In almost every culture there are sporting events. No matter where you live, chances are that you are a fan of a sports team of some kind. Baseball, Football, the Olympics, Soccer, Basketball, etc.",3
+A robot is a machine that is designed to do tasks without the help of a person.,1
+"The Russian spacecraft Zond 5 became the first spacecraft to orbit the moon and return to Earth. Aboard the Zond 5 were turtles, mealworms, seeds, bacteria, and other living things.",4
+"Lightweight palazzo pants paired with a fitted tank top, thong sandals, and a long pendant necklace for a comfortable yet stylish outfit.",2
+Write a Python script to scrape data from a website. The script should extract information such as metrics/information and save it in a structured format like formatting code language.,0
+Write about business failures and analyze the reasons behind them.,7
+"Lightweight culottes in a pastel shade, paired with a fitted sleeveless top, block-heeled mules, and a long chain necklace for a chic daytime look.",2
+"The Hero Asian Champions Trophy 2023, one of the most anticipated hockey tournaments, is set to take place in Chennai, Tamil Nadu.",3
+"import numpy as np
+
+arr = np.array([3, 2, 0, 1])
+
+print(np.sort(arr))",0
+Neutron stars can spin at a rate of 600 rotations per second,4
+"The greatest moment in the history of English football, Bobby Moore lifting aloft the World Cup trophy on home soil after a thrilling final victory over arch-rivals West Germany at Wemble",5
+"The United States had hoped to be the first nation to put a man into space, but the Soviet Union won that race with Gagarin accomplishing that feat.",4
+Steelers QB Kenny Pickett Out Indefinitely After Undergoing Surgery for a High Right Ankle Sprain,3
+Can you help me understand this script written in a particular programming language,0
+"In essence, the Fourth Industrial Revolution is the trend towards automation and data exchange in manufacturing technologies and processes which include cyber-physical systems (CPS), IoT, industrial internet of things",1
+"Heisman Finalists: LSU QB Daniels, Oregon QB Nix, Washington QB Penix Jr., Ohio St WR Harrison Jr.",3

@@ -1,0 +1,2 @@
+You are solving this data science tasks of binary classification: 
+The dataset presented here (the Smoker Status Dataset) comprises a lot of numerical features. We have splitted the dataset into three parts of train, valid and test. Your task is to predict the smoking item, which is a binary label with 0 and 1. The evaluation metric is the area under ROC curve (AUROC).

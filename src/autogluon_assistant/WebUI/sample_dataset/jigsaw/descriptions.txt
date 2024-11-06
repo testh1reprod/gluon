@@ -1,0 +1,2 @@
+You are solving this machine learning tasks of regression: 
+The dataset presented here (the JigSaw reviews) comprises a series of texts. Your task is to predict the corresponding toxicity score (with 0.0 as non-toxic and >0 as toxic) given these texts in the test set. The evaluation metric is root mean squared error (RMSE).

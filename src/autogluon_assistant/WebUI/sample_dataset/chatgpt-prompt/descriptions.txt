@@ -1,0 +1,2 @@
+You are solving this machine learning tasks of classification: 
+The dataset presented here (the ChatGPT prompt dataset) comprises a series of sentences. Given the text, your task is to predict the label of it in range of {0, 1, ..., 7}. The evaluation metric is accuracy.

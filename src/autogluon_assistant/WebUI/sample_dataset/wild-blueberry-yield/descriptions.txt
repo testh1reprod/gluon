@@ -1,0 +1,2 @@
+You are solving this data science tasks of regression: 
+The dataset presented here (the Wild Blueberry Yield Dataset) comprises a lot of numerical features. We have splitted the dataset into three parts of train, valid and test. Your task is to predict the yield item. The evaluation metric is the mean absolute error (MAE).
