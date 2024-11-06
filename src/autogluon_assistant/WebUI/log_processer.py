@@ -1,8 +1,9 @@
-import streamlit as st
 import re
+import time
+
+import streamlit as st
 from constants import TIME_LIMIT_MAPPING
 from stqdm import stqdm
-import time
 
 
 def parse_model_path(log):

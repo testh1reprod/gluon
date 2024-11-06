@@ -1,5 +1,5 @@
 import streamlit as st
-from st_aggrid import GridOptionsBuilder, AgGrid
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 
 def get_user_uploaded_files():

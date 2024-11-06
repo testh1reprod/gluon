@@ -1,11 +1,11 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from pages.nav_bar import nav_bar
-from pages.tutorial import main as tutorial
-from pages.feature import main as feature
 from pages.demo import main as demo
+from pages.feature import main as feature
+from pages.nav_bar import nav_bar
 from pages.preview import main as preview
 from pages.task import main as run
+from pages.tutorial import main as tutorial
 
 st.set_page_config(
     page_title="AutoGluon Assistant",
