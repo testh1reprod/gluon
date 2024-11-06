@@ -122,7 +122,7 @@ def main():
     )
 
     st.markdown(
-    """
+        """
     <div class="main-container" id="get-started">
         <div class="left-section">
             <div class="titleWithLogo">
