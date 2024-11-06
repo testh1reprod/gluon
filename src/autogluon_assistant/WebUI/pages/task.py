@@ -169,7 +169,7 @@ def show_cancel_task_button():
         st.session_state.task_running = False
         st.session_state.process = None
         st.session_state.pid = None
-        st.error(f"No running task is found")
+        st.error("No running task is found")
     except Exception as e:
         st.session_state.task_running = False
         st.session_state.process = None
