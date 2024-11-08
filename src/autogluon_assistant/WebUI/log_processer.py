@@ -66,6 +66,9 @@ def show_logs():
         status_container = st.empty()
         if st.session_state.return_code == 0:
             status_container.success("Task completed successfully!")
+            st.toast(
+                "If you like our project, please consider starring our repo at [GitHub](https://github.com/autogluon/autogluon-assistant)!",
+                icon="⭐")
         else:
             status_container.error("Error detected in the process...Check the logs for more details")
         tab1, tab2 = st.tabs(["Messages", "Logs"])
@@ -78,7 +81,6 @@ def show_logs():
         with tab2:
             log_container = st.empty()
             log_container.text_area("Real-Time Logs", st.session_state.logs, height=400)
-        # st.toast("If you like our project, please consider starring our repo at [GitHub](https://github.com/autogluon/autogluon-assistant?tab=readme-ov-file)!",icon="⭐")
 
 
 def format_log_line(line):
