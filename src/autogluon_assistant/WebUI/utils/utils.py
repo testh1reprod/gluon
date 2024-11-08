@@ -52,30 +52,26 @@ def generate_output_file():
     """
     Generate and store the output file after task completion.
     """
-    if st.session_state.process is not None:
-        process = st.session_state.process
-        process.wait()
-        st.session_state.task_running = False
-        st.session_state.return_code = process.returncode
-        st.session_state.process = None
-        if st.session_state.return_code == 0:
-            output_filename = st.session_state.output_filename
-            if output_filename:
-                df = pd.read_csv(output_filename)
-                st.session_state.output_file = df
-                st.rerun()
-            else:
-                st.error(f"CSV file not found: {output_filename}")
+    if st.session_state.return_code == 0:
+        output_filename = st.session_state.output_filename
+        if output_filename:
+            df = pd.read_csv(output_filename)
+            st.session_state.output_file = df
+        else:
+            st.error(f"CSV file not found: {output_filename}")
 
 
 def clear_directory(directory):
     """
     Before saving the files to the user's directory, clear the directory first
+    but keep the 'description.txt' file.
 
     Args:
        directory (str): Directory path to be cleared.
     """
     for filename in os.listdir(directory):
+        if filename == "description.txt":
+            continue
         file_path = os.path.join(directory, filename)
         try:
             os.remove(file_path)

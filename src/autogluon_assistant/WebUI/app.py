@@ -1,5 +1,8 @@
+from copy import deepcopy
+
 import streamlit as st
 import streamlit.components.v1 as components
+from constants import DEFAULT_PRESET, DEFAULT_SESSION_VALUES, DEFAULT_TIME_LIMIT, INITIAL_STAGE
 from pages.demo import main as demo
 from pages.feature import main as feature
 from pages.nav_bar import nav_bar
@@ -46,73 +49,14 @@ components.html(reload_warning, height=0)
 
 
 def initial_session_state():
-    if "config_overrides" not in st.session_state:
-        st.session_state.config_overrides = []
-    if "preset" not in st.session_state:
-        st.session_state.preset = None
-    if "time_limit" not in st.session_state:
-        st.session_state.time_limit = "1 min"
-    if "llm" not in st.session_state:
-        st.session_state.llm = None
-    if "pid" not in st.session_state:
-        st.session_state.pid = None
-    if "logs" not in st.session_state:
-        st.session_state.logs = ""
-    if "process" not in st.session_state:
-        st.session_state.process = None
-    if "clicked" not in st.session_state:
-        st.session_state.clicked = False
-    if "task_running" not in st.session_state:
-        st.session_state.task_running = False
-    if "output_file" not in st.session_state:
-        st.session_state.output_file = None
-    if "output_filename" not in st.session_state:
-        st.session_state.output_filename = None
-    if "task_description" not in st.session_state:
-        st.session_state.task_description = ""
-    if "sample_description" not in st.session_state:
-        st.session_state.sample_description = ""
-    if "return_code" not in st.session_state:
-        st.session_state.return_code = None
-    if "task_canceled" not in st.session_state:
-        st.session_state.task_canceled = False
-    if "uploaded_files" not in st.session_state:
-        st.session_state.uploaded_files = {}
-    if "sample_files" not in st.session_state:
-        st.session_state.sample_files = {}
-    if "selected_dataset" not in st.session_state:
-        st.session_state.selected_dataset = None
-    if "sample_dataset_dir" not in st.session_state:
-        st.session_state.sample_dataset_dir = None
-    if "description_uploader_key" not in st.session_state:
-        st.session_state.description_uploader_key = 0
-    if "sample_dataset_selector" not in st.session_state:
-        st.session_state.sample_dataset_selector = None
-    if "current_stage" not in st.session_state:
-        st.session_state.current_stage = None
-    if "feature_generation" not in st.session_state:
-        st.session_state.feature_generation = True
-    if "stage_status" not in st.session_state:
-        st.session_state.stage_status = {}
-    if "show_remaining_time" not in st.session_state:
-        st.session_state.show_remaining_time = False
-    if "model_path" not in st.session_state:
-        st.session_state.model_path = None
-    if "increment_time" not in st.session_state:
-        st.session_state.increment_time = 0
-    if "progress_bar" not in st.session_state:
-        st.session_state.progress_bar = None
-    if "increment" not in st.session_state:
-        st.session_state.increment = 2
-    if "zip_path" not in st.session_state:
-        st.session_state.zip_path = None
-    if "stage_container" not in st.session_state:
-        st.session_state.stage_container = {
-            "Task Understanding": [],
-            "Feature Generation": [],
-            "Model Training": [],
-            "Prediction": [],
-        }
+    """
+    Initial Session State
+    """
+    for key, default_value in DEFAULT_SESSION_VALUES.items():
+        if key not in st.session_state:
+            st.session_state[key] = (
+                deepcopy(default_value) if isinstance(default_value, (dict, list)) else default_value
+            )
 
 
 def main():
@@ -123,7 +67,6 @@ def main():
     feature()
     run()
     preview()
-    help()
 
     st.markdown(
         """

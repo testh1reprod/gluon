@@ -14,8 +14,8 @@ dependencies =[
 "streamlit-aggrid==1.0.5",
 "streamlit-extras==0.4.7",
 "psutil>=5.9.8",
-#"autogluon-assistant",
-"autogluon-assistant  @ git+https://github.com/autogluon/autogluon-assistant.git@main",
+"autogluon-assistant",
+#"autogluon-assistant  @ git+https://github.com/autogluon/autogluon-assistant.git@main",
 ]
 
 
@@ -23,7 +23,7 @@ dependencies =[
 "Documentation" = "https://github.com/autogluon/autogluon-assistant"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
 
 [tool.codespell]
 skip = '.git,*.pdf,*.svg,*.ipynb,*.csv,'

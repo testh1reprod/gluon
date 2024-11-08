@@ -2,6 +2,9 @@ import streamlit as st
 
 
 def nav_bar():
+    """
+    Show the top navigation bar
+    """
     st.markdown(
         """
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top" style="padding-left: 81px;">

@@ -1,2 +1,0 @@
-You are solving this machine learning tasks of classification: 
-The dataset presented here (the BoolQ dataset) comprises a series of passage-question pairs. Given a passage and a question, your task is to identify whether the question can be inferred from the passage, with 0 as False and 1 as True. The evaluation metric is accuracy.

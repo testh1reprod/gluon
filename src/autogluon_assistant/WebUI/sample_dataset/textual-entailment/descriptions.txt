@@ -1,2 +1,0 @@
-You are solving this machine learning tasks of classification: 
-The dataset presented here (the Textual Entailment) comprises a series of labeled text pairs. Given two texts, your task is to predict the relationship of the text pair of neutral (0), contradiction (1) or entailment (2). The evaluation metric is accuracy.

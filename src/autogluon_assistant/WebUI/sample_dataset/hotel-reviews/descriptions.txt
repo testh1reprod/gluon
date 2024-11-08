@@ -1,2 +1,0 @@
-You are solving this machine learning tasks of regression: 
-The dataset presented here (the Hotel reviews) comprises customer feedback for TripAdvisor hotels. Here, we provide the textual reviews. Your task is to predict the corresponding rating in the range of {1, ..., 5} given the reviews in the test set. The evaluation metric is root mean squared error (RMSE).

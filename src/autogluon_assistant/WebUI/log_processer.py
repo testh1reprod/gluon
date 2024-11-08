@@ -63,6 +63,11 @@ def show_logs():
     Display logs and task status when task is finished.
     """
     if st.session_state.logs:
+        status_container = st.empty()
+        if st.session_state.return_code == 0:
+            status_container.success("Task completed successfully!")
+        else:
+            status_container.error("Error detected in the process...Check the logs for more details")
         tab1, tab2 = st.tabs(["Messages", "Logs"])
         with tab1:
             for stage, logs in st.session_state.stage_container.items():
@@ -71,13 +76,9 @@ def show_logs():
                         for log in logs:
                             show_log_line(log)
         with tab2:
-            status_container = st.empty()
             log_container = st.empty()
             log_container.text_area("Real-Time Logs", st.session_state.logs, height=400)
-            if st.session_state.return_code == 0:
-                status_container.success("Task completed successfully!")
-            else:
-                status_container.error("Error detected in the process...Check the logs for more details")
+        # st.toast("If you like our project, please consider starring our repo at [GitHub](https://github.com/autogluon/autogluon-assistant?tab=readme-ov-file)!",icon="⭐")
 
 
 def format_log_line(line):
@@ -94,8 +95,7 @@ def format_log_line(line):
     line = re.sub(r"\x1B\[1m(.*?)\x1B\[0m", r"**\1**", line)
     line = re.sub(r"^#", r"\\#", line)
     line = re.sub(r"\033\[\d+m", "", line)
-    line = re.sub(r"^(\s*)\(_dystack pid=\d+\)\s*", r"\1", line)
-    line = line.strip()
+    line = re.sub(r"^\s*\(\w+ pid=\d+\)\s*", "", line)
     return line
 
 
@@ -119,7 +119,6 @@ def process_realtime_logs(line):
         )
         if "AutoGluon training complete" in line:
             st.session_state.show_remaining_time = False
-            st.session_state.stage_container[st.session_state.current_stage].append("st.session_state.progress_bar")
         with st.session_state.stage_status[st.session_state.current_stage]:
             time.sleep(1)
             if "Fitting model" in line and not st.session_state.show_remaining_time:
@@ -152,7 +151,6 @@ def messages():
             "Task loaded!": 10,
             "Beginning AutoGluon training": 25,
             "Preprocessing data": 50,
-            "User-specified model hyperparameters to be fit": 75,
             "Fitting model": 65,
             "AutoGluon training complete": 90,
         }
@@ -162,14 +160,6 @@ def messages():
             print(line, end="")
             line = format_log_line(line)
             st.session_state.logs += line
-            # if "exception" in line.lower():
-            #     status_container.error("Error detected in the process...Check the logs for more details")
-            #     st.session_state.output_file = None
-            #     st.session_state.output_filename = None
-            #     st.session_state.process = None
-            #     st.session_state.pid = None
-            #     st.session_state.task_running = False
-            #     st.rerun()
             if "TabularPredictor saved" in line:
                 model_path = parse_model_path(line)
                 if model_path:
@@ -177,6 +167,8 @@ def messages():
             if "Prediction complete" in line:
                 status_container.success("Task completed successfully!")
                 progress.progress(100)
+                process_realtime_logs(line)
+                break
             else:
                 for stage, progress_value in task_stages.items():
                     if stage.lower() in line.lower():

@@ -1,3 +1,4 @@
+import copy
 import os
 import subprocess
 from pathlib import Path
@@ -10,9 +11,11 @@ from constants import (
     BASE_DATA_DIR,
     CAPTIONS,
     DATASET_OPTIONS,
+    DEFAULT_PRESET,
     INITIAL_STAGE,
     LLM_MAPPING,
     LLM_OPTIONS,
+    PRESET_DEFAULT_CONFIG,
     PRESET_MAPPING,
     PRESET_OPTIONS,
     PROVIDER_MAPPING,
@@ -39,14 +42,10 @@ def update_config_overrides():
     Update the configuration overrides based on the current session state.
     """
     config_overrides = []
-    if st.session_state.preset:
-        config_overrides.append(f"autogluon.predictor_fit_kwargs.presets={PRESET_MAPPING[st.session_state.preset]}")
-
     if st.session_state.time_limit:
         config_overrides.append(
             f"autogluon.predictor_fit_kwargs.time_limit={TIME_LIMIT_MAPPING[st.session_state.time_limit]}"
         )
-
     if st.session_state.llm:
         config_overrides.append(f"llm.model={LLM_MAPPING[st.session_state.llm]}")
         config_overrides.append(f"llm.provider={PROVIDER_MAPPING[st.session_state.llm]}")
@@ -66,6 +65,10 @@ def store_value(key):
         key (str): The key to store the value under in the session state.
     """
     st.session_state[key] = st.session_state["_" + key]
+    if key == "preset":
+        preset_config = PRESET_DEFAULT_CONFIG.get(st.session_state.preset)
+        st.session_state["time_limit"] = preset_config.get("time_limit")
+        st.session_state["feature_generation"] = preset_config.get("feature_generation")
 
 
 def load_value(key):
@@ -78,7 +81,6 @@ def load_value(key):
     st.session_state["_" + key] = st.session_state[key]
 
 
-@st.fragment
 def config_autogluon_preset():
     st.selectbox(
         "Autogluon Preset",
@@ -94,9 +96,10 @@ def config_autogluon_preset():
 
 @st.fragment
 def config_time_limit():
+    load_value("time_limit")
     st.selectbox(
         "Time Limit",
-        index=0,
+        index=5,
         placeholder="Time Limit",
         options=TIME_LIMIT_OPTIONS,
         key="_time_limit",
@@ -120,11 +123,10 @@ def config_llm():
     )
 
 
-@st.fragment
 def config_feature_generation():
+    load_value("feature_generation")
     st.checkbox(
         "Enable Feature Generation",
-        value=True,
         key="_feature_generation",
         on_change=store_value,
         args=["feature_generation"],
@@ -165,6 +167,8 @@ def show_cancel_task_button():
             st.session_state.pid = None
             print("The Task has stopped")
             st.session_state.task_running = False
+            st.session_state.show_remaining_time = False
+            st.session_state.output_filename = None
             st.rerun()
     except psutil.NoSuchProcess:
         st.session_state.task_running = False
@@ -192,6 +196,8 @@ def run_autogluon_assistant(data_dir):
     """
     output_filename = generate_output_filename()
     command = ["aga", data_dir]
+    if st.session_state.preset:
+        command.extend(["--presets", PRESET_MAPPING[st.session_state.preset]])
     if st.session_state.config_overrides:
         command.extend(["--config_overrides", " ".join(st.session_state.config_overrides)])
     command.extend(["--output-filename", output_filename])
@@ -209,7 +215,11 @@ def download_model_button():
     """
     Create and display a download button for the log file.
     """
-    if st.session_state.zip_path and st.session_state.task_running is False:
+    if (
+        st.session_state.preset == DEFAULT_PRESET
+        and st.session_state.zip_path
+        and st.session_state.task_running is False
+    ):
         zip_path = st.session_state.zip_path
         if zip_path and os.path.exists(zip_path):
             with open(zip_path, "rb") as f:
@@ -248,7 +258,7 @@ def toggle_running_state():
     st.session_state.task_running = True
     st.session_state.task_canceled = False
     st.session_state.current_stage = None
-    st.session_state.stage_container = INITIAL_STAGE
+    st.session_state.stage_container = copy.deepcopy(INITIAL_STAGE)
     st.session_state.stage_status = {}
     st.session_state.increment_time = 0
     st.session_state.progress_bar = None
@@ -311,6 +321,23 @@ def set_description():
     add_vertical_space(4)
 
 
+def wait_for_process():
+    """
+    Wait for the process to complete and update session state based on return code.
+    """
+    if st.session_state.process is not None:
+        process = st.session_state.process
+        process.wait()
+        st.session_state.task_running = False
+        st.session_state.return_code = process.returncode
+        st.session_state.process = None
+        st.session_state.pid = None
+        generate_output_file()
+        if st.session_state.feature_generation:
+            generate_model_file()
+        st.rerun()
+
+
 def run_section():
     """
     Set up and display the 'Run AutoGluon' section of the user interface.
@@ -368,8 +395,7 @@ def run_section():
             show_logs()
         elif st.session_state.task_canceled:
             show_cancel_container()
-    generate_model_file()
-    generate_output_file()
+    wait_for_process()
     _, download_pos, _ = st.columns([4, 2, 4])
     with download_pos:
         if not st.session_state.task_running:
@@ -446,6 +472,7 @@ def dataset_selector():
 def main():
     get_user_session_id()
     run_section()
+    st.write(st.session_state)
 
 
 if __name__ == "__main__":
