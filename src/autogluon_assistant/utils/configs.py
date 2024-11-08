@@ -70,8 +70,8 @@ def apply_overrides(config: Dict[str, Any], overrides: List[str]) -> Dict[str, A
 
     # Convert overrides to nested dict
     override_conf = {}
-    overrides = ','.join(overrides)
-    overrides = re.split(r'[,\s]+', overrides)
+    overrides = ",".join(overrides)
+    overrides = re.split(r"[,\s]+", overrides)
     for override in overrides:
         key, value = parse_override(override)
 
