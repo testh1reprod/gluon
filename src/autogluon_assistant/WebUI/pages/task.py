@@ -472,7 +472,6 @@ def dataset_selector():
 def main():
     get_user_session_id()
     run_section()
-    st.write(st.session_state)
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@
 .aim/
 AutogluonModels/
 data/
+user_data/
 results/
 cookies.json
 cdk.out/

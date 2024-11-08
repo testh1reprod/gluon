@@ -93,3 +93,29 @@ aga ./data ./config --output-filename my_output.csv --config-overrides "autogluo
 ```
 
 `autogluon-assistant-tools` provides more functionality and utilities for benchmarking, wrapped around autogluon-assistant. Please check out the [repo](https://github.com/autogluon/autogluon-assistant-tools/) for more details.
+
+## Autogluon Assistant Web UI
+The Autogluon Assistant Web UI is a user-friendly application that allows users to leverage the capabilities of the Autogluon-Assistant library through an intuitive web interface.
+
+The web UI enables users to upload datasets, configure Autogluon-Assistant runs with customized settings, preview data, monitor execution progress, view and download results, and supports secure, isolated sessions for concurrent users.
+
+#### To run the Autogluon Assistant Web UI:
+Navigate to the project directory and run the app:
+````
+cd src/autogluon_assistant/WebUI && streamlit run app.py
+````
+The Autogluon Assistant Web UI should now be accessible in your web browser at `http://localhost:8501`
+
+#### Add GPT4 Model to the LLM Option:
+If you’d like to add additional GPT4 model to the language model (LLM) dropdown:
+
+1. Navigate to src/autogluon_assistant/WebUI/constants.py
+
+2. Locate the `LLM_OPTIONS` variable, which looks like this:
+````
+LLM_OPTIONS = ["Claude 3.5 with bedrock"]
+````
+3. Add "GPT 4" to the list
+````
+LLM_OPTIONS = ["Claude 3.5 with bedrock", "GPT 4"]
+````
