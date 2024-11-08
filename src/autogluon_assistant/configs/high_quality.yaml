@@ -9,12 +9,8 @@ feature_transformers:
 autogluon:
   predictor_init_kwargs: {}
   predictor_fit_kwargs:
-    verbosity: 2
     presets: high_quality
     time_limit: 3600
-    dynamic_stacking: True
-    num_bag_folds: 5
-    num_stack_levels: 2
 llm:
   # Note: bedrock is only supported in limited AWS regions
   provider: bedrock
