@@ -1,6 +1,7 @@
 import streamlit as st
-from streamlit_extras.add_vertical_space import add_vertical_space
 from constants import DEMO_URL
+from streamlit_extras.add_vertical_space import add_vertical_space
+
 
 def video():
     """

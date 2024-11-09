@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import streamlit as st
 import streamlit.components.v1 as components
-from constants import DEFAULT_SESSION_VALUES,LOGO_PATH
+from constants import DEFAULT_SESSION_VALUES, LOGO_PATH
 from pages.demo import main as demo
 from pages.feature import main as feature
 from pages.nav_bar import nav_bar

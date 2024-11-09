@@ -2,9 +2,10 @@ import copy
 import os
 import subprocess
 from pathlib import Path
-import requests
+
 import pandas as pd
 import psutil
+import requests
 import streamlit as st
 from constants import (
     API_KEY_LOCATION,
@@ -19,9 +20,9 @@ from constants import (
     PRESET_MAPPING,
     PRESET_OPTIONS,
     PROVIDER_MAPPING,
+    SAMPLE_DATASET_DESCRIPTION,
     TIME_LIMIT_MAPPING,
     TIME_LIMIT_OPTIONS,
-    SAMPLE_DATASET_DESCRIPTION,
 )
 from file_uploader import description_file_uploader, file_uploader, save_description_file
 from log_processor import messages, show_logs
@@ -419,8 +420,8 @@ def setup_local_dataset():
     all_files = response.json()
 
     for file_info in all_files:
-        if file_info['type'] == 'file':
-            filename = file_info['name']
+        if file_info["type"] == "file":
+            filename = file_info["name"]
             local_path = dataset_dir / filename
             if not local_path.exists():
                 response = requests.get(base_url + filename)
@@ -429,9 +430,10 @@ def setup_local_dataset():
     description = SAMPLE_DATASET_DESCRIPTION
 
     description_path = dataset_dir / "descriptions.txt"
-    description_path.write_text(description, encoding='utf-8')
+    description_path.write_text(description, encoding="utf-8")
 
     return dataset_dir
+
 
 def get_sample_dataset_files(dataset_dir):
     """
