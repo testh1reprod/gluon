@@ -102,7 +102,7 @@ The web UI enables users to upload datasets, configure Autogluon-Assistant runs 
 #### To run the Autogluon Assistant Web UI:
 Navigate to the project directory and run the app:
 ````
-cd src/autogluon_assistant/WebUI && streamlit run app.py
+cd src/autogluon_assistant/ui && streamlit run app.py
 ````
 The Autogluon Assistant Web UI should now be accessible in your web browser at `http://localhost:8501`
 
