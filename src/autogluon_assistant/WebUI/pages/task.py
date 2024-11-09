@@ -251,7 +251,8 @@ def download_output_button():
     if st.session_state.output_file is not None and st.session_state.task_running is False:
         output_file = st.session_state.output_file
         output_filename = st.session_state.output_filename
-        show_output_download_button(output_file.to_csv(index=False), output_filename)
+        final_name = os.path.basename(output_filename)
+        show_output_download_button(output_file.to_csv(index=False), final_name)
 
 
 def toggle_running_state():
