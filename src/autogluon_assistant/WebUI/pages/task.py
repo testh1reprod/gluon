@@ -84,9 +84,9 @@ def load_value(key):
 
 
 def config_autogluon_preset():
+    load_value("preset")
     st.selectbox(
         "Autogluon Preset",
-        index=0,
         placeholder="Autogluon Preset",
         options=PRESET_OPTIONS,
         key="_preset",
@@ -101,7 +101,6 @@ def config_time_limit():
     load_value("time_limit")
     st.selectbox(
         "Time Limit",
-        index=5,
         placeholder="Time Limit",
         options=TIME_LIMIT_OPTIONS,
         key="_time_limit",
@@ -115,7 +114,6 @@ def config_time_limit():
 def config_llm():
     st.selectbox(
         "Choose a LLM model",
-        index=0,
         placeholder="Choose a LLM model",
         options=LLM_OPTIONS,
         key="_llm",
@@ -503,6 +501,7 @@ def main():
     setup_local_dataset()
     get_user_session_id()
     run_section()
+    st.write(st.session_state)
 
 
 if __name__ == "__main__":

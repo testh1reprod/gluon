@@ -2,7 +2,7 @@ import re
 import time
 
 import streamlit as st
-from constants import TIME_LIMIT_MAPPING
+from constants import STAGE_COMPLETE_SIGNAL, STAGE_MESSAGES, STATUS_BAR_STAGE, TIME_LIMIT_MAPPING
 from stqdm import stqdm
 
 
@@ -31,15 +31,7 @@ def show_log_line(line):
     """
     if "INFO:" in line:
         line = line.split(":", 1)[1].split(":", 1)[1]
-    if any(
-        message in line
-        for message in [
-            "Task understanding complete",
-            "Automatic feature generation complete",
-            "Model training complete",
-            "Prediction complete",
-        ]
-    ):
+    if any(message in line for message in STAGE_COMPLETE_SIGNAL):
         return st.success(line)
     elif line.startswith("WARNING:"):
         return st.warning(line)
@@ -47,14 +39,9 @@ def show_log_line(line):
 
 
 def get_stage_from_log(log_line):
-    if "Task understanding starts" in log_line:
-        return "Task Understanding"
-    elif "Automatic feature generation starts" in log_line:
-        return "Feature Generation"
-    elif "Model training starts" in log_line:
-        return "Model Training"
-    elif "Prediction starts" in log_line:
-        return "Prediction"
+    for message, stage in STAGE_MESSAGES.items():
+        if message in log_line:
+            return stage
     return None
 
 
@@ -146,13 +133,6 @@ def messages():
         process = st.session_state.process
         st.session_state.logs = ""
         progress = st.progress(0)
-        task_stages = {
-            "Task loaded!": 10,
-            "Beginning AutoGluon training": 25,
-            "Preprocessing data": 50,
-            "Fitting model": 65,
-            "AutoGluon training complete": 90,
-        }
         status_container = st.empty()
         status_container.info("Running Tasks...")
         for line in process.stdout:
@@ -169,7 +149,7 @@ def messages():
                 process_realtime_logs(line)
                 break
             else:
-                for stage, progress_value in task_stages.items():
+                for stage, progress_value in STATUS_BAR_STAGE.items():
                     if stage.lower() in line.lower():
                         progress.progress(progress_value / 100)
                         status_container.info(stage)

@@ -9,7 +9,7 @@ PRESET_DEFAULT_CONFIG = {
     "High Quality": {"time_limit": "1 hr", "feature_generation": False},
     "Medium Quality": {"time_limit": "10 mins", "feature_generation": False},
 }
-DEFAULT_PRESET = "Best Quality"
+DEFAULT_PRESET = "Medium Quality"
 
 PRESET_MAPPING = {
     "Best Quality": "best_quality",
@@ -28,7 +28,7 @@ TIME_LIMIT_MAPPING = {
     "4 hrs": 14400,
 }
 
-DEFAULT_TIME_LIMIT = "4 hrs"
+DEFAULT_TIME_LIMIT = "10 mins"
 
 TIME_LIMIT_OPTIONS = ["1 min", "10 mins", "30 mins", "1 hr", "2 hrs", "4 hrs"]
 
@@ -76,7 +76,7 @@ DEFAULT_SESSION_VALUES = {
     "description_uploader_key": 0,
     "sample_dataset_selector": None,
     "current_stage": None,
-    "feature_generation": True,
+    "feature_generation": False,
     "stage_status": {},
     "show_remaining_time": False,
     "model_path": None,
@@ -87,7 +87,41 @@ DEFAULT_SESSION_VALUES = {
     "stage_container": deepcopy(INITIAL_STAGE),
 }
 
+# Message to display different logging stage
+STATUS_BAR_STAGE = {
+    "Task loaded!": 10,
+    "Model training starts": 25,
+    "Fitting model": 50,
+    "AutoGluon training complete": 80,
+    "Prediction starts": 90,
+}
 
+STAGE_COMPLETE_SIGNAL = [
+    "Task understanding complete",
+    "Automatic feature generation complete",
+    "Model training complete",
+    "Prediction complete",
+]
+
+# Stage Names
+STAGE_TASK_UNDERSTANDING = "Task Understanding"
+STAGE_FEATURE_GENERATION = "Feature Generation"
+STAGE_MODEL_TRAINING = "Model Training"
+STAGE_PREDICTION = "Prediction"
+
+# Log Messages
+MSG_TASK_UNDERSTANDING = "Task understanding starts"
+MSG_FEATURE_GENERATION = "Automatic feature generation starts"
+MSG_MODEL_TRAINING = "Model training starts"
+MSG_PREDICTION = "Prediction starts"
+
+# Mapping
+STAGE_MESSAGES = {
+    MSG_TASK_UNDERSTANDING: STAGE_TASK_UNDERSTANDING,
+    MSG_FEATURE_GENERATION: STAGE_FEATURE_GENERATION,
+    MSG_MODEL_TRAINING: STAGE_MODEL_TRAINING,
+    MSG_PREDICTION: STAGE_PREDICTION,
+}
 # DataSet Options
 DATASET_OPTIONS = ["Sample Dataset", "Upload Dataset"]
 
