@@ -106,7 +106,6 @@ def process_realtime_logs(line):
         if "AutoGluon training complete" in line:
             st.session_state.show_remaining_time = False
         with st.session_state.stage_status[st.session_state.current_stage]:
-            time.sleep(1)
             if "Fitting model" in line and not st.session_state.show_remaining_time:
                 st.session_state.progress_bar = stqdm(
                     desc="Elapsed Time for Fitting models: ", total=TIME_LIMIT_MAPPING[st.session_state.time_limit]
