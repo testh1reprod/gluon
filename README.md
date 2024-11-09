@@ -113,9 +113,9 @@ If you’d like to add additional GPT4 model to the language model (LLM) dropdow
 
 2. Locate the `LLM_OPTIONS` variable, which looks like this:
 ````
-LLM_OPTIONS = ["Claude 3.5 with bedrock"]
+LLM_OPTIONS = ["Claude 3.5 with Amazon Bedrock"]
 ````
-3. Add "GPT 4" to the list
+3. Add "GPT 4o" to the list
 ````
-LLM_OPTIONS = ["Claude 3.5 with bedrock", "GPT 4"]
+LLM_OPTIONS = ["Claude 3.5 with Amazon Bedrock", "GPT 4o"]
 ````
