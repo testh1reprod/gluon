@@ -74,6 +74,7 @@ class AutogluonTabularPredictor(Predictor):
         predictor_init_kwargs = {
             "learner_kwargs": {"ignored_columns": task.columns_in_train_but_not_test},
             "label": task.label_column,
+            "problem_type": task.problem_type,
             "eval_metric": eval_metric,
             **self.config.predictor_init_kwargs,
         }
