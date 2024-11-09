@@ -44,8 +44,13 @@ def generate_output_filename():
     user_session_id = get_user_session_id()
     unique_id = user_session_id[:8]
     timestamp = pd.Timestamp.now().strftime("%Y%m%d_%H%M%S")
-    output_filename = f"output_{unique_id}_{timestamp}.csv"
-    return output_filename
+    directory_path = os.path.join(unique_id, timestamp)
+    # Create directories if they don't exist
+    os.makedirs(directory_path, exist_ok=True)
+    # Generate full file path
+    output_filepath = os.path.join(directory_path, "output.csv")
+
+    return output_filepath
 
 
 def generate_output_file():
