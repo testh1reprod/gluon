@@ -1,5 +1,4 @@
 import re
-import time
 
 import streamlit as st
 from constants import STAGE_COMPLETE_SIGNAL, STAGE_MESSAGES, STATUS_BAR_STAGE, TIME_LIMIT_MAPPING
