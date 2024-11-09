@@ -1,14 +1,12 @@
 import streamlit as st
 from streamlit_extras.add_vertical_space import add_vertical_space
-
+from constants import DEMO_URL
 
 def video():
     """
     Display Demo video
     """
-    video_file = open("./video/demo.mp4", "rb")
-    video_bytes = video_file.read()
-    st.video(video_bytes, muted=True, autoplay=True)
+    st.video(DEMO_URL, muted=True, autoplay=True)
 
 
 def demo():

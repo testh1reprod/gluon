@@ -6,12 +6,14 @@
 AutogluonModels/
 data/
 user_data/
+sample_dataset/
 results/
 cookies.json
 cdk.out/
 .metaflow
 *.feather
 .langchain.db
+output_*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -34,17 +34,17 @@ TIME_LIMIT_OPTIONS = ["1 min", "10 mins", "30 mins", "1 hr", "2 hrs", "4 hrs"]
 
 # LLM configurations
 LLM_MAPPING = {
-    "Claude 3.5 with bedrock": "anthropic.claude-3-5-sonnet-20241022-v2:0",
-    "GPT 4": "gpt-4o-mini-2024-07-18",
+    "Claude 3.5 with Amazon Bedrock": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+    "GPT 4o": "gpt-4o-mini-2024-07-18",
 }
 
-LLM_OPTIONS = ["Claude 3.5 with bedrock"]
+LLM_OPTIONS = ["Claude 3.5 with Amazon Bedrock"]
 
 # Provider configuration
-PROVIDER_MAPPING = {"Claude 3.5 with bedrock": "bedrock", "GPT 4": "openai"}
+PROVIDER_MAPPING = {"Claude 3.5 with Amazon Bedrock": "bedrock", "GPT 4o": "openai"}
 
 
-API_KEY_LOCATION = {"Claude 3.5 with bedrock": "BEDROCK_API_KEY", "GPT 4": "OPENAI_API_KEY"}
+API_KEY_LOCATION = {"Claude 3.5 with Amazon Bedrock": "BEDROCK_API_KEY", "GPT 4o": "OPENAI_API_KEY"}
 
 INITIAL_STAGE = {
     "Task Understanding": [],
@@ -93,3 +93,8 @@ DATASET_OPTIONS = ["Sample Dataset", "Upload Dataset"]
 
 # Captions under DataSet Options
 CAPTIONS = ["Run with sample dataset", "Upload Train, Test and Output (Optional) Dataset"]
+
+DEMO_URL = "https://automl-mm-bench.s3.amazonaws.com/autogluon-assistant/aga-kaggle-demo.mp4"
+
+SAMPLE_DATASET_DESCRIPTION = """You are solving this data science tasks:The dataset presented here (knot theory) comprises a lot of numerical features. Some of the features may be missing, with nan value. Your task is to predict the 'signature', which has 18 unique integers. The evaluation metric is the classification accuracy."""
+LOGO_PATH = "static/page_icon.png"

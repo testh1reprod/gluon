@@ -2,7 +2,7 @@ import copy
 import os
 import subprocess
 from pathlib import Path
-
+import requests
 import pandas as pd
 import psutil
 import streamlit as st
@@ -21,9 +21,10 @@ from constants import (
     PROVIDER_MAPPING,
     TIME_LIMIT_MAPPING,
     TIME_LIMIT_OPTIONS,
+    SAMPLE_DATASET_DESCRIPTION,
 )
 from file_uploader import description_file_uploader, file_uploader, save_description_file
-from log_processer import messages, show_logs
+from log_processor import messages, show_logs
 from streamlit_extras.add_vertical_space import add_vertical_space
 from utils import (
     generate_model_file,
@@ -405,6 +406,33 @@ def run_section():
     st.markdown("---", unsafe_allow_html=True)
 
 
+def setup_local_dataset():
+    """Download all files from GitHub directory to local directory"""
+    dataset_dir = Path("sample_dataset/knot_theory")
+    dataset_dir.mkdir(parents=True, exist_ok=True)
+
+    api_url = "https://api.github.com/repos/mli/ag-docs/contents/knot_theory"
+    base_url = "https://raw.githubusercontent.com/mli/ag-docs/main/knot_theory/"
+
+    response = requests.get(api_url)
+    response.raise_for_status()
+    all_files = response.json()
+
+    for file_info in all_files:
+        if file_info['type'] == 'file':
+            filename = file_info['name']
+            local_path = dataset_dir / filename
+            if not local_path.exists():
+                response = requests.get(base_url + filename)
+                response.raise_for_status()
+                local_path.write_bytes(response.content)
+    description = SAMPLE_DATASET_DESCRIPTION
+
+    description_path = dataset_dir / "descriptions.txt"
+    description_path.write_text(description, encoding='utf-8')
+
+    return dataset_dir
+
 def get_sample_dataset_files(dataset_dir):
     """
     Get all files from the given sample dataset directory
@@ -470,6 +498,7 @@ def dataset_selector():
 
 
 def main():
+    setup_local_dataset()
     get_user_session_id()
     run_section()
 

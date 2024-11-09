@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import streamlit as st
 import streamlit.components.v1 as components
-from constants import DEFAULT_SESSION_VALUES
+from constants import DEFAULT_SESSION_VALUES,LOGO_PATH
 from pages.demo import main as demo
 from pages.feature import main as feature
 from pages.nav_bar import nav_bar
@@ -12,7 +12,7 @@ from pages.tutorial import main as tutorial
 
 st.set_page_config(
     page_title="AutoGluon Assistant",
-    page_icon="https://pbs.twimg.com/profile_images/1373809646046040067/wTG6A_Ct_400x400.png",
+    page_icon=LOGO_PATH,
     layout="wide",
     initial_sidebar_state="collapsed",
 )

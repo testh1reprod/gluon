@@ -24,7 +24,7 @@ def features():
         <div class="feature-container">
             <div class="feature-title">LLM based Task Understanding</div>
             <div class="feature-description">
-                Leverage the power of Large Language Models to automatically interpret and understand complex tasks. 
+                Leverage the power of Large Language Models to automatically interpret and understand data science tasks. 
                 Autogluon Assistant analyses user’s task description and dataset files, translating them into actionable machine learning objectives without manual intervention.
             </div>
         </div>
