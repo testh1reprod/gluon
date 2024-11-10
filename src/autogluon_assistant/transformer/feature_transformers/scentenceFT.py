@@ -80,12 +80,8 @@ class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
                 transformed_train_column = self.huggingface_run(np.transpose(train_X[series_name].to_numpy()).T)
                 transformed_test_column = self.huggingface_run(np.transpose(test_X[series_name].to_numpy()).T)
             else:
-                transformed_train_column = self.glove_run_one_proc(
-                    np.transpose(train_X[series_name].to_numpy()).T
-                )
-                transformed_test_column = self.glove_run_one_proc(
-                    np.transpose(test_X[series_name].to_numpy()).T
-                )
+                transformed_train_column = self.glove_run_one_proc(np.transpose(train_X[series_name].to_numpy()).T)
+                transformed_test_column = self.glove_run_one_proc(np.transpose(test_X[series_name].to_numpy()).T)
 
             if transformed_train_column.any() and transformed_test_column.any():
                 transformed_train_column = pd.DataFrame(transformed_train_column)
