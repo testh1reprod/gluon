@@ -7,7 +7,6 @@
 AutoGluon Assistant (AG-A) provides users a simple interface where they can input their data, describe their problem, and receive a highly accurate and competitive ML solution — without writing any code. By leveraging the state-of-the-art AutoML capabilities of AutoGluon and integrating them with a Large Language Model (LLM), AG-A automates the entire data science pipeline. AG-A takes AutoGluon’s automation from three lines of code to zero, enabling users to solve new supervised learning tabular problems using only natural language descriptions.
 
 ## Setup
----
 
 ```
 # create a conda env
@@ -51,7 +50,6 @@ Important: Free-tier OpenAI accounts may be subject to rate limits, which could 
 
 
 ## Usage
----
 
 We support two ways of using AutoGluoon Assistant: WebUI and CLI. 
 
@@ -109,7 +107,7 @@ We support three presets, including `medium_quality`, `high_quality` and `best_q
 
 After the run is complete, model predictions on test dataset are saved into the `aga-output-<timestamp>.csv` file which is formatted according to `sample_submission.csv` file.
 
-## Overriding Configs
+#### Overriding Configs
 You can override specific settings in the YAML configuration defined in the [config folder](https://github.com/boranhan/autogluon-assistant/tree/main/src/autogluon_assistant/configs) using
 the `config_overrides` parameter with Hydra syntax from the command line.
 
