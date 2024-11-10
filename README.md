@@ -50,51 +50,10 @@ Important: Free-tier OpenAI accounts may be subject to rate limits, which could 
 
 
 ## Usage
-Before launching AutoGluon Assistant (AG-A), prepare your data files in the following structure. Here's an example using a dataset from the Titanic Kaggle Competition:
-```
-.
-├── config # Configuration files directory
-│ └── [CONFIG_FILE].yaml # Your configuration file
-│
-└── data # Data files directory
-    ├── train.[ext] # Training dataset (required)
-    ├── test.[ext]  # Test dataset (required)
-    └── description.txt # Dataset and task description (recommended)
-```
-Note:
-- The training and test files can be in any tabular data format (e.g., csv, parquet, xlsx)
-- While there are no strict naming requirements, we recommend using clear, descriptive filenames
-- The description file is optional but recommended for better model selection and optimization. It can include:
-  - Dataset description
-  - Problem context
-  - Evaluation metrics
-  - Any other relevant information
 
-Now you can launch the AutoGluon Assistant run using the following command:
-```
-aga [NAME_OF_DATA_DIR]
-# e.g. aga ./toy_data
-```
+We support two ways of using AutoGluoon Assistant: WebUI and CLI. 
 
-After the run is complete, model predictions on test dataset are saved into the `aga-output-<timestamp>.csv` file which is formatted according to `sample_submission.csv` file.
-
-## Overriding parameters from the command-line
-AutoGluon Assistant uses [Hydra](https://hydra.cc) to manage configuration. See [here](https://hydra.cc/docs/advanced/override_grammar/basic/) for the complete override syntax.
-You can override specific settings in the YAML configuration defined in [`config.yaml`](https://github.com/autogluon/autogluon-assistant/blob/main/config/config.yaml) using
-the `config_overrides` parameter with Hydra syntax from the command line.
-
-Here’s an example command with some configuration overrides:
-```
-autogluon-assistant ./data ./config --output-filename my_output.csv --config-overrides "autogluon.predictor_fit_kwargs.time_limit=120 autogluon.predictor_fit_kwargs.verbosity=3 autogluon.predictor_fit_kwargs.presets=medium_quality llm.temperature=0.7 llm.max_tokens=256"
-
-# OR
-
-aga ./data ./config --output-filename my_output.csv --config-overrides "autogluon.predictor_fit_kwargs.time_limit=120 autogluon.predictor_fit_kwargs.verbosity=3 autogluon.predictor_fit_kwargs.presets=medium_quality llm.temperature=0.7 llm.max_tokens=256"
-```
-
-`autogluon-assistant-tools` provides more functionality and utilities for benchmarking, wrapped around autogluon-assistant. Please check out the [repo](https://github.com/autogluon/autogluon-assistant-tools/) for more details.
-
-## Autogluon Assistant Web UI
+### Web UI
 The Autogluon Assistant Web UI is a user-friendly application that allows users to leverage the capabilities of the Autogluon-Assistant library through an intuitive web interface.
 
 The web UI enables users to upload datasets, configure Autogluon-Assistant runs with customized settings, preview data, monitor execution progress, view and download results, and supports secure, isolated sessions for concurrent users.
@@ -119,3 +78,44 @@ LLM_OPTIONS = ["Claude 3.5 with Amazon Bedrock"]
 ````
 LLM_OPTIONS = ["Claude 3.5 with Amazon Bedrock", "GPT 4o"]
 ````
+
+### CLI
+
+Before launching AG-A CLI, prepare your data files in the following structure:
+```
+└── data # Data files directory
+    ├── train.[ext] # Training dataset (required)
+    ├── test.[ext]  # Test dataset (required)
+    └── description.txt # Dataset and task description (recommended)
+```
+Note:
+- The training and test files can be in any tabular data format (e.g., csv, parquet, xlsx)
+- While there are no strict naming requirements, we recommend using clear, descriptive filenames
+- The description file is optional but recommended for better model selection and optimization. It can include:
+  - Dataset description
+  - Problem context
+  - Evaluation metrics
+  - Any other relevant information
+
+Now you can launch the AutoGluon Assistant run using the following command:
+```
+aga [NAME_OF_DATA_DIR] --presets [PRESET_QUALITY]
+# e.g. aga ./toy_data --presets best_quality
+```
+
+We support three presets, including `medium_quality`, `high_quality` and `best_quality`. We use `best_quality` as a default setting.
+
+After the run is complete, model predictions on test dataset are saved into the `aga-output-<timestamp>.csv` file. It will be formatted according to optional `sample_submission.csv` file if provided.
+
+#### Overriding Configs
+You can override specific settings in the YAML configuration defined in the [config folder](https://github.com/boranhan/autogluon-assistant/tree/main/src/autogluon_assistant/configs) using
+the `config_overrides` parameter with Hydra syntax from the command line.
+
+Here’s an example command with some configuration overrides:
+```
+aga toy_data --config_overrides "feature_transformers=[], autogluon.predictor_fit_kwargs.time_limit=3600"
+
+# OR
+
+aga toy_data --config_overrides "feature_transformers=[]" --config_overrides "autogluon.predictor_fit_kwargs.time_limit=3600"
+```
