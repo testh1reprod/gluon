@@ -118,7 +118,7 @@ class LLMFactory:
             return [
                 model["modelId"]
                 for model in response["modelSummaries"]
-                if model["modelId"].startswith("anthropic.claude")
+                if model["modelId"].startswith("anthropic.claude") or model["modelId"].startswith("meta.llama")
             ]
         except Exception as e:
             print(f"Error fetching Bedrock models: {e}")
