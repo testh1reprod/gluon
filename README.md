@@ -105,7 +105,7 @@ aga [NAME_OF_DATA_DIR] --presets [PRESET_QUALITY]
 
 We support three presets, including `medium_quality`, `high_quality` and `best_quality`. We use `best_quality` as a default setting.
 
-After the run is complete, model predictions on test dataset are saved into the `aga-output-<timestamp>.csv` file which is formatted according to `sample_submission.csv` file.
+After the run is complete, model predictions on test dataset are saved into the `aga-output-<timestamp>.csv` file. It will be formatted according to optional `sample_submission.csv` file if provided.
 
 #### Overriding Configs
 You can override specific settings in the YAML configuration defined in the [config folder](https://github.com/boranhan/autogluon-assistant/tree/main/src/autogluon_assistant/configs) using
