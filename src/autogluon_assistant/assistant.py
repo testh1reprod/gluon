@@ -1,5 +1,4 @@
 import logging
-import os
 import signal
 from typing import Any, Dict, Union
 
