@@ -113,8 +113,8 @@ def config_time_limit():
 @st.fragment
 def config_llm():
     st.selectbox(
-        "Choose a LLM model",
-        placeholder="Choose a LLM model",
+        "Choose an LLM model",
+        placeholder="Choose an LLM model",
         options=LLM_OPTIONS,
         key="_llm",
         on_change=store_value,
