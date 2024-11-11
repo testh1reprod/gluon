@@ -176,8 +176,7 @@ def get_ui_path() -> str:
 
 
 def launch_ui(
-    port: int = typer.Option(8501, help="Port to run the UI on"),
-    browser: bool = typer.Option(True, help="Open browser automatically"),
+    port: int = typer.Option(8501, help="Port to run the UI on")
 ):
     """Launch the AutoGluon Assistant Web UI"""
     try:
@@ -198,9 +197,6 @@ def launch_ui(
     os.chdir(ui_dir)
 
     cmd = ["streamlit", "run", "app.py", "--server.port", str(port)]  # Use relative path since we changed directory
-
-    if not browser:
-        cmd.extend(["--server.headless", "true"])
 
     try:
         rprint(f"[green]Launching AutoGluon Assistant UI on port {port}...[/green]")
