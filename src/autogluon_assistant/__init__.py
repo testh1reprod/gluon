@@ -74,6 +74,53 @@ def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFra
     return outputs
 
 
+def get_ui_path() -> str:
+    """Get the absolute path to the UI directory using package resources"""
+    try:
+        # For Python 3.9+
+        with importlib.resources.files("autogluon_assistant.ui") as ui_path:
+            return str(ui_path)
+    except Exception:
+        # Fallback for older Python versions
+        import pkg_resources
+
+        return pkg_resources.resource_filename("autogluon_assistant", "ui")
+
+
+def launch_ui(port: int = typer.Option(8501, help="Port to run the UI on")):
+    """Launch the AutoGluon Assistant Web UI"""
+    try:
+        import streamlit
+    except Exception as e:
+        rprint(f"[red]Error UI not installed: {str(e)}[/red]")
+        sys.exit(1)
+
+    ui_dir = get_ui_path()
+    app_path = os.path.join(ui_dir, "app.py")
+
+    if not os.path.exists(app_path):
+        rprint(f"[red]Error: UI file not found at {app_path}[/red]")
+        sys.exit(1)
+
+    # Change working directory to UI directory before running streamlit
+    original_dir = os.getcwd()
+    os.chdir(ui_dir)
+
+    cmd = ["streamlit", "run", "app.py", "--server.port", str(port)]  # Use relative path since we changed directory
+
+    try:
+        rprint(f"[green]Launching AutoGluon Assistant UI on port {port}...[/green]")
+        subprocess.run(cmd)
+    except KeyboardInterrupt:
+        rprint("\n[yellow]Shutting down UI server...[/yellow]")
+    except Exception as e:
+        rprint(f"[red]Error launching UI: {str(e)}[/red]")
+    finally:
+        # Change back to original directory
+        os.chdir(original_dir)
+        sys.exit(1)
+
+
 def run_assistant(
     task_path: Annotated[str, typer.Argument(help="Directory where task files are included")],
     presets: Annotated[
@@ -160,55 +207,6 @@ def run_assistant(
         rprint(f"[green]Artifacts including transformed datasets and trained model saved at {full_save_path}[/green]")
 
     return output_filename
-
-
-def get_ui_path() -> str:
-    """Get the absolute path to the UI directory using package resources"""
-    try:
-        # For Python 3.9+
-        with importlib.resources.files("autogluon_assistant.ui") as ui_path:
-            return str(ui_path)
-    except Exception:
-        # Fallback for older Python versions
-        import pkg_resources
-
-        return pkg_resources.resource_filename("autogluon_assistant", "ui")
-
-
-def launch_ui(
-    port: int = typer.Option(8501, help="Port to run the UI on")
-):
-    """Launch the AutoGluon Assistant Web UI"""
-    try:
-        import streamlit
-    except Exception as e:
-        rprint(f"[red]Error UI not installed: {str(e)}[/red]")
-        sys.exit(1)
-
-    ui_dir = get_ui_path()
-    app_path = os.path.join(ui_dir, "app.py")
-
-    if not os.path.exists(app_path):
-        rprint(f"[red]Error: UI file not found at {app_path}[/red]")
-        sys.exit(1)
-
-    # Change working directory to UI directory before running streamlit
-    original_dir = os.getcwd()
-    os.chdir(ui_dir)
-
-    cmd = ["streamlit", "run", "app.py", "--server.port", str(port)]  # Use relative path since we changed directory
-
-    try:
-        rprint(f"[green]Launching AutoGluon Assistant UI on port {port}...[/green]")
-        subprocess.run(cmd)
-    except KeyboardInterrupt:
-        rprint("\n[yellow]Shutting down UI server...[/yellow]")
-    except Exception as e:
-        rprint(f"[red]Error launching UI: {str(e)}[/red]")
-    finally:
-        # Change back to original directory
-        os.chdir(original_dir)
-        sys.exit(1)
 
 
 def main():
