@@ -1,3 +1,5 @@
+import os
+
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
@@ -44,7 +46,7 @@ def preview_dataset():
         elif st.session_state.selected_dataset == "Sample Dataset":
             file_options = get_sample_files()
         if st.session_state.output_file is not None:
-            file_options.append(st.session_state.output_filename)
+            file_options.append(os.path.basename(st.session_state.output_filename))
         selected_file = st.selectbox(
             "Preview File",
             options=file_options,
@@ -64,7 +66,9 @@ def preview_dataset():
             """,
                 unsafe_allow_html=True,
             )
-            if selected_file == st.session_state.output_filename:
+            if st.session_state.output_filename and selected_file == os.path.basename(
+                st.session_state.output_filename
+            ):
                 output_file = st.session_state.output_file
                 gb = GridOptionsBuilder.from_dataframe(output_file)
                 gb.configure_pagination()

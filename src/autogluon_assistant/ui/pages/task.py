@@ -239,7 +239,7 @@ def download_log_button():
         st.download_button(
             label="📥&nbsp;&nbsp;Download Logs",
             data=st.session_state.logs,
-            file_name=f"autogluon_logs_{st.session_state.user_session_id}.txt",
+            file_name="aga_logs.txt",
             mime="text/plain",
         )
 
@@ -262,7 +262,6 @@ def toggle_running_state():
     st.session_state.stage_container = copy.deepcopy(INITIAL_STAGE)
     st.session_state.stage_status = {}
     st.session_state.increment_time = 0
-    st.session_state.progress_bar = None
 
 
 def toggle_cancel_state():
@@ -409,6 +408,8 @@ def run_section():
 def setup_local_dataset():
     """Download all files from GitHub directory to local directory"""
     dataset_dir = Path("sample_dataset/knot_theory")
+    if dataset_dir.exists():
+        return
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
     api_url = "https://api.github.com/repos/mli/ag-docs/contents/knot_theory"
