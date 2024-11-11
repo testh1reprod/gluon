@@ -1,5 +1,4 @@
 import logging
-import os
 import signal
 from typing import Any, Dict, Union
 
@@ -102,15 +101,7 @@ class TabularPredictionAssistant:
         task = self.inference_task(task)
         if self.feature_transformers_config:
             logger.info("Automatic feature generation starts...")
-            if "OPENAI_API_KEY" not in os.environ:
-                logger.info("No OpenAI API keys found, therefore, skip CAAFE")
-                fe_transformers = [
-                    instantiate(ft_config)
-                    for ft_config in self.feature_transformers_config
-                    if ft_config["_target_"] != "autogluon_assistant.transformer.CAAFETransformer"
-                ]
-            else:
-                fe_transformers = [instantiate(ft_config) for ft_config in self.feature_transformers_config]
+            fe_transformers = [instantiate(ft_config) for ft_config in self.feature_transformers_config]
             for fe_transformer in fe_transformers:
                 try:
                     with timeout(
@@ -122,7 +113,7 @@ class TabularPredictionAssistant:
                     self.handle_exception(f"Task preprocessing: {fe_transformer.name}", e)
             logger.info("Automatic feature generation complete!")
         else:
-            logger.info("Automatic feature generation is disabled.")
+            logger.info("Automatic feature generation is disabled. ")
         return task
 
     def fit_predictor(self, task: TabularPredictionTask):
