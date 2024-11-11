@@ -1,4 +1,4 @@
-# Autogluon Assistant
+# AutoGluon Assistant
 
 [![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://pypi.org/project/autogluon-assistant/)
 [![GitHub license](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
@@ -8,7 +8,7 @@ AutoGluon Assistant (AG-A) provides users a simple interface where they can inpu
 
 ## Setup
 
-```
+```bash
 # create a conda env
 conda create -n aga python=3.10
 conda activate aga
@@ -28,7 +28,7 @@ AG-A supports using both AWS Bedrock and OpenAI as LLM model providers. You will
 AG-A integrates with AWS Bedrock by default. To use AWS Bedrock, you will need to configure your AWS credentials and region settings, along with the Bedrock-specific API key:
 
 ```bash
-export BEDROCK_API_KEY="4509..."
+export BEDROCK_API_KEY="<your-bedrock-api-key>"
 export AWS_DEFAULT_REGION="<your-region>"
 export AWS_ACCESS_KEY_ID="<your-access-key>"
 export AWS_SECRET_ACCESS_KEY="<your-secret-key>"
@@ -51,50 +51,38 @@ Important: Free-tier OpenAI accounts may be subject to rate limits, which could 
 
 ## Usage
 
-We support two ways of using AutoGluoon Assistant: WebUI and CLI. 
+We support two ways of using AutoGluon Assistant: WebUI and CLI.
 
 ### Web UI
-The Autogluon Assistant Web UI is a user-friendly application that allows users to leverage the capabilities of the Autogluon-Assistant library through an intuitive web interface.
+AutoGluon Assistant Web UI allows users to leverage the capabilities of AG-A through an intuitive web interface.
 
-The web UI enables users to upload datasets, configure Autogluon-Assistant runs with customized settings, preview data, monitor execution progress, view and download results, and supports secure, isolated sessions for concurrent users.
+The web UI enables users to upload datasets, configure AG-A runs with customized settings, preview data, monitor execution progress, view and download results, and supports secure, isolated sessions for concurrent users.
 
-#### To run the Autogluon Assistant Web UI:
+#### To run the AG-A Web UI:
 
-````
+```bash
 aga ui
 
 # OR
 
 # Launch Web-UI on specific port e.g. 8888
 aga ui --port 8888
+```
 
-````
+AG-A Web UI should now be accessible in your web browser at `http://localhost:8501` or the specified port.
 
-Autogluon Assistant Web UI should now be accessible in your web browser at `http://localhost:8501`
-
-#### Add GPT4 Model to the LLM Option:
-If you’d like to add additional GPT4 model to the language model (LLM) dropdown:
-
-1. Navigate to src/autogluon_assistant/WebUI/constants.py
-
-2. Locate the `LLM_OPTIONS` variable, which looks like this:
-````
-LLM_OPTIONS = ["Claude 3.5 with Amazon Bedrock"]
-````
-3. Add "GPT 4o" to the list
-````
-LLM_OPTIONS = ["Claude 3.5 with Amazon Bedrock", "GPT 4o"]
-````
 
 ### CLI
 
 Before launching AG-A CLI, prepare your data files in the following structure:
+
 ```
 └── data # Data files directory
     ├── train.[ext] # Training dataset (required)
     ├── test.[ext]  # Test dataset (required)
     └── description.txt # Dataset and task description (recommended)
 ```
+
 Note:
 - The training and test files can be in any tabular data format (e.g., csv, parquet, xlsx)
 - While there are no strict naming requirements, we recommend using clear, descriptive filenames
@@ -105,7 +93,8 @@ Note:
   - Any other relevant information
 
 Now you can launch the AutoGluon Assistant run using the following command:
-```
+
+```bash
 aga run [NAME_OF_DATA_DIR] --presets [PRESET_QUALITY]
 # e.g. aga run ./toy_data --presets best_quality
 ```
@@ -119,7 +108,8 @@ You can override specific settings in the YAML configuration defined in the [con
 the `config_overrides` parameter with Hydra syntax from the command line.
 
 Here’s an example command with some configuration overrides:
-```
+
+```bash
 aga run toy_data --config_overrides "feature_transformers=[], autogluon.predictor_fit_kwargs.time_limit=3600"
 
 # OR
