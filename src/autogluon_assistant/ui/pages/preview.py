@@ -1,6 +1,7 @@
+import os
+
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
-import os
 
 
 def get_user_uploaded_files():
