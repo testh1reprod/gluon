@@ -195,7 +195,7 @@ def run_autogluon_assistant(data_dir):
         data_dir (str): The path to the data directory.
     """
     output_filename = generate_output_filename()
-    command = ["aga", data_dir]
+    command = ["aga", "run", data_dir]
     if st.session_state.preset:
         command.extend(["--presets", PRESET_MAPPING[st.session_state.preset]])
     if st.session_state.config_overrides:
