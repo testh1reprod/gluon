@@ -263,6 +263,7 @@ def toggle_running_state():
     st.session_state.stage_status = {}
     st.session_state.increment_time = 0
 
+
 def toggle_cancel_state():
     st.session_state.task_canceled = True
 
