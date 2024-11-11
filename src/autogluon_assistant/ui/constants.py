@@ -38,7 +38,7 @@ LLM_MAPPING = {
     "GPT 4o": "gpt-4o-mini-2024-07-18",
 }
 
-LLM_OPTIONS = ["Claude 3.5 with Amazon Bedrock"]
+LLM_OPTIONS = ["Claude 3.5 with Amazon Bedrock", "GPT 4o"]
 
 # Provider configuration
 PROVIDER_MAPPING = {"Claude 3.5 with Amazon Bedrock": "bedrock", "GPT 4o": "openai"}
