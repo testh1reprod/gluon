@@ -2,7 +2,6 @@ import re
 
 import streamlit as st
 from constants import STAGE_COMPLETE_SIGNAL, STAGE_MESSAGES, STATUS_BAR_STAGE, TIME_LIMIT_MAPPING
-from stqdm import stqdm
 
 
 def parse_model_path(log):
@@ -106,15 +105,17 @@ def process_realtime_logs(line):
             st.session_state.show_remaining_time = False
         with st.session_state.stage_status[st.session_state.current_stage]:
             if "Fitting model" in line and not st.session_state.show_remaining_time:
-                st.session_state.progress_bar = stqdm(
-                    desc="Elapsed Time for Fitting models: ", total=TIME_LIMIT_MAPPING[st.session_state.time_limit]
-                )
+                st.session_state.progress_bar = st.progress(0, text="Elapsed Time for Fitting models:")
                 st.session_state.show_remaining_time = True
                 st.session_state.increment_time = 0
             if st.session_state.show_remaining_time:
                 st.session_state.increment_time += 1
                 if st.session_state.increment_time <= TIME_LIMIT_MAPPING[st.session_state.time_limit]:
-                    st.session_state.progress_bar.update(1)
+                    progress_bar = st.session_state.progress_bar
+                    current_time = st.session_state.increment_time + 1
+                    progress = current_time / TIME_LIMIT_MAPPING[st.session_state.time_limit]
+                    time_ratio = f"Elapsed Time for Fitting models: | {current_time}/{TIME_LIMIT_MAPPING[st.session_state.time_limit]} ({progress:.1%})"
+                    progress_bar.progress(current_time, text=time_ratio)
             if not st.session_state.show_remaining_time:
                 st.session_state.stage_container[st.session_state.current_stage].append(line)
                 show_log_line(line)

@@ -12,7 +12,6 @@ from constants import (
     BASE_DATA_DIR,
     CAPTIONS,
     DATASET_OPTIONS,
-    DEFAULT_PRESET,
     INITIAL_STAGE,
     LLM_MAPPING,
     LLM_OPTIONS,
@@ -169,6 +168,7 @@ def show_cancel_task_button():
             st.session_state.task_running = False
             st.session_state.show_remaining_time = False
             st.session_state.output_filename = None
+            st.session_state.zip_path = None
             st.rerun()
     except psutil.NoSuchProcess:
         st.session_state.task_running = False
@@ -195,7 +195,7 @@ def run_autogluon_assistant(data_dir):
         data_dir (str): The path to the data directory.
     """
     output_filename = generate_output_filename()
-    command = ["aga", "run", data_dir]
+    command = ["aga", data_dir]
     if st.session_state.preset:
         command.extend(["--presets", PRESET_MAPPING[st.session_state.preset]])
     if st.session_state.config_overrides:
@@ -215,11 +215,7 @@ def download_model_button():
     """
     Create and display a download button for the log file.
     """
-    if (
-        st.session_state.preset == DEFAULT_PRESET
-        and st.session_state.zip_path
-        and st.session_state.task_running is False
-    ):
+    if st.session_state.zip_path and st.session_state.task_running is False:
         zip_path = st.session_state.zip_path
         if zip_path and os.path.exists(zip_path):
             with open(zip_path, "rb") as f:
@@ -333,8 +329,7 @@ def wait_for_process():
         st.session_state.process = None
         st.session_state.pid = None
         generate_output_file()
-        if st.session_state.feature_generation:
-            generate_model_file()
+        generate_model_file()
         st.rerun()
 
 

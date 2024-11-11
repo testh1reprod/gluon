@@ -71,9 +71,9 @@ def clear_directory(directory):
        directory (str): Directory path to be cleared.
     """
     for filename in os.listdir(directory):
-        if filename == "description.txt":
-            continue
         file_path = os.path.join(directory, filename)
+        if os.path.isdir(file_path) or filename == "description.txt":
+            continue
         try:
             os.remove(file_path)
         except Exception as e:
