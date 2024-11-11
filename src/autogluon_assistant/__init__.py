@@ -1,6 +1,6 @@
 import datetime
 import logging
-import os
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import List, Optional
 
@@ -15,9 +15,17 @@ from .constants import DEFAULT_QUALITY, NO_ID_COLUMN_IDENTIFIED, PRESETS
 from .task import TabularPredictionTask
 from .utils import load_config
 
-logging.basicConfig(level=logging.INFO)
+try:
+    # specified version in pyproject.toml
+    __version__ = version("autogluon-assistant")
+except PackageNotFoundError:
+    # package is not installed
+    __version__ = "unknown"
+
 
 __all__ = ["TabularPredictionAssistant", "TabularPredictionTask"]
+
+logging.basicConfig(level=logging.INFO)
 
 
 def get_task(path: Path) -> TabularPredictionTask:
@@ -43,7 +51,7 @@ def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFra
         output_ids = task.sample_submission_data[task.output_id_column]
 
         if not test_ids.equals(output_ids):
-            print(f"Warning: Test IDs and output IDs do not match!")
+            print("Warning: Test IDs and output IDs do not match!")
 
         # Ensure test ID column is included
         if task.test_id_column not in outputs.columns:
