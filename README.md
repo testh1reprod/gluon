@@ -59,11 +59,18 @@ The Autogluon Assistant Web UI is a user-friendly application that allows users 
 The web UI enables users to upload datasets, configure Autogluon-Assistant runs with customized settings, preview data, monitor execution progress, view and download results, and supports secure, isolated sessions for concurrent users.
 
 #### To run the Autogluon Assistant Web UI:
-Navigate to the project directory and run the app:
+
 ````
-cd src/autogluon_assistant/ui && streamlit run app.py
+aga ui
+
+# OR
+
+# Launch Web-UI on specific port e.g. 8888
+aga ui --port 8888
+
 ````
-The Autogluon Assistant Web UI should now be accessible in your web browser at `http://localhost:8501`
+
+Autogluon Assistant Web UI should now be accessible in your web browser at `http://localhost:8501`
 
 #### Add GPT4 Model to the LLM Option:
 If you’d like to add additional GPT4 model to the language model (LLM) dropdown:
@@ -99,8 +106,8 @@ Note:
 
 Now you can launch the AutoGluon Assistant run using the following command:
 ```
-aga [NAME_OF_DATA_DIR] --presets [PRESET_QUALITY]
-# e.g. aga ./toy_data --presets best_quality
+aga run [NAME_OF_DATA_DIR] --presets [PRESET_QUALITY]
+# e.g. aga run ./toy_data --presets best_quality
 ```
 
 We support three presets, including `medium_quality`, `high_quality` and `best_quality`. We use `best_quality` as a default setting.
@@ -113,9 +120,9 @@ the `config_overrides` parameter with Hydra syntax from the command line.
 
 Here’s an example command with some configuration overrides:
 ```
-aga toy_data --config_overrides "feature_transformers=[], autogluon.predictor_fit_kwargs.time_limit=3600"
+aga run toy_data --config_overrides "feature_transformers=[], autogluon.predictor_fit_kwargs.time_limit=3600"
 
 # OR
 
-aga toy_data --config_overrides "feature_transformers=[]" --config_overrides "autogluon.predictor_fit_kwargs.time_limit=3600"
+aga run toy_data --config_overrides "feature_transformers=[]" --config_overrides "autogluon.predictor_fit_kwargs.time_limit=3600"
 ```

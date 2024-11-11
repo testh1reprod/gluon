@@ -13,6 +13,8 @@ from openai import OpenAI
 from pydantic import BaseModel, Field
 from tenacity import retry, stop_after_attempt, wait_exponential
 
+from ..constants import WHITE_LIST_LLM
+
 logger = logging.getLogger(__name__)
 
 
@@ -115,11 +117,7 @@ class LLMFactory:
         try:
             bedrock = boto3.client("bedrock", region_name="us-west-2")
             response = bedrock.list_foundation_models()
-            return [
-                model["modelId"]
-                for model in response["modelSummaries"]
-                if model["modelId"].startswith("anthropic.claude")
-            ]
+            return [model["modelId"] for model in response["modelSummaries"]]
         except Exception as e:
             print(f"Error fetching Bedrock models: {e}")
             return []
@@ -180,6 +178,9 @@ class LLMFactory:
         assert (
             config.model in valid_models
         ), f"{config.model} is not a valid model in: {valid_models} for provider {config.provider}"
+
+        if config.model not in WHITE_LIST_LLM:
+            logger.warning(f"{config.model} is not on the white list. Our white list models include {WHITE_LIST_LLM}")
 
         if config.provider == "openai":
             return LLMFactory._get_openai_chat_model(config)
