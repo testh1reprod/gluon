@@ -8,7 +8,7 @@ AutoGluon Assistant (AG-A) provides users a simple interface where they can inpu
 
 ## Setup
 
-```
+```bash
 # create a conda env
 conda create -n aga python=3.10
 conda activate aga
@@ -60,15 +60,14 @@ The web UI enables users to upload datasets, configure AG-A runs with customized
 
 #### To run the AG-A Web UI:
 
-````
+```bash
 aga ui
 
 # OR
 
 # Launch Web-UI on specific port e.g. 8888
 aga ui --port 8888
-
-````
+```
 
 AG-A Web UI should now be accessible in your web browser at `http://localhost:8501` or the specified port.
 
@@ -76,12 +75,14 @@ AG-A Web UI should now be accessible in your web browser at `http://localhost:85
 ### CLI
 
 Before launching AG-A CLI, prepare your data files in the following structure:
+
 ```
 └── data # Data files directory
     ├── train.[ext] # Training dataset (required)
     ├── test.[ext]  # Test dataset (required)
     └── description.txt # Dataset and task description (recommended)
 ```
+
 Note:
 - The training and test files can be in any tabular data format (e.g., csv, parquet, xlsx)
 - While there are no strict naming requirements, we recommend using clear, descriptive filenames
@@ -92,7 +93,8 @@ Note:
   - Any other relevant information
 
 Now you can launch the AutoGluon Assistant run using the following command:
-```
+
+```bash
 aga run [NAME_OF_DATA_DIR] --presets [PRESET_QUALITY]
 # e.g. aga run ./toy_data --presets best_quality
 ```
@@ -106,7 +108,8 @@ You can override specific settings in the YAML configuration defined in the [con
 the `config_overrides` parameter with Hydra syntax from the command line.
 
 Here’s an example command with some configuration overrides:
-```
+
+```bash
 aga run toy_data --config_overrides "feature_transformers=[], autogluon.predictor_fit_kwargs.time_limit=3600"
 
 # OR
