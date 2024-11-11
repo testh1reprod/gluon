@@ -65,8 +65,8 @@ aga ui
 
 # OR
 
-# Run on specific port e.g. 8888
-aga ui --port [PORT]
+# Launch Web-UI on specific port e.g. 8888
+aga ui --port 8888
 
 ````
 
