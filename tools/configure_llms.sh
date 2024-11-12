@@ -230,14 +230,16 @@ configure_provider() {
     print_color "$GREEN" "Select your LLM provider to configure:"
     echo "1) AWS Bedrock"
     echo "2) OpenAI"
-    read -p "Enter your choice (1/2): " provider_choice
+    echo -n "Enter your choice (1/2): "
+    read provider_choice
     
     case $provider_choice in
         1)
             print_color "$BLUE" "\nConfiguring AWS Bedrock..."
             
             while true; do
-                read -p "Enter your Bedrock API Key (starts with 4509): " BEDROCK_API_KEY
+                echo -n "Enter your Bedrock API Key (starts with 4509): "
+                read BEDROCK_API_KEY
                 if validate_api_key "$BEDROCK_API_KEY" "bedrock"; then
                     break
                 fi
@@ -245,15 +247,18 @@ configure_provider() {
             done
             
             while true; do
-                read -p "Enter your AWS region (e.g., us-east-1): " AWS_DEFAULT_REGION
+                echo -n "Enter your AWS region (e.g., us-east-1): "
+                read AWS_DEFAULT_REGION
                 if validate_aws_region "$AWS_DEFAULT_REGION"; then
                     break
                 fi
                 print_color "$RED" "Invalid AWS region. Please enter a valid region."
             done
             
-            read -p "Enter your AWS Access Key ID: " AWS_ACCESS_KEY_ID
-            read -s -p "Enter your AWS Secret Access Key: " AWS_SECRET_ACCESS_KEY
+            echo -n "Enter your AWS Access Key ID: "
+            read AWS_ACCESS_KEY_ID
+            echo -n "Enter your AWS Secret Access Key: "
+            read -s AWS_SECRET_ACCESS_KEY
             echo
             
             save_configuration "bedrock"
@@ -263,7 +268,8 @@ configure_provider() {
             print_color "$BLUE" "\nConfiguring OpenAI..."
             
             while true; do
-                read -p "Enter your OpenAI API Key (starts with sk-): " OPENAI_API_KEY
+                echo -n "Enter your OpenAI API Key (starts with sk-): "
+                read OPENAI_API_KEY
                 if validate_api_key "$OPENAI_API_KEY" "openai"; then
                     break
                 fi
@@ -294,7 +300,8 @@ print_color "$GREEN" "Select an option:"
 echo "1) Configure LLM providers"
 echo "2) View current configuration file"
 echo "3) View current environment variables"
-read -p "Enter your choice (1/2/3): " main_choice
+echo -n "Enter your choice (1/2/3): "
+read main_choice
 
 case $main_choice in
     1)
