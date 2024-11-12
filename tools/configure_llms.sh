@@ -54,9 +54,9 @@ validate_aws_region() {
 }
 
 # Function to validate API keys
-validate_api_key() {
+validate_openai_api_key() {
     local key=$1
-    [[ $key =~ ^sk.*$ ]] && return 0
+    [[ $key =~ ^sk-[A-Za-z0-9_-]+$ ]] && return 0
     return 1
 }
 
@@ -240,7 +240,7 @@ configure_provider() {
             while true; do
                 echo -n "Enter your OpenAI API Key (starts with sk-): "
                 read OPENAI_API_KEY
-                if validate_api_key "$OPENAI_API_KEY"; then
+                if validate_openai_api_key "$OPENAI_API_KEY"; then
                     break
                 fi
                 print_color "$RED" "Invalid OpenAI API Key format. Please try again."
