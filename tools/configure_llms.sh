@@ -17,6 +17,13 @@ NC='\033[0m' # No Color
 # Configuration file path
 CONFIG_FILE="$HOME/.llm_config"
 
+# Initialize temporary variables
+tmp_BEDROCK_API_KEY=""
+tmp_AWS_DEFAULT_REGION=""
+tmp_AWS_ACCESS_KEY_ID=""
+tmp_AWS_SECRET_ACCESS_KEY=""
+tmp_OPENAI_API_KEY=""
+
 # Function to print colored messages
 print_color() {
     local color=$1
@@ -64,13 +71,6 @@ validate_api_key() {
 
 # Function to read existing configuration into temporary variables
 read_existing_config() {
-    # Declare temporary variables
-    declare -g tmp_BEDROCK_API_KEY=""
-    declare -g tmp_AWS_DEFAULT_REGION=""
-    declare -g tmp_AWS_ACCESS_KEY_ID=""
-    declare -g tmp_AWS_SECRET_ACCESS_KEY=""
-    declare -g tmp_OPENAI_API_KEY=""
-    
     if [ -f "$CONFIG_FILE" ]; then
         while IFS='=' read -r key value; do
             if [ -n "$key" ] && [ -n "$value" ]; then
