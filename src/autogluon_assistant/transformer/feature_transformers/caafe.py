@@ -24,6 +24,7 @@ class CAAFETransformer(BaseFeatureTransformer):
         num_iterations: int = 2,
         optimization_metric: str = "roc",
         eval_model: str = "lightgbm",
+        # TODO: Remove hardcoding AWS region
         region_name: str = "us-west-2",
         **kwargs,
     ) -> None:

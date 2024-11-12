@@ -115,6 +115,7 @@ class LLMFactory:
     @staticmethod
     def get_bedrock_models() -> List[str]:
         try:
+            # TODO: Remove hardcoding AWS region
             bedrock = boto3.client("bedrock", region_name="us-west-2")
             response = bedrock.list_foundation_models()
             return [model["modelId"] for model in response["modelSummaries"]]
@@ -165,6 +166,7 @@ class LLMFactory:
                 "temperature": config.temperature,
                 "max_tokens": config.max_tokens,
             },
+            # TODO: Remove hardcoding AWS region
             region_name="us-west-2",
             verbose=config.verbose,
         )
