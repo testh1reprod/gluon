@@ -5,9 +5,8 @@ import pytest
 from hydra import compose, initialize
 
 from autogluon_assistant.llm import LLMFactory
-from autogluon_assistant.task import TabularPredictionTask
-from autogluon_assistant.task_inference import LabelColumnInference
-from autogluon_assistant.constants import TRAIN, TEST, OUTPUT
+from autogluon_assistant.task import DatasetType, TabularPredictionTask
+from autogluon_assistant.transformer.task_inference import LabelColumnInferenceTransformer
 
 _config_path = "../../../config"
 with initialize(version_base=None, config_path=_config_path):
@@ -70,27 +69,29 @@ def test_label_column_inference(toy_multiclass_data):
     metadata = {
         "output_columns": list(sample_submission.columns),
         "label_column": None,  # Label column should be inferred
-        "name": "shelter-animal-outcomes",
-        "description": "Predict the outcome type for shelter animals",
     }
 
     task = TabularPredictionTask(
-        name=metadata["name"],
-        description=metadata["description"],
+        name="shelter-animal-outcomes",
+        description="Predict the outcome type for shelter animals",
         filepaths=[Path("train.csv"), Path("test.csv"), Path("sample_submission.csv")],
         metadata=metadata,
         cache_data=False,
     )
 
-    task.dataset_mapping[TRAIN] = train
-    task.dataset_mapping[TEST] = test
-    task.dataset_mapping[OUTPUT] = sample_submission
+    task.dataset_mapping[DatasetType.TRAIN] = train
+    task.dataset_mapping[DatasetType.TEST] = test
+    task.dataset_mapping[DatasetType.OUTPUT] = sample_submission
 
-    transformer = LabelColumnInference(_llm)
+    # this won't guarantee a test for fallback logic since LLM will work most probably
+    transformer = LabelColumnInferenceTransformer(_llm)
     task = transformer.transform(task)
     assert task.metadata["label_column"] == "OutcomeType", "The label column should be 'OutcomeType'."
 
-    # Test fallback logic
-    task.metadata["label_column"] = None
-    task = transformer.transform(task)
+    # guaranteed test fallback logic explicitly
+    task.metadata["label_column"] = task._infer_label_column_from_sample_submission_data()
     assert task.metadata["label_column"] == "OutcomeType", "The label column should be 'OutcomeType'."
+
+
+if __name__ == "__main__":
+    pytest.main()
