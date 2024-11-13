@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 html, body, [class*="css"] {
-    font-family: "Montserrat", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
 }
@@ -9,7 +9,7 @@ html, body, [class*="css"] {
     display: None;
 }}
 
-.appview-container .main .block-container{
+.block-container{
     padding-left:0;
     padding-right: 0;
     padding-top: 0;
@@ -38,7 +38,6 @@ div[data-testid='stFileUploader'] > section[aria-label="Upload task description 
     height: 50%;
     background-color: transparent;
 }
-
 /*File Uploader*/
 div[data-testid='stFileUploader'] > section[aria-label="Select the dataset"] > input + div {
     margin: 0;
@@ -51,7 +50,7 @@ div[data-testid='stFileUploader'] > section[aria-label="Select the dataset"]{
 }
 
 /*Task Description File Uploader*/
-section[aria-label="Upload task description file"][data-testid='stFileUploaderDropzone'] > [data-testid='baseButton-secondary'] {
+section[aria-label="Upload task description file"] > button {
         margin-top: 4px;
         margin-bottom: -1px;
         text-indent: -9999px;
@@ -67,7 +66,7 @@ section[aria-label="Upload task description file"][data-testid='stFileUploaderDr
     }
 
 /* Run Button*/
-div.row-widget.stButton{
+div.stButton{
     display: flex;
     justify-content: flex-start;
     width: max-content;
@@ -75,7 +74,7 @@ div.row-widget.stButton{
     align-items: center;
 }
 
-div.row-widget.stButton > button[data-testid='baseButton-secondary']{
+div.stButton > button{
     background: #FFA63D;
     border: 0.75px solid rgba(0, 0, 0, 0.1);
     box-shadow: 0px 0.75px 0.75px rgba(0, 0, 0, 0.16);
@@ -83,12 +82,12 @@ div.row-widget.stButton > button[data-testid='baseButton-secondary']{
     width: 8rem;
     height: 2rem;
 }
-div.row-widget.stButton > button[data-testid='baseButton-secondary'] > div > p{
+div.stButton > button > div > p{
         font-weight: bold;
 }
 
 /*Download button*/
-div.row-widget.stDownloadButton > button[data-testid='baseButton-secondary']{
+div.stDownloadButton > button{
     background: #FFA63D;
     border: 0.75px solid rgba(0, 0, 0, 0.1);
     box-shadow: 0px 0.75px 0.75px rgba(0, 0, 0, 0.16);
@@ -96,7 +95,7 @@ div.row-widget.stDownloadButton > button[data-testid='baseButton-secondary']{
     width: 15rem;
     height: 2rem;
 }
-div.row-widget.stDownloadButton > button[data-testid='baseButton-secondary'] > div > p{
+div.stDownloadButton > button > div > p{
         font-weight: bold;
 }
 
@@ -131,10 +130,6 @@ div[data-baseweb="select"] > div {
 div[data-baseweb="select"] > div:hover {
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
-/* Radio button gap*/
-[role=radiogroup]{
-    gap: 6rem;
-}
 
 /*features.py*/
 .feature-container {
@@ -153,17 +148,6 @@ div[data-baseweb="select"] > div:hover {
     color: #666;
     margin-bottom: 15px;
 }
-.learn-more-btn {
-    display: inline-block;
-    padding: 5px 10px;
-    background-color: white;
-    color: #18A0FB;
-    text-decoration: none;
-    border-radius: 3px;
-    border: 1px solid #18A0FB;
-    font-size: 12px;
-    transition: all 0.3s ease;
-}
 
 div[data-testid='stExpanderDetails'] p{
     font-size:0.8rem
@@ -172,79 +156,158 @@ div[data-testid='stExpanderDetails'] p{
 /*tutorial.py*/
 .main-container {
     display: flex;
-    height: 70vh;
     flex-direction: row;
     margin-bottom: 10px;
-    }
+}
+
 .right-section {
     flex: 1;
     color: black;
     background-color: #ececec;
-    display:flex;
-    flex-direction:column;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: flex-start;
     padding-left: 3vw;
 }
+
 .logo {
-    width: 13rem;
-    height: 13rem;
+    width: 20vw;
+    height: 13vh;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    top: 2rem;
+    top: 2vh;
     right: 15%;
-    margin-left:2rem;
+    margin-left: 2vh;
 }
+
 .title {
-    font-size: 4rem;
+    font-size: 4vw;
     font-weight: bold;
     color: white;
     width: 30vw;
     height: 30vh;
-    margin: 4vw;
-    margin-top:13vh;
-    margin-bottom: 10px;
-    font-family: "Inter", sans-serif;
+    margin: 13vh 4vw 10px;
     position: relative;
-
-
 }
-.titleWithLogo{
+
+.titleWithLogo {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     position: relative;
-
 }
+
 .subtitle {
-    font-size: 2rem;
+    font-size: 2vw;
     text-align: center;
     max-width: 80%;
     color: white;
-    font-family: "Inter", sans-serif;
     position: relative;
-
-
-
+    max-height: 50px;
+    padding: 1vh;
 }
+
 .get-started-title {
-    font-size: 48px;
+    font-size: 3.5vw;
     font-weight: bold;
     margin-bottom: 20px;
-    font-family: "Inter", sans-serif;
+    margin-top: 2vh;
 }
+
 .description {
-    font-size: 1rem;
-    line-height: 24px;
-    margin-bottom: 20px;
-    font-family: "Inter", sans-serif;
-    padding-right: 50px;
+    font-size: 1.3vw;
+    margin-bottom: 2vh;
+    padding-right: 2vw;
 }
+
 .steps {
-    font-size: 20px;
-    line-height: 32px;
-    font-family: "Inter", sans-serif;
+    line-height: 3vh;
 }
+
+.steps li {
+    font-size: 1.3vw;
+}
+
+/*Responsive Nav Bar*/
+@media (max-width: 575px) {
+    .navbar-nav {
+        padding-left: 5px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .nav-item {
+        font-size: 14px;
+        margin-right: 8px;
+        font-weight: lighter;
+    }
+}
+
+/* Responsive tutorial.py*/
+@media (max-width: 800px) {
+    .main-container {
+        height: 40vh;
+        flex-direction: column;
+        margin-bottom:100px;
+    }
+
+    .title {
+        font-size: medium;
+        width: 20vw;
+        height: 5vh;
+        margin-top: 3vh;
+        margin-right: 2vw;
+        margin-bottom: 10px;
+    }
+
+    .subtitle {
+        font-size: 0.7rem;
+        max-width: 100%;
+        max-height: 50px;
+        padding: 1vh;
+    }
+
+
+    .logo {
+        width: 8vw;
+        min-width: 50px;
+        right: 10%;
+        margin-left: 2rem;
+        top: 10px;
+
+    }
+
+    .get-started-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .description {
+        font-size: 10px;
+        margin-bottom: 10px;
+        padding: 15px;
+        line-height: 2.5vh;
+    }
+
+    .steps {
+        font-size: 10px;
+        line-height: 15px;
+        padding: 0 15px;
+    }
+
+    .steps li {
+        font-size: 10px;
+
+    }
+
+    .right-section {
+        padding-left: 5vw;
+        padding-top: 2vh;
+    }
+    }

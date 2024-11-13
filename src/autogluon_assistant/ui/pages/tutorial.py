@@ -14,15 +14,26 @@ def set_png_as_page_bg(png_file):
     page_bg_img = (
         """
     <style>
+    @media (max-width: 800px) {
+        .left-section {
+            font-size: 0.9rem;
+            width: 100vw !important;
+            background-color: white !important;
+            justify-content: center;
+            background-size: 120vw !important;
+            min-height: 20vh !important;
+        }
+    }
     .left-section {
         width: 47vw;
         background-image: url("data:image/png;base64,%s");
         background-size: 45vw;
         background-repeat: no-repeat;
-        background-position: left top;
+        background-position: left;
         display: flex;
         background-color: #ececec;
         flex-direction: column;
+        min-height: 70vh;
     }
     </style>
     """

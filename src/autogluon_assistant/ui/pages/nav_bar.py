@@ -7,7 +7,7 @@ def nav_bar():
     """
     st.markdown(
         """
-    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top" style="padding-left: 81px;">
+    <nav class="navbar navbar-expand-sm navbar-light bg-white fixed-top" style="padding-left: 81px;">
         <div class="navbar-nav">
           <a class="nav-item nav-link active" href="#get-started" style="color: #18A0FB;">Get Started <span class="sr-only">(current)</span></a>
           <a class="nav-item nav-link" href="#quick-demo" style="color: #18A0FB;">Demo </a>
