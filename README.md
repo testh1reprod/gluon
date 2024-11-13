@@ -25,16 +25,15 @@ cd autogluon-assistant && pip install -e ".[dev]" && cd ..
 AG-A supports using both AWS Bedrock and OpenAI as LLM model providers. You will need to set up API keys for the respective provider you choose. By default, AG-A uses AWS Bedrock for its language models.
 
 #### AWS Bedrock Setup
-AG-A integrates with AWS Bedrock by default. To use AWS Bedrock, you will need to configure your AWS credentials and region settings, along with the Bedrock-specific API key:
+AG-A integrates with AWS Bedrock by default. To use AWS Bedrock, you will need to configure your AWS credentials and region settings:
 
 ```bash
-export BEDROCK_API_KEY="<your-bedrock-api-key>"
 export AWS_DEFAULT_REGION="<your-region>"
 export AWS_ACCESS_KEY_ID="<your-access-key>"
 export AWS_SECRET_ACCESS_KEY="<your-secret-key>"
 ```
 
-Ensure you have an active AWS account and appropriate permissions set up for Bedrock. You can manage your AWS credentials through the AWS Management Console.
+Ensure you have an active AWS account and appropriate permissions set up for using Bedrock models. You can manage your AWS credentials through the AWS Management Console. See [Bedrock supported AWS regions](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-regions.html)
 
 
 #### OpenAI Setup

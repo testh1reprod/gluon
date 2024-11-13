@@ -48,6 +48,7 @@ class TabularPredictionAssistant:
         self.llm: Union[AssistantChatOpenAI, AssistantChatBedrock] = LLMFactory.get_chat_model(config.llm)
         self.predictor = AutogluonTabularPredictor(config.autogluon)
         self.feature_transformers_config = config.feature_transformers
+        self.use_feature_transformers = config.use_feature_transformers
 
     def describe(self) -> Dict[str, Any]:
         return {
@@ -99,7 +100,7 @@ class TabularPredictionAssistant:
         # instantiate and run task preprocessors, which infer the problem type, important filenames
         # and columns as well as the feature extractors
         task = self.inference_task(task)
-        if self.feature_transformers_config:
+        if self.feature_transformers_config and self.use_feature_transformers:
             logger.info("Automatic feature generation starts...")
             fe_transformers = [instantiate(ft_config) for ft_config in self.feature_transformers_config]
             for fe_transformer in fe_transformers:

@@ -17,6 +17,12 @@ NC='\033[0m' # No Color
 # Configuration file path
 CONFIG_FILE="$HOME/.llm_config"
 
+# Initialize temporary variables
+tmp_AWS_DEFAULT_REGION=""
+tmp_AWS_ACCESS_KEY_ID=""
+tmp_AWS_SECRET_ACCESS_KEY=""
+tmp_OPENAI_API_KEY=""
+
 # Function to print colored messages
 print_color() {
     local color=$1
@@ -36,10 +42,11 @@ print_header() {
 validate_aws_region() {
     local region=$1
     # List of valid AWS regions
+    # TODO: Raise warning if bedrock is not supported or is gated in region
     local valid_regions=("us-east-1" "us-east-2" "us-west-1" "us-west-2" "eu-west-1" "eu-central-1" "ap-southeast-1" "ap-southeast-2" "ap-northeast-1")
     
     for valid_region in "${valid_regions[@]}"; do
-        if [ "$region" == "$valid_region" ]; then
+        if [ "$region" = "$valid_region" ]; then
             return 0
         fi
     done
@@ -47,35 +54,18 @@ validate_aws_region() {
 }
 
 # Function to validate API keys
-validate_api_key() {
+validate_openai_api_key() {
     local key=$1
-    local type=$2
-    
-    case $type in
-        "bedrock")
-            [[ $key =~ ^[0-9]{4}[0-9.]+$ ]] && return 0 ;;
-        "openai")
-            [[ $key =~ ^sk-[A-Za-z0-9]+$ ]] && return 0 ;;
-        *)
-            return 1 ;;
-    esac
+    [[ $key =~ ^sk-[A-Za-z0-9_-]+$ ]] && return 0
     return 1
 }
 
 # Function to read existing configuration into temporary variables
 read_existing_config() {
-    # Declare temporary variables
-    declare -g tmp_BEDROCK_API_KEY=""
-    declare -g tmp_AWS_DEFAULT_REGION=""
-    declare -g tmp_AWS_ACCESS_KEY_ID=""
-    declare -g tmp_AWS_SECRET_ACCESS_KEY=""
-    declare -g tmp_OPENAI_API_KEY=""
-    
     if [ -f "$CONFIG_FILE" ]; then
         while IFS='=' read -r key value; do
             if [ -n "$key" ] && [ -n "$value" ]; then
                 case "$key" in
-                    "BEDROCK_API_KEY") tmp_BEDROCK_API_KEY="$value" ;;
                     "AWS_DEFAULT_REGION") tmp_AWS_DEFAULT_REGION="$value" ;;
                     "AWS_ACCESS_KEY_ID") tmp_AWS_ACCESS_KEY_ID="$value" ;;
                     "AWS_SECRET_ACCESS_KEY") tmp_AWS_SECRET_ACCESS_KEY="$value" ;;
@@ -91,11 +81,10 @@ save_configuration() {
     local provider=$1
     
     # Create or truncate the config file
-    > "$CONFIG_FILE"
+    echo "" > "$CONFIG_FILE" || { print_color "$RED" "Error: Cannot write to '$CONFIG_FILE'"; return 1; }
     
-    if [ "$provider" == "bedrock" ]; then
-        # Update Bedrock variables
-        tmp_BEDROCK_API_KEY="$BEDROCK_API_KEY"
+    if [ "$provider" = "bedrock" ]; then
+        # Update AWS variables
         tmp_AWS_DEFAULT_REGION="$AWS_DEFAULT_REGION"
         tmp_AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
         tmp_AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
@@ -105,13 +94,10 @@ save_configuration() {
     fi
     
     # Save all configurations
-    if [ -n "$tmp_BEDROCK_API_KEY" ]; then
-        cat << EOF >> "$CONFIG_FILE"
-BEDROCK_API_KEY=$tmp_BEDROCK_API_KEY
-AWS_DEFAULT_REGION=$tmp_AWS_DEFAULT_REGION
-AWS_ACCESS_KEY_ID=$tmp_AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY=$tmp_AWS_SECRET_ACCESS_KEY
-EOF
+    if [ -n "$tmp_AWS_ACCESS_KEY_ID" ]; then
+        echo "AWS_DEFAULT_REGION=$tmp_AWS_DEFAULT_REGION" >> "$CONFIG_FILE"
+        echo "AWS_ACCESS_KEY_ID=$tmp_AWS_ACCESS_KEY_ID" >> "$CONFIG_FILE"
+        echo "AWS_SECRET_ACCESS_KEY=$tmp_AWS_SECRET_ACCESS_KEY" >> "$CONFIG_FILE"
     fi
     
     if [ -n "$tmp_OPENAI_API_KEY" ]; then
@@ -119,8 +105,7 @@ EOF
     fi
     
     # Export all variables
-    if [ -n "$tmp_BEDROCK_API_KEY" ]; then
-        export BEDROCK_API_KEY="$tmp_BEDROCK_API_KEY"
+    if [ -n "$tmp_AWS_ACCESS_KEY_ID" ]; then
         export AWS_DEFAULT_REGION="$tmp_AWS_DEFAULT_REGION"
         export AWS_ACCESS_KEY_ID="$tmp_AWS_ACCESS_KEY_ID"
         export AWS_SECRET_ACCESS_KEY="$tmp_AWS_SECRET_ACCESS_KEY"
@@ -158,8 +143,7 @@ display_config() {
     print_header "Current Configuration File"
     
     print_color "$GREEN" "AWS Bedrock Configuration:"
-    if [ -n "$tmp_BEDROCK_API_KEY" ]; then
-        echo "BEDROCK_API_KEY=${tmp_BEDROCK_API_KEY}"
+    if [ -n "$tmp_AWS_ACCESS_KEY_ID" ]; then
         echo "AWS_DEFAULT_REGION=${tmp_AWS_DEFAULT_REGION}"
         echo "AWS_ACCESS_KEY_ID=${tmp_AWS_ACCESS_KEY_ID}"
         echo "AWS_SECRET_ACCESS_KEY=********"
@@ -182,7 +166,6 @@ display_env_vars() {
     print_header "Current Environment Variables"
     
     print_color "$GREEN" "AWS Bedrock Environment Variables:"
-    echo "BEDROCK_API_KEY=${BEDROCK_API_KEY:-(not set)}"
     echo "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-(not set)}"
     echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-(not set)}"
     if [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
@@ -201,10 +184,6 @@ display_env_vars() {
         read_existing_config
         
         local has_mismatch=false
-        
-        if [ -n "$tmp_BEDROCK_API_KEY" ] && [ "$tmp_BEDROCK_API_KEY" != "$BEDROCK_API_KEY" ]; then
-            has_mismatch=true
-        fi
         if [ -n "$tmp_AWS_DEFAULT_REGION" ] && [ "$tmp_AWS_DEFAULT_REGION" != "$AWS_DEFAULT_REGION" ]; then
             has_mismatch=true
         fi
@@ -230,30 +209,26 @@ configure_provider() {
     print_color "$GREEN" "Select your LLM provider to configure:"
     echo "1) AWS Bedrock"
     echo "2) OpenAI"
-    read -p "Enter your choice (1/2): " provider_choice
+    echo -n "Enter your choice (1/2): "
+    read provider_choice
     
     case $provider_choice in
         1)
             print_color "$BLUE" "\nConfiguring AWS Bedrock..."
             
             while true; do
-                read -p "Enter your Bedrock API Key (starts with 4509): " BEDROCK_API_KEY
-                if validate_api_key "$BEDROCK_API_KEY" "bedrock"; then
-                    break
-                fi
-                print_color "$RED" "Invalid Bedrock API Key format. Please try again."
-            done
-            
-            while true; do
-                read -p "Enter your AWS region (e.g., us-east-1): " AWS_DEFAULT_REGION
+                echo -n "Enter your AWS region (e.g., us-east-1): "
+                read AWS_DEFAULT_REGION
                 if validate_aws_region "$AWS_DEFAULT_REGION"; then
                     break
                 fi
                 print_color "$RED" "Invalid AWS region. Please enter a valid region."
             done
             
-            read -p "Enter your AWS Access Key ID: " AWS_ACCESS_KEY_ID
-            read -s -p "Enter your AWS Secret Access Key: " AWS_SECRET_ACCESS_KEY
+            echo -n "Enter your AWS Access Key ID: "
+            read AWS_ACCESS_KEY_ID
+            echo -n "Enter your AWS Secret Access Key: "
+            read -s AWS_SECRET_ACCESS_KEY
             echo
             
             save_configuration "bedrock"
@@ -263,8 +238,9 @@ configure_provider() {
             print_color "$BLUE" "\nConfiguring OpenAI..."
             
             while true; do
-                read -p "Enter your OpenAI API Key (starts with sk-): " OPENAI_API_KEY
-                if validate_api_key "$OPENAI_API_KEY" "openai"; then
+                echo -n "Enter your OpenAI API Key (starts with sk-): "
+                read OPENAI_API_KEY
+                if validate_openai_api_key "$OPENAI_API_KEY"; then
                     break
                 fi
                 print_color "$RED" "Invalid OpenAI API Key format. Please try again."
@@ -288,13 +264,14 @@ configure_provider() {
 
 # Main script
 clear
-print_color "$BLUE" "=== LLM Configuration Tool ==="
+print_color "$BLUE" "=== AGA LLM Configuration Tool ==="
 echo
 print_color "$GREEN" "Select an option:"
 echo "1) Configure LLM providers"
 echo "2) View current configuration file"
 echo "3) View current environment variables"
-read -p "Enter your choice (1/2/3): " main_choice
+echo -n "Enter your choice (1/2/3): "
+read main_choice
 
 case $main_choice in
     1)

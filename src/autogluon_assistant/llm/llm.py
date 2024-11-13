@@ -115,6 +115,7 @@ class LLMFactory:
     @staticmethod
     def get_bedrock_models() -> List[str]:
         try:
+            # TODO: Remove hardcoding AWS region
             bedrock = boto3.client("bedrock", region_name="us-west-2")
             response = bedrock.list_foundation_models()
             return [model["modelId"] for model in response["modelSummaries"]]
@@ -139,10 +140,10 @@ class LLMFactory:
 
     @staticmethod
     def _get_openai_chat_model(config: DictConfig) -> AssistantChatOpenAI:
-        if config.api_key_location in os.environ:
-            api_key = os.environ[config.api_key_location]
+        if "OPENAI_API_KEY" in os.environ:
+            api_key = os.environ["OPENAI_API_KEY"]
         else:
-            raise Exception("OpenAI API env variable not set")
+            raise Exception("OpenAI API env variable OPENAI_API_KEY not set")
 
         logger.info(f"AGA is using model {config.model} from OpenAI to assist you with the task.")
 
@@ -165,6 +166,7 @@ class LLMFactory:
                 "temperature": config.temperature,
                 "max_tokens": config.max_tokens,
             },
+            # TODO: Remove hardcoding AWS region
             region_name="us-west-2",
             verbose=config.verbose,
         )

@@ -112,10 +112,16 @@ def process_realtime_logs(line):
                 st.session_state.increment_time += 1
                 if st.session_state.increment_time <= TIME_LIMIT_MAPPING[st.session_state.time_limit]:
                     progress_bar = st.session_state.progress_bar
-                    current_time = st.session_state.increment_time + 1
+                    current_time = min(
+                        st.session_state.increment_time + 1,
+                        TIME_LIMIT_MAPPING[st.session_state.time_limit],
+                    )
                     progress = current_time / TIME_LIMIT_MAPPING[st.session_state.time_limit]
-                    time_ratio = f"Elapsed Time for Fitting models: | {current_time}/{TIME_LIMIT_MAPPING[st.session_state.time_limit]} ({progress:.1%})"
-                    progress_bar.progress(current_time, text=time_ratio)
+                    time_ratio = (
+                        f"Elapsed Time for Fitting models: | "
+                        f"{current_time}/{TIME_LIMIT_MAPPING[st.session_state.time_limit]} ({progress:.1%})"
+                    )
+                    progress_bar.progress(progress, text=time_ratio)
             if not st.session_state.show_remaining_time:
                 st.session_state.stage_container[st.session_state.current_stage].append(line)
                 show_log_line(line)
