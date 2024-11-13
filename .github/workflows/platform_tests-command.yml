@@ -41,8 +41,6 @@ jobs:
 
             [1]: ${{ steps.vars.outputs.run-url }}
 
-
-
   install:
     needs: setup
     runs-on: ${{ matrix.os }}
@@ -71,6 +69,16 @@ jobs:
           auto-update-conda: true
           python-version: ${{ matrix.python }}
           miniconda-version: "latest"
+      - name: Setup OMP
+        if: matrix.os == 'macos-latest'
+        shell: bash -l {0}
+        run: |
+          wget https://raw.githubusercontent.com/Homebrew/homebrew-core/fb8323f2b170bd4ae97e1bac9bf3e2983af3fdb0/Formula/libomp.rb
+          if brew list | grep -q libomp; then
+            brew unlink libomp
+          fi
+          brew install libomp.rb
+          rm libomp.rb
       - name: test-install
         shell: bash -l {0}
         run: |
