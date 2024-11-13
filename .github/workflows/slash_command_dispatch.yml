@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Get PR SHA
         id: sha
-        uses: actions/github-script@v7
+        uses: actions/github-script@v4
         with:
           result-encoding: string
           script: |
@@ -22,7 +22,7 @@ jobs:
             return pr.data.head.sha
       - name: Get PR number
         id: pr_number
-        uses: actions/github-script@v7
+        uses: actions/github-script@v4
         with:
           result-encoding: string
           script: |
