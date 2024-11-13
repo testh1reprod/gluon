@@ -401,7 +401,10 @@ def run_section():
 def setup_local_dataset():
     """Download all files from GitHub directory to local directory"""
     dataset_dir = Path("sample_dataset/knot_theory")
-    if dataset_dir.exists():
+
+    # Check if directory exists and required files exist
+    required_files = ["train.csv", "test.csv", "descriptions.txt"]
+    if dataset_dir.exists() and all((dataset_dir / file).exists() for file in required_files):
         return
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
