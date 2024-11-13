@@ -8,10 +8,8 @@ save_artifacts:
 feature_transformers:
   - _target_: autogluon_assistant.transformer.CAAFETransformer
     eval_model: lightgbm
-    llm_provider: bedrock
-    llm_model: "anthropic.claude-3-5-sonnet-20241022-v2:0"
-    # llm_provider: openai
-    # llm_model: gpt-4o-2024-08-06
+    llm_provider: ${llm.provider}
+    llm_model: ${llm.model}
     num_iterations: 5
     optimization_metric: roc
   - _target_: autogluon_assistant.transformer.OpenFETransformer
@@ -30,7 +28,6 @@ llm:
   provider: bedrock
   model: "anthropic.claude-3-5-sonnet-20241022-v2:0"
   # provider: openai
-  # api_key_location: OPENAI_API_KEY
   # model: gpt-4o-2024-08-06
   max_tokens: 512
   proxy_url: null

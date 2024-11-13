@@ -43,9 +43,6 @@ LLM_OPTIONS = ["Claude 3.5 with Amazon Bedrock", "GPT 4o"]
 # Provider configuration
 PROVIDER_MAPPING = {"Claude 3.5 with Amazon Bedrock": "bedrock", "GPT 4o": "openai"}
 
-# TODO: Remove model specific mappings
-API_KEY_LOCATION = {"GPT 4o": "OPENAI_API_KEY"}
-
 INITIAL_STAGE = {
     "Task Understanding": [],
     "Feature Generation": [],
