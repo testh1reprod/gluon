@@ -8,7 +8,6 @@ import psutil
 import requests
 import streamlit as st
 from constants import (
-    API_KEY_LOCATION,
     BASE_DATA_DIR,
     CAPTIONS,
     DATASET_OPTIONS,
@@ -50,7 +49,6 @@ def update_config_overrides():
     if st.session_state.llm:
         config_overrides.append(f"llm.model={LLM_MAPPING[st.session_state.llm]}")
         config_overrides.append(f"llm.provider={PROVIDER_MAPPING[st.session_state.llm]}")
-        config_overrides.append(f"llm.api_key_location={API_KEY_LOCATION[st.session_state.llm]}")
 
     if not st.session_state.feature_generation:
         config_overrides.append("feature_transformers=[]")
