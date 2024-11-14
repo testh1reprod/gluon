@@ -40,7 +40,6 @@ class Predictor:
 
 
 class AutogluonTabularPredictor(Predictor):
-
     def __init__(self, config: Any):
         self.config = config
         self.metadata: Dict[str, Any] = defaultdict(dict)

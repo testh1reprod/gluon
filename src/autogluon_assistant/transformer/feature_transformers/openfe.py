@@ -317,7 +317,6 @@ class AssistantOpenFE(OpenFE):
 
 
 class OpenFETransformer(BaseFeatureTransformer):
-
     identifier = "openfe"
 
     def __init__(self, n_jobs: int = 1, num_features_to_keep: int = 10, **kwargs) -> None:

@@ -14,7 +14,6 @@ warnings.filterwarnings(action="ignore")
 
 
 class CAAFETransformer(BaseFeatureTransformer):
-
     identifier = "caafe"
 
     def __init__(
@@ -78,7 +77,6 @@ class CAAFETransformer(BaseFeatureTransformer):
         dataset_description: str = "",
         **kwargs,
     ) -> None:
-
         if problem_type not in ("binary", "multiclass"):
             logger.info("Feature transformer CAAFE only supports classification problems.")
             return
