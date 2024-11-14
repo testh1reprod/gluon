@@ -112,9 +112,18 @@ def load_config(
         ValueError: If config file not found or invalid
     """
     # Load default config
-    default_config_path = _get_default_config_path(presets)
+    default_config_path = _get_default_config_path(presets="default")
     logging.info(f"Loading default config from: {default_config_path}")
     config = OmegaConf.load(default_config_path)
+    print(config)
+
+    # Apply Presets
+    presets_config_path = _get_default_config_path(presets=presets)
+    presets_config = OmegaConf.load(presets_config_path)
+    logging.info(f"Merging {presets} config from: {presets_config_path}")
+    config = OmegaConf.merge(config, presets_config)
+    print(config)
+    exit()
 
     # If custom config provided, merge it
     if config_path:
@@ -134,3 +143,36 @@ def load_config(
         logging.info("Successfully applied command-line overrides")
 
     return config
+
+
+def get_feature_transformers_config(config: OmegaConf) -> Optional[List[Dict[str, Any]]]:
+    """
+    Retrieve the configuration of feature transformers based on enabled models.
+    Returns None if no models are enabled.
+    
+    Args:
+        config (OmegaConf): The configuration object loaded from YAML
+        
+    Returns:
+        Optional[List[Dict[str, Any]]]: List of transformer configurations,
+                                      or None if no models are enabled
+    """
+    # Get list of enabled models
+    enabled_models = config.feature_transformers.enabled_models
+    
+    # Return None if no models are enabled
+    if not enabled_models:
+        return None
+    
+    # Get all available model configurations
+    all_models_config = config.feature_transformers.models
+    
+    # Create list of configurations for enabled models
+    transformers_config = [
+        OmegaConf.to_container(all_models_config[model_name], resolve=True)
+        for model_name in enabled_models
+        if model_name in all_models_config
+    ]
+    
+    # Return None if no valid configurations were found
+    return transformers_config if transformers_config else None

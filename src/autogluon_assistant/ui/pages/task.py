@@ -51,9 +51,9 @@ def update_config_overrides():
         config_overrides.append(f"llm.provider={PROVIDER_MAPPING[st.session_state.llm]}")
 
     if st.session_state.feature_generation:
-        config_overrides.append("feature_transformers.enabled=True")
+        config_overrides.append("feature_transformers.enabled_models=[CAAFE, OpenFE, PretrainedEmbedding]")
     else:
-        config_overrides.append("feature_transformers.enabled=False")
+        config_overrides.append("feature_transformers.enabled_models=None")
 
     st.session_state.config_overrides = config_overrides
 

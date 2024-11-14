@@ -22,6 +22,7 @@ from .task_inference import (
     TestIDColumnInference,
     TrainIDColumnInference,
 )
+from .utils import get_feature_transformers_config
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +57,7 @@ class TabularPredictionAssistant:
         self.config = config
         self.llm: Union[AssistantChatOpenAI, AssistantChatBedrock] = LLMFactory.get_chat_model(config.llm)
         self.predictor = AutogluonTabularPredictor(config.autogluon)
-        self.feature_transformers_config = config.feature_transformers.transformers
-        self.use_feature_transformers = config.feature_transformers.enabled
+        self.feature_transformers_config = get_feature_transformers_config(config)
 
     def describe(self) -> Dict[str, Any]:
         return {
@@ -109,7 +109,7 @@ class TabularPredictionAssistant:
         # instantiate and run task preprocessors, which infer the problem type, important filenames
         # and columns as well as the feature extractors
         task = self.inference_task(task)
-        if self.feature_transformers_config and self.use_feature_transformers:
+        if self.feature_transformers_config:
             logger.info("Automatic feature generation starts...")
             fe_transformers = [instantiate(ft_config) for ft_config in self.feature_transformers_config]
             for fe_transformer in fe_transformers:

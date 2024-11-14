@@ -109,9 +109,9 @@ the `config_overrides` parameter with Hydra syntax from the command line.
 Here’s an example command with some configuration overrides:
 
 ```bash
-aga run toy_data --config_overrides "feature_transformers.enabled=False, autogluon.predictor_fit_kwargs.time_limit=3600"
+aga run toy_data --config_overrides "feature_transformers.enabled_models=None, autogluon.predictor_fit_kwargs.time_limit=3600"
 
 # OR
 
-aga run toy_data --config_overrides "feature_transformers.enabled=False" --config_overrides "autogluon.predictor_fit_kwargs.time_limit=3600"
+aga run toy_data --config_overrides "feature_transformers.enabled_models=None" --config_overrides "autogluon.predictor_fit_kwargs.time_limit=3600"
 ```

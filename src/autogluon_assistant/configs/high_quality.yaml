@@ -1,37 +1,4 @@
-infer_eval_metric: True
-detect_and_drop_id_column: False
-task_preprocessors_timeout: 3600
-save_artifacts:
-  enabled: False
-  append_timestamp: True
-  path: "./aga-artifacts"
-feature_transformers:
-  enabled: False
-  transformers:
-    - _target_: autogluon_assistant.transformer.CAAFETransformer
-      eval_model: lightgbm
-      llm_provider: ${llm.provider}
-      llm_model: ${llm.model}
-      num_iterations: 5
-      optimization_metric: roc
-    - _target_: autogluon_assistant.transformer.OpenFETransformer
-      n_jobs: 1
-      num_features_to_keep: 10
-    - _target_: autogluon_assistant.transformer.PretrainedEmbeddingTransformer
-      model_name: 'all-mpnet-base-v2'
 autogluon:
-  predictor_init_kwargs: {}
   predictor_fit_kwargs:
     presets: high_quality
     time_limit: 3600
-llm:
-  # Note: bedrock is only supported in limited AWS regions
-  #       and requires AWS credentials
-  provider: bedrock
-  model: "anthropic.claude-3-5-sonnet-20241022-v2:0"
-  # provider: openai
-  # model: gpt-4o-2024-08-06
-  max_tokens: 512
-  proxy_url: null
-  temperature: 0
-  verbose: True
