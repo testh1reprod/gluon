@@ -1,6 +1,9 @@
 import logging
 import signal
-from typing import Any, Dict, Union
+import sys
+import threading
+from contextlib import contextmanager
+from typing import Any, Dict, Optional, Union
 
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
@@ -19,19 +22,13 @@ from .task_inference import (
     TestIDColumnInference,
     TrainIDColumnInference,
 )
-from .transformer import TransformTimeoutError
-
-import sys
-from contextlib import contextmanager
-import threading
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
 
 @contextmanager
 def timeout(seconds: int, error_message: Optional[str] = None):
-    if sys.platform == 'win32':
+    if sys.platform == "win32":
         # Windows implementation using threading
         timer = threading.Timer(seconds, lambda: (_ for _ in ()).throw(TimeoutError(error_message)))
         timer.start()
