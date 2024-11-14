@@ -57,11 +57,9 @@ def parse_override(override: str) -> tuple:
 def apply_overrides(config: Dict[str, Any], overrides: List[str]) -> Dict[str, Any]:
     """
     Apply command-line overrides to config
-
     Args:
         config: Base configuration
         overrides: List of overrides in format ["key1=value1", "key2.nested=value2"]
-
     Returns:
         Updated configuration
     """
@@ -71,17 +69,26 @@ def apply_overrides(config: Dict[str, Any], overrides: List[str]) -> Dict[str, A
     # Convert overrides to nested dict
     override_conf = {}
     overrides = ",".join(overrides)
-    overrides = re.split(r"[,\s]+", overrides)
+    # Split by comma but preserve commas inside square brackets
+    overrides = re.split(r',(?![^\[]*\])', overrides)
+    
     for override in overrides:
+        override = override.strip()  # Remove any whitespace
         key, value = parse_override(override)
-
-        # Try to convert value to appropriate type
-        try:
-            # Try to evaluate as literal (for numbers, bools, etc)
-            value = eval(value)
-        except:
-            # Keep as string if eval fails
-            pass
+        
+        # Handle list values enclosed in square brackets
+        if value.startswith('[') and value.endswith(']'):
+            # Extract items between brackets and split by comma
+            items = value[1:-1].split(',')
+            # Clean up each item and convert to list
+            value = [item.strip() for item in items if item.strip()]
+        else:
+            # Try to convert value to appropriate type for non-list values
+            try:
+                value = eval(value)
+            except:
+                # Keep as string if eval fails
+                pass
 
         # Handle nested keys
         current = override_conf
@@ -93,7 +100,6 @@ def apply_overrides(config: Dict[str, Any], overrides: List[str]) -> Dict[str, A
     # Convert override dict to OmegaConf and merge
     override_conf = OmegaConf.create(override_conf)
     return OmegaConf.merge(config, override_conf)
-
 
 def load_config(
     presets: str, config_path: Optional[str] = None, overrides: Optional[List[str]] = None
