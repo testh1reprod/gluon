@@ -115,15 +115,12 @@ def load_config(
     default_config_path = _get_default_config_path(presets="default")
     logging.info(f"Loading default config from: {default_config_path}")
     config = OmegaConf.load(default_config_path)
-    print(config)
 
     # Apply Presets
     presets_config_path = _get_default_config_path(presets=presets)
     presets_config = OmegaConf.load(presets_config_path)
     logging.info(f"Merging {presets} config from: {presets_config_path}")
     config = OmegaConf.merge(config, presets_config)
-    print(config)
-    exit()
 
     # If custom config provided, merge it
     if config_path:
