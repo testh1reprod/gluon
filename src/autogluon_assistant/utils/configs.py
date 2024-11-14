@@ -146,30 +146,30 @@ def get_feature_transformers_config(config: OmegaConf) -> Optional[List[Dict[str
     """
     Retrieve the configuration of feature transformers based on enabled models.
     Returns None if no models are enabled.
-    
+
     Args:
         config (OmegaConf): The configuration object loaded from YAML
-        
+
     Returns:
         Optional[List[Dict[str, Any]]]: List of transformer configurations,
                                       or None if no models are enabled
     """
     # Get list of enabled models
     enabled_models = config.feature_transformers.enabled_models
-    
+
     # Return None if no models are enabled
     if not enabled_models:
         return None
-    
+
     # Get all available model configurations
     all_models_config = config.feature_transformers.models
-    
+
     # Create list of configurations for enabled models
     transformers_config = [
         OmegaConf.to_container(all_models_config[model_name], resolve=True)
         for model_name in enabled_models
         if model_name in all_models_config
     ]
-    
+
     # Return None if no valid configurations were found
     return transformers_config if transformers_config else None
