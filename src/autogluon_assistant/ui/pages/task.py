@@ -51,7 +51,7 @@ def update_config_overrides():
         config_overrides.append(f"llm.provider={PROVIDER_MAPPING[st.session_state.llm]}")
 
     if not st.session_state.feature_generation:
-        config_overrides.append("feature_transformers=[]")
+        config_overrides.append("feature_transformers.enabled=False")
 
     st.session_state.config_overrides = config_overrides
 

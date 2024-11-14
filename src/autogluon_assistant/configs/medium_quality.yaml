@@ -5,19 +5,20 @@ save_artifacts:
   enabled: False
   append_timestamp: True
   path: "./aga-artifacts"
-use_feature_transformers: False
 feature_transformers:
-  - _target_: autogluon_assistant.transformer.CAAFETransformer
-    eval_model: lightgbm
-    llm_provider: ${llm.provider}
-    llm_model: ${llm.model}
-    num_iterations: 5
-    optimization_metric: roc
-  - _target_: autogluon_assistant.transformer.OpenFETransformer
-    n_jobs: 1
-    num_features_to_keep: 10
-  - _target_: autogluon_assistant.transformer.PretrainedEmbeddingTransformer
-    model_name: 'all-mpnet-base-v2'
+  enabled: False
+  transformers:
+    - _target_: autogluon_assistant.transformer.CAAFETransformer
+      eval_model: lightgbm
+      llm_provider: ${llm.provider}
+      llm_model: ${llm.model}
+      num_iterations: 5
+      optimization_metric: roc
+    - _target_: autogluon_assistant.transformer.OpenFETransformer
+      n_jobs: 1
+      num_features_to_keep: 10
+    - _target_: autogluon_assistant.transformer.PretrainedEmbeddingTransformer
+      model_name: 'all-mpnet-base-v2'
 autogluon:
   predictor_init_kwargs: {}
   predictor_fit_kwargs:

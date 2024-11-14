@@ -47,8 +47,8 @@ class TabularPredictionAssistant:
         self.config = config
         self.llm: Union[AssistantChatOpenAI, AssistantChatBedrock] = LLMFactory.get_chat_model(config.llm)
         self.predictor = AutogluonTabularPredictor(config.autogluon)
-        self.feature_transformers_config = config.feature_transformers
-        self.use_feature_transformers = config.use_feature_transformers
+        self.feature_transformers_config = config.feature_transformers.transformers
+        self.use_feature_transformers = config.feature_transformers.enabled
 
     def describe(self) -> Dict[str, Any]:
         return {
