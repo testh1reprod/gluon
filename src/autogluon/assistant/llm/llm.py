@@ -13,7 +13,7 @@ from openai import OpenAI
 from pydantic import BaseModel, Field
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from ..constants import WHITE_LIST_LLM
+from autogluon.assistant.constants import WHITE_LIST_LLM
 
 logger = logging.getLogger(__name__)
 

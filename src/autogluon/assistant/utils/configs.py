@@ -18,7 +18,12 @@ def _get_default_config_path(
     """
     try:
         # Get the package root directory using relative import
-        package_root = Path(importlib.resources.files(__package__.split(".")[0]))
+        try:
+            package_paths = list(importlib.resources.files(__package__.split(".")[0]).iterdir())
+            package_root = next(p for p in package_paths if "assistant" in str(p))
+        except Exception:
+            # Fallback for development environment
+            package_root = Path(__file__).parent.parent
 
         # Construct path to configs directory
         config_path = package_root / CONFIGS / f"{presets}.yaml"

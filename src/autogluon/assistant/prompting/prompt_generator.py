@@ -6,9 +6,14 @@ from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from ..constants import METRICS_DESCRIPTION, NO_FILE_IDENTIFIED, NO_ID_COLUMN_IDENTIFIED, PROBLEM_TYPES
-from ..utils import is_text_file, load_pd_quietly
-from .utils import get_outer_columns
+from autogluon.assistant.constants import (
+    METRICS_DESCRIPTION,
+    NO_FILE_IDENTIFIED,
+    NO_ID_COLUMN_IDENTIFIED,
+    PROBLEM_TYPES,
+)
+from autogluon.assistant.prompting.utils import get_outer_columns
+from autogluon.assistant.utils import is_text_file, load_pd_quietly
 
 
 class PromptGenerator(ABC):

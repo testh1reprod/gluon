@@ -5,7 +5,7 @@ from typing import Any, Dict, List  # Added Union for type hinting
 from autogluon.core.utils.utils import infer_problem_type
 from langchain_core.exceptions import OutputParserException  # Updated import
 
-from autogluon_assistant.prompting import (
+from autogluon.assistant.prompting import (
     DataFileNamePromptGenerator,
     DescriptionFileNamePromptGenerator,
     EvalMetricPromptGenerator,
@@ -15,7 +15,7 @@ from autogluon_assistant.prompting import (
     TestIDColumnPromptGenerator,
     TrainIDColumnPromptGenerator,
 )
-from autogluon_assistant.task import TabularPredictionTask
+from autogluon.assistant.task import TabularPredictionTask
 
 from ..constants import (
     CLASSIFICATION_PROBLEM_TYPES,

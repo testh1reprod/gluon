@@ -2,13 +2,14 @@ from copy import deepcopy
 
 import streamlit as st
 import streamlit.components.v1 as components
-from constants import DEFAULT_SESSION_VALUES, LOGO_PATH
-from pages.demo import main as demo
-from pages.feature import main as feature
-from pages.nav_bar import nav_bar
-from pages.preview import main as preview
-from pages.task import main as run
-from pages.tutorial import main as tutorial
+
+from autogluon.assistant.ui.constants import DEFAULT_SESSION_VALUES, LOGO_PATH
+from autogluon.assistant.ui.pages.demo import main as demo
+from autogluon.assistant.ui.pages.feature import main as feature
+from autogluon.assistant.ui.pages.nav_bar import nav_bar
+from autogluon.assistant.ui.pages.preview import main as preview
+from autogluon.assistant.ui.pages.task import main as run
+from autogluon.assistant.ui.pages.tutorial import main as tutorial
 
 st.set_page_config(
     page_title="AutoGluon Assistant",
@@ -41,7 +42,7 @@ reload_warning = """
   window.onbeforeunload = function () {
 
     return  "Are you sure want to LOGOUT the session ?";
-}; 
+};
 </script>
 """
 
