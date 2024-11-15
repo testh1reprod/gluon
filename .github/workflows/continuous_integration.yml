@@ -1,12 +1,13 @@
 name: Continuous Integration
 on:
   push:
-  pull_request_target: 
+  pull_request_target:
     types: [labeled, synchronize, opened]
 
 permissions:
   id-token: write
   contents: read
+  pull-requests: write # for removing tags
 
 jobs:
   permission_check:
@@ -45,7 +46,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
         python: ["3.9", "3.10", "3.11"]
-    
+
     steps:
       - name: Checkout repository
         if: ${{ github.event_name != 'pull_request_target' }}
