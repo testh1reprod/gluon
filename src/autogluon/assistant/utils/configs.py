@@ -169,6 +169,10 @@ def get_feature_transformers_config(config: OmegaConf) -> Optional[List[Dict[str
     # Get list of enabled models
     enabled_models = config.feature_transformers.enabled_models
 
+    # Convert string to list if single model string
+    if isinstance(enabled_models, str):
+        enabled_models = [enabled_models]
+
     # Return None if no models are enabled
     if not enabled_models:
         return None
