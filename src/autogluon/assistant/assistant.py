@@ -126,9 +126,9 @@ class TabularPredictionAssistant:
             logger.info("Automatic feature generation is disabled. ")
         return task
 
-    def fit_predictor(self, task: TabularPredictionTask):
+    def fit_predictor(self, task: TabularPredictionTask, time_limit: float):
         try:
-            self.predictor.fit(task)
+            self.predictor.fit(task, time_limit=time_limit)
         except Exception as e:
             self.handle_exception("Predictor Fit", e)
 
