@@ -10,34 +10,34 @@ from ..constants import CONFIGS
 
 
 def _get_default_config_path(presets: str) -> Path:
-   """
-   Get default config folder under package root
-   Returns Path to the config.yaml file
-   """
-   try:
-       # Get the package root directory using relative import
-       try:
-           package_paths = list(importlib.resources.files(__package__.split(".")[0]).iterdir())
-           package_root = next(p for p in package_paths if str(p).endswith("autogluon/assistant"))
-       except Exception:
-           # Fallback for development environment
-           current_path = Path(__file__).parent
-           # Search up until we find "autogluon/assistant" in path
-           while not str(current_path).endswith("autogluon/assistant"):
-               current_path = current_path.parent
-           package_root = current_path
-           
-       # Construct path to configs directory  
-       config_path = package_root / CONFIGS / f"{presets}.yaml"
-       if not config_path.exists():
-           raise ValueError(
-               f"Config file not found at expected location: {config_path}\n"
-               f"Please ensure the config files are properly installed in the configs directory."
-           )
-       return config_path
-   except Exception as e:
-       logging.error(f"Error finding config file: {str(e)}")
-       raise
+    """
+    Get default config folder under package root
+    Returns Path to the config.yaml file
+    """
+    try:
+        # Get the package root directory using relative import
+        try:
+            package_paths = list(importlib.resources.files(__package__.split(".")[0]).iterdir())
+            package_root = next(p for p in package_paths if str(p).endswith("autogluon/assistant"))
+        except Exception:
+            # Fallback for development environment
+            current_path = Path(__file__).parent
+            # Search up until we find "autogluon/assistant" in path
+            while not str(current_path).endswith("autogluon/assistant"):
+                current_path = current_path.parent
+            package_root = current_path
+
+        # Construct path to configs directory
+        config_path = package_root / CONFIGS / f"{presets}.yaml"
+        if not config_path.exists():
+            raise ValueError(
+                f"Config file not found at expected location: {config_path}\n"
+                f"Please ensure the config files are properly installed in the configs directory."
+            )
+        return config_path
+    except Exception as e:
+        logging.error(f"Error finding config file: {str(e)}")
+        raise
 
 
 def parse_override(override: str) -> tuple:
