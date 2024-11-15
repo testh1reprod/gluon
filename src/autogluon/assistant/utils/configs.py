@@ -9,7 +9,7 @@ from omegaconf import OmegaConf
 from ..constants import CONFIGS
 
 
-def get_default_config_path(presets: str) -> Path:
+def _get_default_config_path(presets: str) -> Path:
    """
    Get default config folder under package root
    Returns Path to the config.yaml file
