@@ -7,7 +7,6 @@ save_artifacts:
   path: "./aga-artifacts"
 feature_transformers:
   enabled_models:
-    - CAAFE
   models:
     CAAFE:
       _target_: autogluon.assistant.transformer.CAAFETransformer
