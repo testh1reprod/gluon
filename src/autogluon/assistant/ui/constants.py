@@ -129,3 +129,7 @@ DEMO_URL = "https://automl-mm-bench.s3.amazonaws.com/autogluon-assistant/aga-kag
 
 SAMPLE_DATASET_DESCRIPTION = """You are solving this data science tasks:The dataset presented here (knot theory) comprises a lot of numerical features. Some of the features may be missing, with nan value. Your task is to predict the 'signature', which has 18 unique integers. The evaluation metric is the classification accuracy."""
 LOGO_PATH = "static/page_icon.png"
+SUCCESS_MESSAGE = """
+        🎉🎉Task completed successfully! If you found this useful, please consider:
+        ⭐ [Starring our repository](https://github.com/autogluon/autogluon-assistant)
+        """
