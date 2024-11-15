@@ -83,3 +83,50 @@ jobs:
         shell: bash -l {0}
         run: |
           chmod +x ./.github/workflow_scripts/test_install.sh && ./.github/workflow_scripts/test_install.sh
+
+  integration_test:
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        python: ["3.9", "3.10", "3.11"]
+    steps:
+      - name: Checkout repository for PR
+        if: (github.event_name == 'workflow_dispatch')
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr-sha }}
+
+      - name: Checkout repository for nightly test
+        if: (github.event_name == 'schedule')
+        uses: actions/checkout@v4
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: assistant_py3
+          environment-file: .github/workflows_env/unittest_env.yml
+          auto-update-conda: true
+          python-version: ${{ matrix.python }}
+          miniconda-version: "latest"
+
+      - name: Setup OMP for macOS
+        if: matrix.os == 'macos-latest'
+        shell: bash -l {0}
+        run: |
+          wget https://raw.githubusercontent.com/Homebrew/homebrew-core/fb8323f2b170bd4ae97e1bac9bf3e2983af3fdb0/Formula/libomp.rb
+          if brew list | grep -q libomp; then
+            brew unlink libomp
+          fi
+          brew install libomp.rb
+          rm libomp.rb
+
+      - name: Integration Test
+        uses: ./.github/actions/test-assistant
+        with:
+          aws-role-arn: ${{ secrets.AWS_CI_ROLE_ARN }}
+          submodule-to-test: integration
