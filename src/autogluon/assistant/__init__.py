@@ -13,14 +13,13 @@ from omegaconf import OmegaConf
 from rich import print as rprint
 from typing_extensions import Annotated
 
-from .assistant import TabularPredictionAssistant
-from .constants import DEFAULT_QUALITY, NO_ID_COLUMN_IDENTIFIED, PRESETS
-from .task import TabularPredictionTask
-from .utils import load_config
+from autogluon.assistant.assistant import TabularPredictionAssistant
+from autogluon.assistant.constants import DEFAULT_QUALITY, NO_ID_COLUMN_IDENTIFIED, PRESETS
+from autogluon.assistant.task import TabularPredictionTask
+from autogluon.assistant.utils import load_config
 
 try:
-    # specified version in pyproject.toml
-    __version__ = version("autogluon-assistant")
+    __version__ = version("autogluon.assistant")
 except PackageNotFoundError:
     # package is not installed
     __version__ = "unknown"
@@ -86,14 +85,14 @@ def make_prediction_outputs(task: TabularPredictionTask, predictions: pd.DataFra
 def get_ui_path() -> str:
     """Get the absolute path to the UI directory using package resources"""
     try:
-        # For Python 3.9+
-        with importlib.resources.files("autogluon_assistant.ui") as ui_path:
-            return str(ui_path)
-    except Exception:
-        # Fallback for older Python versions
-        import pkg_resources
+        from importlib.resources import files
 
-        return pkg_resources.resource_filename("autogluon_assistant", "ui")
+        package_paths = list(files("autogluon.assistant.ui").iterdir())
+        ui_path = next(str(p.parent) for p in package_paths if "app.py" in str(p))
+        return ui_path
+    except Exception:
+        # Fallback for development environment
+        return str(Path(__file__).parent / "ui")
 
 
 def launch_ui(port: int = typer.Option(8501, help="Port to run the UI on")):

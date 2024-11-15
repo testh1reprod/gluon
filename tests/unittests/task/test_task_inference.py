@@ -2,11 +2,10 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from autogluon.llm import LLMFactory
+from autogluon.task import DatasetType, TabularPredictionTask
+from autogluon.transformer.task_inference import LabelColumnInferenceTransformer
 from hydra import compose, initialize
-
-from autogluon_assistant.llm import LLMFactory
-from autogluon_assistant.task import DatasetType, TabularPredictionTask
-from autogluon_assistant.transformer.task_inference import LabelColumnInferenceTransformer
 
 _config_path = "../../../config"
 with initialize(version_base=None, config_path=_config_path):

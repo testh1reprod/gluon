@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import pytest
 
-from autogluon_assistant import run_assistant
+from autogluon.assistant import run_assistant
 
 
 @pytest.fixture
@@ -22,10 +22,10 @@ def titanic_data_path(tmp_path):
     # Create description file
     description = """
     Binary classification task to predict passenger survival on the Titanic.
-    
+
     Target Variable:
     - Survived: Survival (0 = No; 1 = Yes)
-    
+
     Features include:
     - Pclass: Passenger Class (1 = 1st; 2 = 2nd; 3 = 3rd)
     - Sex: Gender
@@ -34,7 +34,7 @@ def titanic_data_path(tmp_path):
     - Parch: Number of parents/children aboard
     - Fare: Passenger fare
     - Embarked: Port of embarkation (C = Cherbourg; Q = Queenstown; S = Southampton)
-    
+
     Evaluation metric: Binary classification accuracy
     """
 

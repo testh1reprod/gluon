@@ -1,4 +1,4 @@
-from autogluon_assistant.task import TabularPredictionTask
+from autogluon.assistant.task import TabularPredictionTask
 
 
 class TransformTimeoutError(TimeoutError):

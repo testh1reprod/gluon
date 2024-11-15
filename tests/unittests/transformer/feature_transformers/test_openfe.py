@@ -1,7 +1,6 @@
+from autogluon.transformer import OpenFETransformer
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
-
-from autogluon_assistant.transformer import OpenFETransformer
 
 
 def test_openfe_transformer():

@@ -7,7 +7,19 @@ import pandas as pd
 import psutil
 import requests
 import streamlit as st
-from constants import (
+from file_uploader import description_file_uploader, file_uploader, save_description_file
+from log_processor import messages, show_logs
+from streamlit_extras.add_vertical_space import add_vertical_space
+from utils import (
+    generate_model_file,
+    generate_output_file,
+    generate_output_filename,
+    get_user_data_dir,
+    get_user_session_id,
+    save_all_files,
+)
+
+from autogluon.assistant.ui.constants import (
     BASE_DATA_DIR,
     CAPTIONS,
     DATASET_OPTIONS,
@@ -21,17 +33,6 @@ from constants import (
     SAMPLE_DATASET_DESCRIPTION,
     TIME_LIMIT_MAPPING,
     TIME_LIMIT_OPTIONS,
-)
-from file_uploader import description_file_uploader, file_uploader, save_description_file
-from log_processor import messages, show_logs
-from streamlit_extras.add_vertical_space import add_vertical_space
-from utils import (
-    generate_model_file,
-    generate_output_file,
-    generate_output_filename,
-    get_user_data_dir,
-    get_user_session_id,
-    save_all_files,
 )
 
 os.makedirs(BASE_DATA_DIR, exist_ok=True)

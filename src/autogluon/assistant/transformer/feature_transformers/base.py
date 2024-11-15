@@ -5,8 +5,8 @@ from typing import Tuple
 
 import pandas as pd
 
-from autogluon_assistant.task import TabularPredictionTask
-from autogluon_assistant.transformer.base import BaseTransformer, TransformTimeoutError
+from autogluon.assistant.task import TabularPredictionTask
+from autogluon.assistant.transformer.base import BaseTransformer, TransformTimeoutError
 
 logger = logging.getLogger(__name__)
 
