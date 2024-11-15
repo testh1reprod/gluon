@@ -103,10 +103,12 @@ We support three presets, including `medium_quality`, `high_quality` and `best_q
 After the run is complete, model predictions on test dataset are saved into the `aga-output-<timestamp>.csv` file. It will be formatted according to optional `sample_submission.csv` file if provided.
 
 #### Overriding Configs
-You can override specific settings in the YAML configuration defined in the [config folder](https://github.com/autogluon/autogluon-assistant/tree/main/src/autogluon/assistant/configs) using
-the `config_overrides` parameter with Hydra syntax from the command line.
 
-Here’s an example command with some configuration overrides:
+You can override specific settings in the YAML configuration defined in the [config folder](https://github.com/autogluon/autogluon-assistant/tree/main/src/autogluon/assistant/configs) using
+the `config_overrides` parameter with format `"key1=value1, key2.nested=value2"` from the command line.
+
+
+Here are some example commands on using configuration overrides:
 
 ```bash
 aga run toy_data --config_overrides "feature_transformers.enabled_models=None, autogluon.predictor_fit_kwargs.time_limit=3600"
