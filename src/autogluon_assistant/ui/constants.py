@@ -123,7 +123,7 @@ STAGE_MESSAGES = {
 DATASET_OPTIONS = ["Sample Dataset", "Upload Dataset"]
 
 # Captions under DataSet Options
-CAPTIONS = ["Run with sample dataset", "Upload Train, Test and Output (Optional) Dataset"]
+CAPTIONS = ["Run with sample dataset", "Upload Train (Required), Test (Required) and Output (Optional) Dataset"]
 
 DEMO_URL = "https://automl-mm-bench.s3.amazonaws.com/autogluon-assistant/aga-kaggle-demo.mp4"
 

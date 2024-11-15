@@ -45,7 +45,7 @@ def generate_output_filename():
     timestamp = pd.Timestamp.now().strftime("%Y%m%d_%H%M%S")
     directory_path = os.path.join(user_data_dir, timestamp)
     os.makedirs(directory_path, exist_ok=True)
-    output_filepath = os.path.join(directory_path, "output.csv")
+    output_filepath = os.path.join(directory_path, "predictions.csv")
     return output_filepath
 
 

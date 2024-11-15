@@ -152,7 +152,7 @@ def display_description():
 
 @st.fragment
 def show_output_download_button(data, file_name):
-    st.download_button(label="💾&nbsp;&nbsp;Download Output", data=data, file_name=file_name, mime="text/csv")
+    st.download_button(label="💾&nbsp;&nbsp;Download Predictions", data=data, file_name=file_name, mime="text/csv")
 
 
 def show_cancel_task_button():
@@ -199,7 +199,7 @@ def run_autogluon_assistant(data_dir):
     if st.session_state.preset:
         command.extend(["--presets", PRESET_MAPPING[st.session_state.preset]])
     if st.session_state.config_overrides:
-        command.extend(["--config_overrides", " ".join(st.session_state.config_overrides)])
+        command.extend(["--config_overrides", ",".join(st.session_state.config_overrides)])
     command.extend(["--output-filename", output_filename])
     st.session_state.output_file = None
     st.session_state.output_filename = output_filename
