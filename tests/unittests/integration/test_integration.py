@@ -2,6 +2,7 @@ import os
 
 import pandas as pd
 import pytest
+from omegaconf import OmegaConf
 
 from autogluon.assistant import run_assistant
 
@@ -44,9 +45,35 @@ def titanic_data_path(tmp_path):
     return str(data_dir)
 
 
-def test_titanic_prediction(titanic_data_path):
-    # Run assistant
-    output_file = run_assistant(task_path=titanic_data_path, presets="medium_quality")
+@pytest.fixture
+def light_config():
+    return OmegaConf.create(
+        {
+            "llm": {"provider": "bedrock", "model": "anthropic.claude-3-5-haiku-20241022-v1:0"},
+            "autogluon": {
+                "predictor_fit_kwargs": {
+                    "presets": "medium_quality",  # lighter preset
+                    "time_limit": 300,  # 5 minutes timeout
+                }
+            },
+        }
+    )
+
+
+def test_titanic_prediction(titanic_data_path, light_config):
+    # Convert config to string overrides
+    config_overrides = [
+        f"llm.provider={light_config.llm.provider}",
+        f"llm.model={light_config.llm.model}",
+        f"autogluon.predictor_fit_kwargs.presets={light_config.autogluon.predictor_fit_kwargs.presets}",
+        f"autogluon.predictor_fit_kwargs.time_limit={light_config.autogluon.predictor_fit_kwargs.time_limit}",
+        "feature_transformers.enabled_models=null",
+    ]
+
+    # Run assistant with config overrides
+    output_file = run_assistant(
+        task_path=titanic_data_path, presets="medium_quality", config_overrides=config_overrides
+    )
 
     # Load original test data and predictions
     test_data = pd.read_csv(os.path.join(titanic_data_path, "test.csv"))
