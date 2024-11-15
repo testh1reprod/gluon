@@ -1,7 +1,7 @@
 import re
 
 import streamlit as st
-from constants import STAGE_COMPLETE_SIGNAL, STAGE_MESSAGES, STATUS_BAR_STAGE, TIME_LIMIT_MAPPING
+from constants import STAGE_COMPLETE_SIGNAL, STAGE_MESSAGES, STATUS_BAR_STAGE, SUCCESS_MESSAGE, TIME_LIMIT_MAPPING
 
 
 def parse_model_path(log):
@@ -50,7 +50,7 @@ def show_logs():
     if st.session_state.logs:
         status_container = st.empty()
         if st.session_state.return_code == 0:
-            status_container.success("Task completed successfully!")
+            status_container.success(SUCCESS_MESSAGE)
         else:
             status_container.error("Error detected in the process...Check the logs for more details")
         tab1, tab2 = st.tabs(["Messages", "Logs"])
@@ -149,9 +149,10 @@ def messages():
                 if model_path:
                     st.session_state.model_path = model_path
             if "Prediction complete" in line:
-                status_container.success("Task completed successfully!")
+                status_container.success(SUCCESS_MESSAGE)
                 progress.progress(100)
                 process_realtime_logs(line)
+                st.toast("Task completed successfully! 🎉", icon="✅")
                 break
             else:
                 for stage, progress_value in STATUS_BAR_STAGE.items():

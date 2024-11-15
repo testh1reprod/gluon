@@ -153,7 +153,7 @@ def display_description():
 
 @st.fragment
 def show_output_download_button(data, file_name):
-    st.download_button(label="💾&nbsp;&nbsp;Download Output", data=data, file_name=file_name, mime="text/csv")
+    st.download_button(label="💾&nbsp;&nbsp;Download Predictions", data=data, file_name=file_name, mime="text/csv")
 
 
 def show_cancel_task_button():

@@ -1,12 +1,10 @@
-import importlib.resources
 import logging
 import re
+from importlib.resources import files
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from omegaconf import OmegaConf
-
-from ..constants import CONFIGS
 
 
 def _get_default_config_path(
@@ -17,27 +15,22 @@ def _get_default_config_path(
     Returns Path to the config.yaml file
     """
     try:
-        # Get the package root directory using relative import
-        try:
-            package_paths = list(importlib.resources.files(__package__.split(".")[0]).iterdir())
-            package_root = next(p for p in package_paths if "assistant" in str(p))
-        except Exception:
-            # Fallback for development environment
-            package_root = Path(__file__).parent.parent
-
-        # Construct path to configs directory
-        config_path = package_root / CONFIGS / f"{presets}.yaml"
+        # Look directly in the assistant package for configs
+        config_path = files("autogluon.assistant") / "configs" / f"{presets}.yaml"
 
         if not config_path.exists():
             raise ValueError(
                 f"Config file not found at expected location: {config_path}\n"
-                f"Please ensure the config files are properly installed in the configs directory."
+                "Please ensure the config files are properly installed in the configs directory."
             )
-
         return config_path
-    except Exception as e:
-        logging.error(f"Error finding config file: {str(e)}")
-        raise
+    except Exception:
+        # Fallback for development environment
+        package_root = Path(__file__).parent.parent
+        config_path = package_root / "configs" / f"{presets}.yaml"
+        if not config_path.exists():
+            raise ValueError(f"Config file not found: {config_path}")
+        return config_path
 
 
 def parse_override(override: str) -> tuple:
