@@ -6,8 +6,7 @@ save_artifacts:
   append_timestamp: True
   path: "./aga-artifacts"
 feature_transformers:
-  enabled_models:
-    - CAAFE
+  enabled_models: []
   models:
     CAAFE:
       _target_: autogluon.assistant.transformer.CAAFETransformer
