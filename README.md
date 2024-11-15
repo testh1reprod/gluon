@@ -104,7 +104,7 @@ After the run is complete, model predictions on test dataset are saved into the 
 
 #### Overriding Configs
 You can override specific settings in the YAML configuration defined in the [config folder](https://github.com/boranhan/autogluon-assistant/tree/main/src/autogluon.assistant/configs) using
-the `config_overrides` parameter with format ["key1=value1", "key2.nested=value2"] from the command line.
+the `config_overrides` parameter with format `"key1=value1, key2.nested=value2"` from the command line.
 
 Here are some example commands on using configuration overrides:
 
