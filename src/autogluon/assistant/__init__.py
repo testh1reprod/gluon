@@ -189,7 +189,9 @@ def run_assistant(
     time_init_assistant = time_init_assistant_end - time_run_assistant_start
     time_used = time_init_assistant_end - time_run_assistant_start
     time_left = time_limit - time_used
-    logging.info(f"It took {time_init_assistant:.2f} seconds initializing AutoGluon-Assistant. Time left: {time_left:.2f}/{time_limit:.2f}")
+    logging.info(
+        f"It took {time_init_assistant:.2f} seconds initializing AutoGluon-Assistant. Time left: {time_left:.2f}/{time_limit:.2f}"
+    )
 
     task = assistant.preprocess_task(task)
 
@@ -197,11 +199,13 @@ def run_assistant(
     time_preprocess_task = time_preprocess_task_end - time_init_assistant_end
     time_used = time_preprocess_task_end - time_run_assistant_start
     time_left = time_limit - time_used
-    logging.info(f"It took {time_preprocess_task:.2f} seconds initializing AutoGluon-Assistant. Time left: {time_left:.2f}/{time_limit:.2f}")
+    logging.info(
+        f"It took {time_preprocess_task:.2f} seconds initializing AutoGluon-Assistant. Time left: {time_left:.2f}/{time_limit:.2f}"
+    )
 
     rprint("Model training starts...")
 
-    assistant.fit_predictor(task, time_limit = time_left)
+    assistant.fit_predictor(task, time_limit=time_left)
 
     rprint("[green]Model training complete![/green]")
 

@@ -89,7 +89,9 @@ class AutogluonTabularPredictor(Predictor):
             "predictor_fit_kwargs": predictor_fit_kwargs,
         }
         self.save_dataset_details(task)
-        self.predictor = TabularPredictor(**predictor_init_kwargs).fit(task.train_data, **predictor_fit_kwargs, time_limit=time_limit)
+        self.predictor = TabularPredictor(**predictor_init_kwargs).fit(
+            task.train_data, **predictor_fit_kwargs, time_limit=time_limit
+        )
 
         self.metadata["leaderboard"] = self.predictor.leaderboard().to_dict()
         return self
