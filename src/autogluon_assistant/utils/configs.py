@@ -70,16 +70,16 @@ def apply_overrides(config: Dict[str, Any], overrides: List[str]) -> Dict[str, A
     override_conf = {}
     overrides = ",".join(overrides)
     # Split by comma but preserve commas inside square brackets
-    overrides = re.split(r',(?![^\[]*\])', overrides)
-    
+    overrides = re.split(r",(?![^\[]*\])", overrides)
+
     for override in overrides:
         override = override.strip()  # Remove any whitespace
         key, value = parse_override(override)
-        
+
         # Handle list values enclosed in square brackets
-        if value.startswith('[') and value.endswith(']'):
+        if value.startswith("[") and value.endswith("]"):
             # Extract items between brackets and split by comma
-            items = value[1:-1].split(',')
+            items = value[1:-1].split(",")
             # Clean up each item and convert to list
             value = [item.strip() for item in items if item.strip()]
         else:
@@ -100,6 +100,7 @@ def apply_overrides(config: Dict[str, Any], overrides: List[str]) -> Dict[str, A
     # Convert override dict to OmegaConf and merge
     override_conf = OmegaConf.create(override_conf)
     return OmegaConf.merge(config, override_conf)
+
 
 def load_config(
     presets: str, config_path: Optional[str] = None, overrides: Optional[List[str]] = None
