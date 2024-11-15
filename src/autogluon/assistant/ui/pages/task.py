@@ -420,7 +420,7 @@ def setup_local_dataset():
     api_url = "https://api.github.com/repos/mli/ag-docs/contents/knot_theory"
     base_url = "https://raw.githubusercontent.com/mli/ag-docs/main/knot_theory/"
 
-    response = requests.get(api_url)
+    response = requests.get(api_url, headers={"User-Agent": "AutoGluon Assistant"})
     response.raise_for_status()
     all_files = response.json()
 
