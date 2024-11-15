@@ -49,7 +49,7 @@ def titanic_data_path(tmp_path):
 def light_config():
     return OmegaConf.create(
         {
-            "llm": {"provider": "bedrock", "model": "anthropic.claude-3-haiku-20240307-v1:0"},
+            "llm": {"provider": "bedrock", "model": "anthropic.claude-3-5-haiku-20241022-v1:0"},
             "autogluon": {
                 "predictor_fit_kwargs": {
                     "presets": "medium_quality",  # lighter preset
