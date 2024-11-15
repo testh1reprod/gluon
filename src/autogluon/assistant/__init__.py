@@ -5,6 +5,7 @@ import subprocess
 import sys
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
+from time import time
 from typing import List, Optional
 
 import pandas as pd
@@ -149,6 +150,8 @@ def run_assistant(
     ] = None,
     output_filename: Annotated[Optional[str], typer.Option(help="Output File")] = "",
 ) -> str:
+    time_run_assistant_start = time.time()
+
     logging.info("Starting AutoGluon-Assistant")
 
     if presets is None or presets not in PRESETS:
@@ -180,6 +183,10 @@ def run_assistant(
     rprint(task)
 
     assistant = TabularPredictionAssistant(config)
+
+    time_init_assistant_end = time.time()
+    time_limit = config.time_limit
+
     task = assistant.preprocess_task(task)
 
     rprint("Model training starts...")
