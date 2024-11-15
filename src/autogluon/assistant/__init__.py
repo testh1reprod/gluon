@@ -136,11 +136,11 @@ def launch_ui(port: int = typer.Option(8501, help="Port to run the UI on")):
 class TimingContext:
     start_time: float
     total_time_limit: float
-    
+
     @property
     def time_elapsed(self) -> float:
         return time.time() - self.start_time
-    
+
     @property
     def time_remaining(self) -> float:
         return self.total_time_limit - self.time_elapsed
