@@ -1,7 +1,7 @@
 import re
 
 import streamlit as st
-from constants import STAGE_COMPLETE_SIGNAL, STAGE_MESSAGES, STATUS_BAR_STAGE, TIME_LIMIT_MAPPING, SUCCESS_MESSAGE
+from constants import STAGE_COMPLETE_SIGNAL, STAGE_MESSAGES, STATUS_BAR_STAGE, SUCCESS_MESSAGE, TIME_LIMIT_MAPPING
 
 
 def parse_model_path(log):
