@@ -47,18 +47,17 @@ def titanic_data_path(tmp_path):
 
 @pytest.fixture
 def light_config():
-    return OmegaConf.create({
-        "llm": {
-            "provider": "bedrock",
-            "model": "anthropic.claude-3-haiku-20240307-v1:0"
-        },
-        "autogluon": {
-            "predictor_fit_kwargs": {
-                "presets": "medium_quality",  # lighter preset
-                "time_limit": 300  # 5 minutes timeout
-            }
+    return OmegaConf.create(
+        {
+            "llm": {"provider": "bedrock", "model": "anthropic.claude-3-haiku-20240307-v1:0"},
+            "autogluon": {
+                "predictor_fit_kwargs": {
+                    "presets": "medium_quality",  # lighter preset
+                    "time_limit": 300,  # 5 minutes timeout
+                }
+            },
         }
-    })
+    )
 
 
 def test_titanic_prediction(titanic_data_path, light_config):
@@ -67,14 +66,12 @@ def test_titanic_prediction(titanic_data_path, light_config):
         f"llm.provider={light_config.llm.provider}",
         f"llm.model={light_config.llm.model}",
         f"autogluon.predictor_fit_kwargs.presets={light_config.autogluon.predictor_fit_kwargs.presets}",
-        f"autogluon.predictor_fit_kwargs.time_limit={light_config.autogluon.predictor_fit_kwargs.time_limit}"
+        f"autogluon.predictor_fit_kwargs.time_limit={light_config.autogluon.predictor_fit_kwargs.time_limit}",
     ]
 
     # Run assistant with config overrides
     output_file = run_assistant(
-        task_path=titanic_data_path,
-        presets="medium_quality",
-        config_overrides=config_overrides
+        task_path=titanic_data_path, presets="medium_quality", config_overrides=config_overrides
     )
 
     # Load original test data and predictions

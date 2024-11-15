@@ -15,7 +15,6 @@ def _get_default_config_path(
     Returns Path to the config.yaml file
     """
     try:
-
         # Look directly in the assistant package for configs
         config_path = files("autogluon.assistant") / "configs" / f"{presets}.yaml"
 
