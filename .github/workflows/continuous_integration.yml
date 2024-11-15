@@ -9,6 +9,10 @@ permissions:
   contents: read
   pull-requests: write # for removing tags
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.event.pull_request.head.sha }}
+  cancel-in-progress: true
+
 jobs:
   permission_check:
     runs-on: ubuntu-latest
