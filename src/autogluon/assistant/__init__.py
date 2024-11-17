@@ -28,7 +28,7 @@ except PackageNotFoundError:
     __version__ = "unknown"
 
 
-__all__ = ["TabularPredictionAssistant", "TabularPredictionTask"]
+__all__ = ["TabularPredictionAssistant", "TabularPredictionTask", "run_assistant", "__version__"]
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.ERROR)
