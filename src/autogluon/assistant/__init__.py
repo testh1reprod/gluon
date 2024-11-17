@@ -3,6 +3,9 @@ import logging
 import os
 import subprocess
 import sys
+import time
+from contextlib import contextmanager
+from dataclasses import dataclass
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import List, Optional
@@ -129,6 +132,34 @@ def launch_ui(port: int = typer.Option(8501, help="Port to run the UI on")):
         sys.exit(1)
 
 
+@dataclass
+class TimingContext:
+    start_time: float
+    total_time_limit: float
+
+    @property
+    def time_elapsed(self) -> float:
+        return time.time() - self.start_time
+
+    @property
+    def time_remaining(self) -> float:
+        return self.total_time_limit - self.time_elapsed
+
+
+@contextmanager
+def time_block(description: str, timer: TimingContext):
+    """Context manager for timing code blocks and logging the duration."""
+    start_time = time.time()
+    try:
+        yield
+    finally:
+        duration = time.time() - start_time
+        logging.info(
+            f"It took {duration:.2f} seconds {description}. "
+            f"Time remaining: {timer.time_remaining:.2f}/{timer.total_time_limit:.2f}"
+        )
+
+
 def run_assistant(
     task_path: Annotated[str, typer.Argument(help="Directory where task files are included")],
     presets: Annotated[
@@ -149,6 +180,8 @@ def run_assistant(
     ] = None,
     output_filename: Annotated[Optional[str], typer.Option(help="Output File")] = "",
 ) -> str:
+    start_time = time.time()
+
     logging.info("Starting AutoGluon-Assistant")
 
     if presets is None or presets not in PRESETS:
@@ -165,39 +198,45 @@ def run_assistant(
         logging.error(f"Failed to load config: {e}")
         raise
 
-    rprint("🤖 [bold red] Welcome to AutoGluon-Assistant [/bold red]")
+    timer = TimingContext(start_time=start_time, total_time_limit=config.time_limit)
+    with time_block("initializing components", timer):
+        rprint("🤖 [bold red] Welcome to AutoGluon-Assistant [/bold red]")
 
-    rprint("Will use task config:")
-    rprint(OmegaConf.to_container(config))
+        rprint("Will use task config:")
+        rprint(OmegaConf.to_container(config))
 
-    task_path = Path(task_path).resolve()
-    assert task_path.is_dir(), "Task path does not exist, please provide a valid directory."
-    rprint(f"Task path: {task_path}")
+        task_path = Path(task_path).resolve()
+        assert task_path.is_dir(), "Task path does not exist, please provide a valid directory."
+        rprint(f"Task path: {task_path}")
 
-    task = TabularPredictionTask.from_path(task_path)
+        task = TabularPredictionTask.from_path(task_path)
 
-    rprint("[green]Task loaded![/green]")
-    rprint(task)
+        rprint("[green]Task loaded![/green]")
+        rprint(task)
 
-    assistant = TabularPredictionAssistant(config)
-    task = assistant.preprocess_task(task)
+        assistant = TabularPredictionAssistant(config)
 
-    rprint("Model training starts...")
+    with time_block("preprocessing task", timer):
+        task = assistant.preprocess_task(task)
 
-    assistant.fit_predictor(task)
+    with time_block("training model", timer):
+        rprint("Model training starts...")
 
-    rprint("[green]Model training complete![/green]")
+        assistant.fit_predictor(task, time_limit=timer.time_remaining)
 
-    rprint("Prediction starts...")
+        rprint("[green]Model training complete![/green]")
 
-    predictions = assistant.predict(task)
+    with time_block("making predictions", timer):
+        rprint("Prediction starts...")
 
-    if not output_filename:
-        output_filename = f"aga-output-{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv"
-    with open(output_filename, "w") as fp:
-        make_prediction_outputs(task, predictions).to_csv(fp, index=False)
+        predictions = assistant.predict(task)
 
-    rprint(f"[green]Prediction complete! Outputs written to {output_filename}[/green]")
+        if not output_filename:
+            output_filename = f"aga-output-{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        with open(output_filename, "w") as fp:
+            make_prediction_outputs(task, predictions).to_csv(fp, index=False)
+
+        rprint(f"[green]Prediction complete! Outputs written to {output_filename}[/green]")
 
     if config.save_artifacts.enabled:
         # Determine the artifacts_dir with or without timestamp

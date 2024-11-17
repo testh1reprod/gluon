@@ -2,7 +2,7 @@
 
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import numpy as np
 from autogluon.common.features.feature_metadata import FeatureMetadata
@@ -29,7 +29,7 @@ root_mean_square_logarithmic_error = make_scorer(
 
 
 class Predictor:
-    def fit(self, task: TabularPredictionTask) -> "Predictor":
+    def fit(self, task: TabularPredictionTask, time_limit: Optional[float] = None) -> "Predictor":
         return self
 
     def predict(self, task: TabularPredictionTask) -> Any:
@@ -57,7 +57,7 @@ class AutogluonTabularPredictor(Predictor):
     def describe(self) -> Dict[str, Any]:
         return dict(self.metadata)
 
-    def fit(self, task: TabularPredictionTask) -> "AutogluonTabularPredictor":
+    def fit(self, task: TabularPredictionTask, time_limit: Optional[float] = None) -> "AutogluonTabularPredictor":
         """Trains an AutoGluon TabularPredictor with parsed arguments. Saves trained predictor to
         `self.predictor`.
 
@@ -78,6 +78,7 @@ class AutogluonTabularPredictor(Predictor):
             **self.config.predictor_init_kwargs,
         }
         predictor_fit_kwargs = self.config.predictor_fit_kwargs.copy()
+        predictor_fit_kwargs.pop("time_limit", None)
 
         logger.info("Fitting AutoGluon TabularPredictor")
         logger.info(f"predictor_init_kwargs: {predictor_init_kwargs}")
@@ -88,7 +89,9 @@ class AutogluonTabularPredictor(Predictor):
             "predictor_fit_kwargs": predictor_fit_kwargs,
         }
         self.save_dataset_details(task)
-        self.predictor = TabularPredictor(**predictor_init_kwargs).fit(task.train_data, **predictor_fit_kwargs)
+        self.predictor = TabularPredictor(**predictor_init_kwargs).fit(
+            task.train_data, **predictor_fit_kwargs, time_limit=time_limit
+        )
 
         self.metadata["leaderboard"] = self.predictor.leaderboard().to_dict()
         return self
