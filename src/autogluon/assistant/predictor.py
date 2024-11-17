@@ -78,7 +78,6 @@ class AutogluonTabularPredictor(Predictor):
             **self.config.predictor_init_kwargs,
         }
         predictor_fit_kwargs = self.config.predictor_fit_kwargs.copy()
-        predictor_fit_kwargs.pop("time_limit", None)
 
         logger.info("Fitting AutoGluon TabularPredictor")
         logger.info(f"predictor_init_kwargs: {predictor_init_kwargs}")
