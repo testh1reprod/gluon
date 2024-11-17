@@ -5,7 +5,7 @@ BASE_DATA_DIR = "./user_data"
 
 # Preset configurations
 PRESET_DEFAULT_CONFIG = {
-    "Best Quality": {"time_limit": "4 hrs", "feature_generation": True},
+    "Best Quality": {"time_limit": "4 hrs", "feature_generation": False},
     "High Quality": {"time_limit": "1 hr", "feature_generation": False},
     "Medium Quality": {"time_limit": "10 mins", "feature_generation": False},
 }

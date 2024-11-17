@@ -93,6 +93,10 @@ def process_realtime_logs(line):
     stage = get_stage_from_log(line)
     if stage:
         if stage != st.session_state.current_stage:
+            if st.session_state.current_stage:
+                st.session_state.stage_status[st.session_state.current_stage].update(
+                            state="complete",
+                        )
             st.session_state.current_stage = stage
         if stage not in st.session_state.stage_status:
             st.session_state.stage_status[stage] = st.status(stage, expanded=False)
@@ -125,7 +129,6 @@ def process_realtime_logs(line):
             if not st.session_state.show_remaining_time:
                 st.session_state.stage_container[st.session_state.current_stage].append(line)
                 show_log_line(line)
-
 
 def messages():
     """
@@ -161,3 +164,9 @@ def messages():
                         status_container.info(stage)
                         break
             process_realtime_logs(line)
+            if st.session_state.current_stage:
+                st.session_state.stage_status[st.session_state.current_stage].update(
+                    state="running",
+                )
+
+

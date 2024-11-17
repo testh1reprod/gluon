@@ -126,7 +126,7 @@ def config_llm():
 def config_feature_generation():
     load_value("feature_generation")
     st.checkbox(
-        "Enable Feature Generation",
+        "Feature Generation (Beta Feature)",
         key="_feature_generation",
         on_change=store_value,
         args=["feature_generation"],
