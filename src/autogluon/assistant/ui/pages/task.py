@@ -133,7 +133,11 @@ def config_feature_generation():
     )
     # Show warning if checkbox is checked
     if checkbox:
-        st.warning("Feature Generation is an experimental feature. Results and performance may vary.", icon="⚠️")
+        st.warning(
+            "Feature Generation is an experimental feature which requires optional packages. Please install [requirements](https://github.com/autogluon/autogluon-assistant/blob/main/requirements.txt) with: "
+            "'pip install -r requirements.txt'",
+            icon="⚠️",
+        )
 
 
 def store_value_and_save_file(key):
