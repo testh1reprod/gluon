@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "autogluon.assistant"
-version = "0.0.1"
+version = "0.1.0"
 description = "An LLM-backed AI agent for competitive tabular machine learning"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -39,7 +39,7 @@ dev = [
     "ruff==0.4",
 ]
 
-beta = [
+all = [
     "caafe@git+https://github.com/anirudhdagar/CAAFE.git@main",
     "gensim>=4.3",
     "sentence-transformers>=3.1.0",
