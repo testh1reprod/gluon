@@ -10,7 +10,6 @@ from typing import Any, Dict, Mapping, Tuple
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
-from openfe import OpenFE, transform
 from sklearn.feature_selection import mutual_info_classif, mutual_info_regression
 from tqdm import tqdm
 
@@ -19,6 +18,13 @@ from .base import BaseFeatureTransformer
 warnings.filterwarnings(action="ignore")
 
 logger = logging.getLogger(__name__)
+
+try:
+    from openfe import OpenFE, transform
+except ImportError:
+    raise ImportError(
+        "OpenFE required for feature generation but not installed. Please install with: `pip install 'openfe>=0.0.12,<0.1'`"
+    )
 
 
 def _subsample(iterators, min_chunk_size: int = 100):

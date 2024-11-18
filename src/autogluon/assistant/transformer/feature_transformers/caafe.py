@@ -4,13 +4,19 @@ import warnings
 from typing import Mapping, Tuple
 
 import pandas as pd
-from caafe import CAAFEClassifier
-from caafe.run_llm_code import run_llm_code
 
 from .base import BaseFeatureTransformer
 
 logger = logging.getLogger(__name__)
 warnings.filterwarnings(action="ignore")
+
+try:
+    from caafe import CAAFEClassifier
+    from caafe.run_llm_code import run_llm_code
+except ImportError:
+    raise ImportError(
+        "CAAFE required for feature generation but not installed. Please install with: `pip install caafe@git+https://github.com/anirudhdagar/CAAFE.git@main`"
+    )
 
 
 class CAAFETransformer(BaseFeatureTransformer):

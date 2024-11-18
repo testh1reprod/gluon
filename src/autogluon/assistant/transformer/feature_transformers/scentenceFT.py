@@ -4,12 +4,9 @@ import warnings
 from collections import namedtuple
 from typing import Tuple
 
-import gensim.downloader as api
 import numpy as np
 import pandas as pd
 import torch
-from gensim.utils import tokenize
-from sentence_transformers import SentenceTransformer
 
 from .base import BaseFeatureTransformer
 
@@ -32,9 +29,23 @@ def get_device_info():
 class PretrainedEmbeddingTransformer(BaseFeatureTransformer):
     def __init__(self, model_name, **kwargs) -> None:
         if torch.cuda.is_available():
+            try:
+                if torch.cuda.is_available():
+                    from sentence_transformers import SentenceTransformer
+            except ImportError:
+                raise ImportError(
+                    "sentence_transformers required for feature generation but not installed. Please install with: `pip install 'sentence-transformers>=3.1.0'`"
+                )
             self.model_name = model_name
 
         if not torch.cuda.is_available():
+            try:
+                import gensim.downloader as api
+                from gensim.utils import tokenize
+            except ImportError:
+                raise ImportError(
+                    "gensim required for feature generation but not installed. Please install with: `pip install 'gensim>=4.3'`"
+                )
             logger.warning("CUDA is not found. For an optimized user experience, we switched to the glove embeddings")
             self.model_name = "glove-wiki-gigaword"
             self.dim = 300
