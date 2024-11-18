@@ -28,10 +28,10 @@ pip install autogluon.assistant
 
 #### Beta Features
 
-AG-A now supports automatic feature generation as part of its beta features. To enable these features, please install the beta version using the following command:
+AG-A now supports automatic feature generation as part of its beta features. To enable these features, please install the beta version dependencies using the following command:
 
 ```bash
-pip install -e ".[all]"
+pip install -r requirements.txt
 ```
 
 ### API Keys
