@@ -66,7 +66,7 @@ def test_titanic_prediction(titanic_data_path, light_config):
         f"llm.provider={light_config.llm.provider}",
         f"llm.model={light_config.llm.model}",
         f"autogluon.predictor_fit_kwargs.presets={light_config.autogluon.predictor_fit_kwargs.presets}",
-        f"autogluon.predictor_fit_kwargs.time_limit={light_config.autogluon.predictor_fit_kwargs.time_limit}",
+        f"time_limit={light_config.time_limit}",
         "feature_transformers.enabled_models=null",
     ]
 

@@ -45,7 +45,7 @@ def update_config_overrides():
     config_overrides = []
     if st.session_state.time_limit:
         config_overrides.append(
-            f"autogluon.predictor_fit_kwargs.time_limit={TIME_LIMIT_MAPPING[st.session_state.time_limit]}"
+            f"time_limit={TIME_LIMIT_MAPPING[st.session_state.time_limit]}"
         )
     if st.session_state.llm:
         config_overrides.append(f"llm.model={LLM_MAPPING[st.session_state.llm]}")

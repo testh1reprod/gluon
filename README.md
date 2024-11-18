@@ -111,9 +111,9 @@ the `config_overrides` parameter with format `"key1=value1, key2.nested=value2"`
 Here are some example commands on using configuration overrides:
 
 ```bash
-aga run toy_data --config_overrides "feature_transformers.enabled_models=None, autogluon.predictor_fit_kwargs.time_limit=3600"
+aga run toy_data --config_overrides "feature_transformers.enabled_models=None, time_limit=3600"
 
 # OR
 
-aga run toy_data --config_overrides "feature_transformers.enabled_models=None" --config_overrides "autogluon.predictor_fit_kwargs.time_limit=3600"
+aga run toy_data --config_overrides "feature_transformers.enabled_models=None" --config_overrides "time_limit=3600"
 ```
