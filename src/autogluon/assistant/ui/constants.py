@@ -20,7 +20,7 @@ PRESET_OPTIONS = ["Best Quality", "High Quality", "Medium Quality"]
 
 # Time limit configurations (in seconds)
 TIME_LIMIT_MAPPING = {
-    "1 min": 60,
+    "3 mins": 180,
     "10 mins": 600,
     "30 mins": 1800,
     "1 hr": 3600,
@@ -30,7 +30,7 @@ TIME_LIMIT_MAPPING = {
 
 DEFAULT_TIME_LIMIT = "10 mins"
 
-TIME_LIMIT_OPTIONS = ["1 min", "10 mins", "30 mins", "1 hr", "2 hrs", "4 hrs"]
+TIME_LIMIT_OPTIONS = ["3 mins", "10 mins", "30 mins", "1 hr", "2 hrs", "4 hrs"]
 
 # LLM configurations
 LLM_MAPPING = {
@@ -127,9 +127,11 @@ CAPTIONS = ["Run with sample dataset", "Upload Train (Required), Test (Required)
 
 DEMO_URL = "https://automl-mm-bench.s3.amazonaws.com/autogluon-assistant/aga-kaggle-demo.mp4"
 
-SAMPLE_DATASET_DESCRIPTION = """You are solving this data science tasks:The dataset presented here (knot theory) comprises a lot of numerical features. Some of the features may be missing, with nan value. Your task is to predict the 'signature', which has 18 unique integers. The evaluation metric is the classification accuracy."""
 LOGO_PATH = "static/page_icon.png"
 SUCCESS_MESSAGE = """
         🎉🎉Task completed successfully! If you found this useful, please consider:
         ⭐ [Starring our repository](https://github.com/autogluon/autogluon-assistant)
         """
+S3_URL = "https://automl-mm-bench.s3.us-east-1.amazonaws.com/aga/data/aga_sample_data.zip"
+LOCAL_ZIP_PATH = "sample_data.zip"
+EXTRACT_DIR = "sample_dataset"

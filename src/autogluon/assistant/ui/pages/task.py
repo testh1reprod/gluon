@@ -1,6 +1,7 @@
 import copy
 import os
 import subprocess
+import zipfile
 from pathlib import Path
 
 import pandas as pd
@@ -23,14 +24,16 @@ from autogluon.assistant.ui.constants import (
     BASE_DATA_DIR,
     CAPTIONS,
     DATASET_OPTIONS,
+    EXTRACT_DIR,
     INITIAL_STAGE,
     LLM_MAPPING,
     LLM_OPTIONS,
+    LOCAL_ZIP_PATH,
     PRESET_DEFAULT_CONFIG,
     PRESET_MAPPING,
     PRESET_OPTIONS,
     PROVIDER_MAPPING,
-    SAMPLE_DATASET_DESCRIPTION,
+    S3_URL,
     TIME_LIMIT_MAPPING,
     TIME_LIMIT_OPTIONS,
 )
@@ -402,37 +405,17 @@ def run_section():
 
 
 def setup_local_dataset():
-    """Download all files from GitHub directory to local directory"""
-    dataset_dir = Path("sample_dataset/knot_theory")
-    # Check if directory exists and required files exist
-    if dataset_dir.exists():
-        train_present = any("train" in file.name for file in dataset_dir.iterdir())
-        test_present = any("test" in file.name for file in dataset_dir.iterdir())
-        txt_present = any(file.suffix == ".txt" for file in dataset_dir.iterdir())
-        if train_present and test_present and txt_present:
-            return
-    dataset_dir.mkdir(parents=True, exist_ok=True)
-
-    description = SAMPLE_DATASET_DESCRIPTION
-    description_path = dataset_dir / "descriptions.txt"
-    if not description_path.exists():
-        description_path.write_text(description, encoding="utf-8")
-    api_url = "https://api.github.com/repos/mli/ag-docs/contents/knot_theory"
-    base_url = "https://raw.githubusercontent.com/mli/ag-docs/main/knot_theory/"
-
-    response = requests.get(api_url, headers={"User-Agent": "AutoGluon Assistant"})
-    response.raise_for_status()
-    all_files = response.json()
-
-    for file_info in all_files:
-        if file_info["type"] == "file":
-            filename = file_info["name"]
-            local_path = dataset_dir / filename
-            if not local_path.exists():
-                response = requests.get(base_url + filename)
-                response.raise_for_status()
-                local_path.write_bytes(response.content)
-    return dataset_dir
+    """Download dataset from S3 to local directory"""
+    if not os.path.exists(EXTRACT_DIR):
+        response = requests.get(S3_URL, stream=True)
+        if response.status_code == 200:
+            with open(LOCAL_ZIP_PATH, "wb") as f:
+                f.write(response.content)
+            with zipfile.ZipFile(LOCAL_ZIP_PATH, "r") as zip_ref:
+                zip_ref.extractall(EXTRACT_DIR)
+            os.remove(LOCAL_ZIP_PATH)
+        else:
+            st.error(f"Failed to download the file. HTTP status code: {response.status_code}")
 
 
 def get_sample_dataset_files(dataset_dir):
