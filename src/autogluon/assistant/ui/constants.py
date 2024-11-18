@@ -132,6 +132,6 @@ SUCCESS_MESSAGE = """
         🎉🎉Task completed successfully! If you found this useful, please consider:
         ⭐ [Starring our repository](https://github.com/autogluon/autogluon-assistant)
         """
-S3_URL = "https://automl-mm-bench.s3.us-east-1.amazonaws.com/aga/data/aga_sample_data.zip"
+S3_URL = "https://automl-mm-bench.s3.us-east-1.amazonaws.com/autogluon-assistant/sample_dataset.zip"
 LOCAL_ZIP_PATH = "sample_data.zip"
 EXTRACT_DIR = "sample_dataset"

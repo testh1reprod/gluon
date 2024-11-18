@@ -124,6 +124,7 @@ def config_llm():
     )
 
 
+@st.fragment
 def config_feature_generation():
     load_value("feature_generation")
     checkbox = st.checkbox(
@@ -411,16 +412,28 @@ def run_section():
 
 def setup_local_dataset():
     """Download dataset from S3 to local directory"""
-    if not os.path.exists(EXTRACT_DIR):
-        response = requests.get(S3_URL, stream=True)
-        if response.status_code == 200:
-            with open(LOCAL_ZIP_PATH, "wb") as f:
-                f.write(response.content)
-            with zipfile.ZipFile(LOCAL_ZIP_PATH, "r") as zip_ref:
-                zip_ref.extractall(EXTRACT_DIR)
-            os.remove(LOCAL_ZIP_PATH)
-        else:
-            st.error(f"Failed to download the file. HTTP status code: {response.status_code}")
+    try:
+        if not os.path.exists(EXTRACT_DIR):
+            response = requests.get(S3_URL, stream=True)
+            if response.status_code == 200:
+                with open(LOCAL_ZIP_PATH, "wb") as f:
+                    f.write(response.content)
+                try:
+                    with zipfile.ZipFile(LOCAL_ZIP_PATH, "r") as zip_ref:
+                        zip_ref.extractall(EXTRACT_DIR)
+                except zipfile.BadZipFile:
+                    st.error("Failed to extract the zip file.")
+                    return
+                finally:
+                    os.remove(LOCAL_ZIP_PATH)
+            else:
+                st.error(f"Failed to download the file. HTTP status code: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        st.error(f"An error occurred while downloading the sample dataset: {e}")
+    except OSError as e:
+        st.error(f"An error occurred while handling files or directories: {e}")
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
 
 
 def get_sample_dataset_files(dataset_dir):
