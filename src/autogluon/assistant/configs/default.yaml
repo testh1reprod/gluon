@@ -10,18 +10,18 @@ feature_transformers:
   enabled_models: []
   models:
     CAAFE:
-      _target_: autogluon.assistant.transformer.CAAFETransformer
+      _target_: autogluon.assistant.transformer.feature_transformers.caafe.CAAFETransformer
       eval_model: lightgbm
       llm_provider: ${llm.provider}
       llm_model: ${llm.model}
       num_iterations: 5
       optimization_metric: roc
     OpenFE:
-      _target_: autogluon.assistant.transformer.OpenFETransformer
+      _target_: autogluon.assistant.transformer.feature_transformers.openfe.OpenFETransformer
       n_jobs: 1
       num_features_to_keep: 10
     PretrainedEmbedding:
-      _target_: autogluon.assistant.transformer.PretrainedEmbeddingTransformer
+      _target_: autogluon.assistant.transformer.feature_transformers.scentenceFT.PretrainedEmbeddingTransformer
       model_name: 'all-mpnet-base-v2'
 autogluon:
   predictor_init_kwargs: {}

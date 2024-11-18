@@ -4,12 +4,9 @@ import warnings
 from collections import namedtuple
 from typing import Tuple
 
-import gensim.downloader as api
 import numpy as np
 import pandas as pd
 import torch
-from gensim.utils import tokenize
-from sentence_transformers import SentenceTransformer
 
 from .base import BaseFeatureTransformer
 
@@ -18,6 +15,23 @@ logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
 DeviceInfo = namedtuple("DeviceInfo", ["cpu_count", "gpu_devices"])
+
+if torch.cuda.is_available():
+    try:
+        if torch.cuda.is_available():
+            from sentence_transformers import SentenceTransformer
+    except ImportError:
+        raise ImportError(
+            "sentence_transformers required for feature generation but not installed. Please install with: `pip install 'sentence-transformers>=3.1.0'`"
+        )
+else:
+    try:
+        import gensim.downloader as api
+        from gensim.utils import tokenize
+    except ImportError:
+        raise ImportError(
+            "gensim required for feature generation but not installed. Please install with: `pip install 'gensim>=4.3'`"
+        )
 
 
 def get_device_info():

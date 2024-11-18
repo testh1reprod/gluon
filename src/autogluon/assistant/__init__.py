@@ -31,6 +31,7 @@ except PackageNotFoundError:
 __all__ = ["TabularPredictionAssistant", "TabularPredictionTask"]
 
 logging.basicConfig(level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.ERROR)
 
 
 def get_task(path: Path) -> TabularPredictionTask:

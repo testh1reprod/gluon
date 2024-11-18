@@ -49,11 +49,11 @@ def titanic_data_path(tmp_path):
 def light_config():
     return OmegaConf.create(
         {
+            "time_limit": 300,  # 5 minutes timeout
             "llm": {"provider": "bedrock", "model": "anthropic.claude-3-5-haiku-20241022-v1:0"},
             "autogluon": {
                 "predictor_fit_kwargs": {
                     "presets": "medium_quality",  # lighter preset
-                    "time_limit": 300,  # 5 minutes timeout
                 }
             },
         }
@@ -66,7 +66,7 @@ def test_titanic_prediction(titanic_data_path, light_config):
         f"llm.provider={light_config.llm.provider}",
         f"llm.model={light_config.llm.model}",
         f"autogluon.predictor_fit_kwargs.presets={light_config.autogluon.predictor_fit_kwargs.presets}",
-        f"autogluon.predictor_fit_kwargs.time_limit={light_config.autogluon.predictor_fit_kwargs.time_limit}",
+        f"time_limit={light_config.time_limit}",
         "feature_transformers.enabled_models=null",
     ]
 
