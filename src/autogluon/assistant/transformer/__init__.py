@@ -15,7 +15,7 @@ def get_openfe():
     return OpenFETransformer
 
 
-def get_pretrained():
+def get_sentenceft():
     from .feature_transformers.scentenceFT import PretrainedEmbeddingTransformer
 
     return PretrainedEmbeddingTransformer
@@ -27,5 +27,5 @@ __all__ = [
     "TransformTimeoutError",
     "get_caafe",
     "get_openfe",
-    "get_pretrained",
+    "get_sentenceft",
 ]
