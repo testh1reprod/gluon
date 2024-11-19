@@ -1,7 +1,15 @@
 import re
+import time
 
 import streamlit as st
-from constants import STAGE_COMPLETE_SIGNAL, STAGE_MESSAGES, STATUS_BAR_STAGE, SUCCESS_MESSAGE, TIME_LIMIT_MAPPING
+from constants import (
+    IGNORED_MESSAGES,
+    STAGE_COMPLETE_SIGNAL,
+    STAGE_MESSAGES,
+    STATUS_BAR_STAGE,
+    SUCCESS_MESSAGE,
+    TIME_LIMIT_MAPPING,
+)
 
 
 def parse_model_path(log):
@@ -90,6 +98,8 @@ def process_realtime_logs(line):
 
     Args:  line (str): A single line from the log stream to process.
     """
+    if any(ignored_msg in line for ignored_msg in IGNORED_MESSAGES):
+        return
     stage = get_stage_from_log(line)
     if stage:
         if stage != st.session_state.current_stage:
@@ -102,30 +112,24 @@ def process_realtime_logs(line):
             st.session_state.stage_status[stage] = st.status(stage, expanded=False)
 
     if st.session_state.current_stage:
-        st.session_state.stage_status[st.session_state.current_stage].update(
-            state="running",
-        )
         if "AutoGluon training complete" in line:
             st.session_state.show_remaining_time = False
         with st.session_state.stage_status[st.session_state.current_stage]:
             if "Fitting model" in line and not st.session_state.show_remaining_time:
                 st.session_state.progress_bar = st.progress(0, text="Elapsed Time for Fitting models:")
                 st.session_state.show_remaining_time = True
-                st.session_state.increment_time = 0
+                st.session_state.elapsed_time = time.time() - st.session_state.start_time
+                st.session_state.remaining_time = (
+                    TIME_LIMIT_MAPPING[st.session_state.time_limit] - st.session_state.elapsed_time
+                )
+                st.session_state.start_model_train_time = time.time()
             if st.session_state.show_remaining_time:
-                st.session_state.increment_time += 1
-                if st.session_state.increment_time <= TIME_LIMIT_MAPPING[st.session_state.time_limit]:
-                    progress_bar = st.session_state.progress_bar
-                    current_time = min(
-                        st.session_state.increment_time + 1,
-                        TIME_LIMIT_MAPPING[st.session_state.time_limit],
-                    )
-                    progress = current_time / TIME_LIMIT_MAPPING[st.session_state.time_limit]
-                    time_ratio = (
-                        f"Elapsed Time for Fitting models: | "
-                        f"{current_time}/{TIME_LIMIT_MAPPING[st.session_state.time_limit]} ({progress:.1%})"
-                    )
-                    progress_bar.progress(progress, text=time_ratio)
+                st.session_state.elapsed_time = time.time() - st.session_state.start_model_train_time
+                progress_bar = st.session_state.progress_bar
+                current_time = min(st.session_state.elapsed_time, st.session_state.remaining_time)
+                progress = current_time / st.session_state.remaining_time
+                time_ratio = f"Elapsed Time for Fitting models: | ({progress:.1%})"
+                progress_bar.progress(progress, text=time_ratio)
             if not st.session_state.show_remaining_time:
                 st.session_state.stage_container[st.session_state.current_stage].append(line)
                 show_log_line(line)
@@ -143,6 +147,7 @@ def messages():
         st.session_state.logs = ""
         progress = st.progress(0)
         status_container = st.empty()
+        st.session_state.start_time = time.time()
         status_container.info("Running Tasks...")
         for line in process.stdout:
             print(line, end="")

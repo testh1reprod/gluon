@@ -77,11 +77,14 @@ DEFAULT_SESSION_VALUES = {
     "stage_status": {},
     "show_remaining_time": False,
     "model_path": None,
-    "increment_time": 0,
+    "elapsed_time": 0,
     "progress_bar": None,
     "increment": 2,
     "zip_path": None,
     "stage_container": deepcopy(INITIAL_STAGE),
+    "start_time": None,
+    "remaining_time": 0,
+    "start_model_train_time": 0,
 }
 
 # Message to display different logging stage
@@ -135,3 +138,7 @@ SUCCESS_MESSAGE = """
 S3_URL = "https://automl-mm-bench.s3.us-east-1.amazonaws.com/autogluon-assistant/sample_dataset.zip"
 LOCAL_ZIP_PATH = "sample_data.zip"
 EXTRACT_DIR = "sample_dataset"
+IGNORED_MESSAGES = [
+    "Failed to identify the sample_submission_data of the task, it is set to None.",
+    "Too many requests, please wait before trying again",
+]
