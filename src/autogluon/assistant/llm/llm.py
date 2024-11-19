@@ -115,7 +115,7 @@ class LLMFactory:
     @staticmethod
     def get_bedrock_models() -> List[str]:
         try:
-            bedrock = boto3.client("bedrock", region_name=os.environ.get("AWS_DEFAULT_REGION", "us-west-2"))
+            bedrock = boto3.client("bedrock")
             response = bedrock.list_foundation_models()
             return [model["modelId"] for model in response["modelSummaries"]]
         except Exception as e:
@@ -165,7 +165,6 @@ class LLMFactory:
                 "temperature": config.temperature,
                 "max_tokens": config.max_tokens,
             },
-            region_name=os.environ.get("AWS_DEFAULT_REGION", "us-west-2"),
             verbose=config.verbose,
         )
 
