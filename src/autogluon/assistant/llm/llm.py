@@ -175,9 +175,11 @@ class LLMFactory:
         assert config.provider in valid_providers, f"{config.provider} is not a valid provider in: {valid_providers}"
 
         valid_models = cls.get_valid_models(config.provider)
-        assert (
-            config.model in valid_models
-        ), f"{config.model} is not a valid model in: {valid_models} for provider {config.provider}"
+        assert config.model in valid_models, (
+            f"{config.model} is not a valid model in: {valid_models} for provider {config.provider}. "
+            "Please check if the requested model is available in "
+            f"`AWS_DEFAULT_REGION={os.environ.get('AWS_DEFAULT_REGION', 'us-west-2')}`."
+        )
 
         if config.model not in WHITE_LIST_LLM:
             logger.warning(f"{config.model} is not on the white list. Our white list models include {WHITE_LIST_LLM}")
