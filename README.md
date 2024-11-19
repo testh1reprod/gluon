@@ -1,6 +1,6 @@
 # AutoGluon Assistant
 
-[![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://pypi.org/project/autogluon-assistant/)
+[![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://pypi.org/project/autogluon.assistant/)
 [![GitHub license](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![Continuous Integration](https://github.com/autogluon/autogluon-assistant/actions/workflows/lint.yml/badge.svg)](https://github.com/autogluon/autogluon-assistant/actions/workflows/lint.yml)
 
@@ -8,15 +8,31 @@ AutoGluon Assistant (AG-A) provides users a simple interface where they can inpu
 
 ## 💾 Installation
 
-AutoGluon is supported on Python 3.8 - 3.11 and is available on Linux, MacOS, and Windows.
+Installing from source: 
 
-You can install AutoGluon Assistant with:
+```bash
+# create a conda env
+conda create -n aga python=3.10
+conda activate aga
 
-```python
-pip install autogluon-assistant
+# clone repositories
+git clone https://github.com/autogluon/autogluon-assistant.git
+cd autogluon-assistant && pip install -e "." && cd ..
 ```
 
-Visit our [Installation Guide (WIP)](https://auto.gluon.ai/stable/install.html) for detailed instructions, including (TBA).
+or simply:
+
+```bash
+pip install autogluon.assistant
+```
+
+#### Beta Features
+
+AG-A now supports automatic feature generation as part of its beta features. To enable these features, please install the beta version dependencies using the following command:
+
+```bash
+pip install -r requirements.txt
+```
 
 ### API Keys
 
@@ -102,15 +118,17 @@ We support three presets, including `medium_quality`, `high_quality` and `best_q
 After the run is complete, model predictions on test dataset are saved into the `aga-output-<timestamp>.csv` file. It will be formatted according to optional `sample_submission.csv` file if provided.
 
 #### Overriding Configs
-You can override specific settings in the YAML configuration defined in the [config folder](https://github.com/boranhan/autogluon-assistant/tree/main/src/autogluon_assistant/configs) using
-the `config_overrides` parameter with Hydra syntax from the command line.
 
-Here’s an example command with some configuration overrides:
+You can override specific settings in the YAML configuration defined in the [config folder](https://github.com/autogluon/autogluon-assistant/tree/main/src/autogluon/assistant/configs) using
+the `config_overrides` parameter with format `"key1=value1, key2.nested=value2"` from the command line.
+
+
+Here are some example commands on using configuration overrides:
 
 ```bash
-aga run toy_data --config_overrides "feature_transformers.enabled_models=None, autogluon.predictor_fit_kwargs.time_limit=3600"
+aga run toy_data --config_overrides "feature_transformers.enabled_models=None, time_limit=3600"
 
 # OR
 
-aga run toy_data --config_overrides "feature_transformers.enabled_models=None" --config_overrides "autogluon.predictor_fit_kwargs.time_limit=3600"
+aga run toy_data --config_overrides "feature_transformers.enabled_models=None" --config_overrides "time_limit=3600"
 ```

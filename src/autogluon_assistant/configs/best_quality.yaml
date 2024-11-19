@@ -1,5 +1,0 @@
-feature_transformers:
-  enabled_models:
-    - CAAFE
-    - OpenFE
-    - PretrainedEmbedding

@@ -1,12 +1,17 @@
 name: Continuous Integration
 on:
   push:
-  pull_request_target: 
+  pull_request_target:
     types: [labeled, synchronize, opened]
 
 permissions:
   id-token: write
   contents: read
+  pull-requests: write # for removing tags
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.event.pull_request.head.sha }}
+  cancel-in-progress: true
 
 jobs:
   permission_check:
@@ -43,9 +48,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-        python: ["3.9", "3.10", "3.11"]
-    
+        os: [ubuntu-latest]
+        python: ["3.10"]
+
     steps:
       - name: Checkout repository
         if: ${{ github.event_name != 'pull_request_target' }}

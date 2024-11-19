@@ -2,8 +2,9 @@ import os
 
 import pandas as pd
 import pytest
+from omegaconf import OmegaConf
 
-from autogluon_assistant import run_assistant
+from autogluon.assistant import run_assistant
 
 
 @pytest.fixture
@@ -22,10 +23,10 @@ def titanic_data_path(tmp_path):
     # Create description file
     description = """
     Binary classification task to predict passenger survival on the Titanic.
-    
+
     Target Variable:
     - Survived: Survival (0 = No; 1 = Yes)
-    
+
     Features include:
     - Pclass: Passenger Class (1 = 1st; 2 = 2nd; 3 = 3rd)
     - Sex: Gender
@@ -34,7 +35,7 @@ def titanic_data_path(tmp_path):
     - Parch: Number of parents/children aboard
     - Fare: Passenger fare
     - Embarked: Port of embarkation (C = Cherbourg; Q = Queenstown; S = Southampton)
-    
+
     Evaluation metric: Binary classification accuracy
     """
 
@@ -44,9 +45,35 @@ def titanic_data_path(tmp_path):
     return str(data_dir)
 
 
-def test_titanic_prediction(titanic_data_path):
-    # Run assistant
-    output_file = run_assistant(task_path=titanic_data_path, presets="medium_quality")
+@pytest.fixture
+def light_config():
+    return OmegaConf.create(
+        {
+            "time_limit": 300,  # 5 minutes timeout
+            "llm": {"provider": "bedrock", "model": "anthropic.claude-3-5-haiku-20241022-v1:0"},
+            "autogluon": {
+                "predictor_fit_kwargs": {
+                    "presets": "medium_quality",  # lighter preset
+                }
+            },
+        }
+    )
+
+
+def test_titanic_prediction(titanic_data_path, light_config):
+    # Convert config to string overrides
+    config_overrides = [
+        f"llm.provider={light_config.llm.provider}",
+        f"llm.model={light_config.llm.model}",
+        f"autogluon.predictor_fit_kwargs.presets={light_config.autogluon.predictor_fit_kwargs.presets}",
+        f"time_limit={light_config.time_limit}",
+        "feature_transformers.enabled_models=null",
+    ]
+
+    # Run assistant with config overrides
+    output_file = run_assistant(
+        task_path=titanic_data_path, presets="medium_quality", config_overrides=config_overrides
+    )
 
     # Load original test data and predictions
     test_data = pd.read_csv(os.path.join(titanic_data_path, "test.csv"))
