@@ -177,7 +177,7 @@ class LLMFactory:
         assert config.model in valid_models, (
             f"{config.model} is not a valid model in: {valid_models} for provider {config.provider}. "
             "Please check if the requested model is available in "
-            f"`AWS_DEFAULT_REGION={os.environ.get('AWS_DEFAULT_REGION', 'us-west-2')}`."
+            f"`AWS_DEFAULT_REGION={os.environ.get('AWS_DEFAULT_REGION')}`."
         )
 
         if config.model not in WHITE_LIST_LLM:
