@@ -9,7 +9,7 @@ authors = [
     {name = "AutoGluon Community"}
 ]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8,<3.12"
 dependencies = [
     "autogluon.tabular[all]>=1.1,<2.0",
     "importlib-resources>=6.4.5,<7.0",
@@ -28,7 +28,7 @@ dependencies = [
     "python-calamine",
     "tenacity>=8.2.2,<10.0",
     "pandas>=2.2",
-    "streamlit>=1.37, <1.41",
+    "streamlit>=1.37,<1.41",
     "streamlit-aggrid>=1.0.2,<1.1",
     "streamlit-extras>=0.4,<0.6",
     "psutil>=5.9.8",
@@ -65,7 +65,7 @@ xfail_strict = true
 
 [tool.black]
 line-length = 119
-target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+target-version = ['py38', 'py39', 'py310', 'py311']
 
 [tool.isort]
 known_first_party = "autogluon.assistant"
