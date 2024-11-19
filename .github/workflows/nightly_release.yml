@@ -11,6 +11,7 @@ on:
 jobs:
   nightly_release:
     runs-on: ubuntu-latest
+    environment: pypi
     if: github.repository == 'autogluon/autogluon-assistant'
     permissions:
       contents: read

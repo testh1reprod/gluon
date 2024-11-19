@@ -10,6 +10,7 @@ on:
 jobs:
   test_release:
     runs-on: ubuntu-latest
+    environment: test_pypi
     permissions:
       contents: read
       id-token: write
