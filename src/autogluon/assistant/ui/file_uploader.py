@@ -44,7 +44,18 @@ def file_uploader():
     """
     Handle file uploads
     """
-    st.markdown("#### Upload Dataset")
+    header_html = """
+     <div class="header-hover">
+         <h4>Upload Dataset</h4>
+         <div class="tooltip">
+             Recommended file naming:<br>
+             • train.csv/xlsx<br>
+             • test.csv/xlsx<br>
+             • sample_dataset.csv/xlsx
+         </div>
+     </div>
+     """
+    st.markdown(header_html, unsafe_allow_html=True)
     uploaded_files = st.file_uploader(
         "Select the dataset", accept_multiple_files=True, label_visibility="collapsed", type=["csv", "xlsx"]
     )
