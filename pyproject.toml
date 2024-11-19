@@ -1,11 +1,13 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
-
 [project]
 name = "autogluon.assistant"
-version = "0.1.0"
-description = "An LLM-backed AI agent for competitive tabular machine learning"
+version = "0.0.1"
+description = "ML Assistant for Competitive Machine Learning"
+authors = [
+    {name = "AutoGluon Community"}
+]
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
@@ -48,6 +50,8 @@ aga = "autogluon.assistant:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["autogluon.assistant*"]
+namespaces = true
 
 [tool.setuptools.package-data]
 "autogluon.assistant" = ["configs/*.yaml", "ui/**/*"]
@@ -59,13 +63,13 @@ xfail_strict = true
 
 [tool.black]
 line-length = 119
-target-version = ['py38', 'py39', 'py310']
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
 
 [tool.isort]
 known_first_party = "autogluon.assistant"
 known_third_party = [
     "autogluon",
-    "caafe",
+    # "caafe",
     "joblib",
     "langchain",
     "numpy",
