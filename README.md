@@ -1,13 +1,18 @@
-<div align="left">
-  <img src="https://user-images.githubusercontent.com/16392542/77208906-224aa500-6aba-11ea-96bd-e81806074030.png" width="350">
-</div>
+<table>
+<tr>
+<td width="70%">
 
 # AutoGluon Assistant
-
 [![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://pypi.org/project/autogluon.assistant/)
 [![GitHub license](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![Continuous Integration](https://github.com/autogluon/autogluon-assistant/actions/workflows/continuous_integration.yml/badge.svg)](https://github.com/autogluon/autogluon-assistant/actions/workflows/continuous_integration.yml)
 
+</td>
+<td>
+<img src="https://user-images.githubusercontent.com/16392542/77208906-224aa500-6aba-11ea-96bd-e81806074030.png" width="350">
+</td>
+</tr>
+</table>
 
 AutoGluon Assistant (AG-A) provides users a simple interface where they can input their data, describe their problem, and receive a highly accurate and competitive ML solution — without writing any code. By leveraging the state-of-the-art AutoML capabilities of [AutoGluon](https://github.com/autogluon/autogluon) and integrating them with a Large Language Model (LLM), AG-A automates the entire data science pipeline. AG-A takes [AutoGluon](https://github.com/autogluon/autogluon)'s automation from three lines of code to zero, enabling users to solve new supervised learning tabular problems using only natural language descriptions.
 
